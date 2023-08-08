@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "vitest": "^0.34.1"
+  },
+  "scripts": {
+    "test": "vitest --run --reporter verbose",
+    "test:watch": "vitest"
+  }
+}
