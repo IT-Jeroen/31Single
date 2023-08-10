@@ -1,3 +1,101 @@
-body {
-    background-color: blue;
+/*
+Transform is viewport dimensions / pixels
+vw vh don't seem to be usable by itself
+translate x% is based upon elem dimension
+z-index the highest number sits on top
+*/
+
+:root{
+    --field-size: 1000px;
+    --field-padding: 10px;
+    --center-point: calc(var(--field-size)/2);
+    --center-width: 0.5vw;
+    --card-width: calc(var(--field-size)/10);
+    --half-card-width:calc(var(--card-width)/2);
+    --card-height: calc(var(--card-width)*1.3);
+    --half-card-height: calc(var(--card-height)/2);
+    --card-margin: 10px;
+}
+
+.background {
+    background-color: #1a1a1a;
+}
+
+.test{
+    width: 50vw;
+    height: 50vh;
+    background-color: red;
+}
+
+.playfield{
+    width: var(--field-size);
+    height: var(--field-size);
+    background-color: green;
+    /* margin: auto; */
+    /* position: absolute;
+    top: 0px;
+    left: 0px; */
+    transform: translate(calc(50vw - var(--center-point)), calc(50vh - var(--center-point)));
+}
+
+.grid-v{
+    height: calc(var(--card-width) - 1px);
+    width: calc(var(--card-height) - 1px);
+    border: 1px solid black; 
+
+}
+
+.grid-h{
+    width: calc(var(--card-width) - 1px);
+    height: calc(var(--card-height) - 1px);
+    border: 1px solid black;
+
+}
+
+.flex{
+    display: flex;
+}
+
+.card {
+    width: var(--card-width);
+    height: var(--card-height);
+    background-color: white;
+    /* based upon parent element */
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    /* display: flex; */
+    
+}
+
+/* .move{
+    width: var(--card-width);
+    height: var(--card-height);
+    background-color: white;
+    transform: translate(50vw, 50vh);
+} */
+
+.centre{
+    /* transform: translate3d(400px,400px,0px); */
+    transform: translate(calc(var(--center-point) - var(--half-card-width)), calc(var(--center-point) - var(--half-card-height)));
+    /* transform: translate(var(--center-point), var(--center-point)); */
+
+}
+
+.north {
+    /* start coordinates are pX 0, pY 0 */
+    transform: translate(calc(var(--center-point) - var(--half-card-width)), 0px);
+}
+
+.south {
+    transform: translate(calc(var(--center-point) - var(--half-card-width)), calc(var(--field-size) - var(--card-height)));
+}
+
+.west{
+    transform: translate(0, calc(var(--center-point) - var(--half-card-height)));
+    /* transform: translate(calc(var(--center-point) - var(--half-card-width)), calc(var(--center-point) - var(--half-card-height))); */
+}
+
+.east{
+    transform: translate(calc(var(--field-size) - var(--card-width)), calc(var(--center-point) - var(--half-card-height)));
 }
