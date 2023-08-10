@@ -8,42 +8,36 @@
 </head>
 <body class="background">
     <!-- <h1>Test Playfield</h1> -->
-    <!-- <div class="test"></div> -->
     <div class="playfield">
         <div class="card centre" style="z-index: 0;">0</div>
-        <!-- Every next element is a full card height lower in pX pY fixed with absolute postion-->
-        <div class="card north" style="z-index: 2;">1</div>
-        <!-- Doesn't work especialy not for the y-axis -->
-        <!-- <div class="move">move</div> -->
-        <div class="card south" style="z-index: 1;">2</div>
-        <div class="card west" style="z-index: 2;">3</div>
-        <div class="card east" style="z-index: 3;">4</div>
-        <!-- <div class="flex">
-            <div class="grid-h">0</div>
-            <div class="grid-h">1</div>
-            <div class="grid-h">2</div>
-            <div class="grid-h">3</div>
-            <div class="grid-h">4</div>
-            <div class="grid-h">5</div>
-            <div class="grid-h">6</div>
-            <div class="grid-h">7</div>
-            <div class="grid-h">8</div>
-            <div class="grid-h">9</div>
+
+        <!-- <div class="north start-pos flex">
+            <div class="test-card" style="z-index: 1;">N1</div>
+            <div class="test-card" style="z-index: 2;">N2</div>
+            <div class="test-card" style="z-index: 3;">N3</div>
         </div> -->
-        <!-- <div class=>
-            <div class="grid-v">0</div>
-            <div class="grid-v">1</div>
-            <div class="grid-v">2</div>
-            <div class="grid-v">3</div>
-            <div class="grid-v">4</div>
-            <div class="grid-v">5</div>
-            <div class="grid-v">6</div>
-            <div class="grid-v">7</div>
-            <div class="grid-v">8</div>
-            <div class="grid-v">9</div>
+
+        <div class="north-a start-pos flex">
+            <div class="stack flex">
+                <div class="test-card start-pos" style="background-color: red;">N1</div>
+                <div class="stack flex">
+                    <div class="test-card start-pos" style="background-color: blue;">N2</div>
+                    <div class="stack flex">
+                        <div class="test-card start-pos" style="background-color: gold;">N3</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- <div class="grid-h">11</div> -->
-    </div> -->
+        
+        <div class="card south" style="z-index: 1;">S1</div>
+        <div class="card south" style="z-index: 1;">S2</div>
+        <div class="card south" style="z-index: 1;">S3</div>
+        
+        <div class="card west" style="z-index: 2;">3</div>
+
+        <div class="card east" style="z-index: 3;">4</div>
+    
+    </div>
     
 </body>
 <script src="./index.js"></script>
