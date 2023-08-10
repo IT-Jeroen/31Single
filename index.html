@@ -19,7 +19,7 @@
 
         <div class="north-a start-pos flex">
             <div class="stack flex">
-                <div class="test-card start-pos" style="background-color: red;">N1</div>
+                <div class="test-card start-pos" style="background-color: red; z-index:3;">N1</div>
                 <div class="stack flex">
                     <div class="test-card start-pos" style="background-color: blue;">N2</div>
                     <div class="stack flex">
@@ -29,9 +29,13 @@
             </div>
         </div>
         
-        <div class="card south" style="z-index: 1;">S1</div>
-        <div class="card south" style="z-index: 1;">S2</div>
-        <div class="card south" style="z-index: 1;">S3</div>
+        <!-- <div class="card south" style="z-index: 1;">S1</div>
+        <div class="card south" style="z-index: 2;">S2</div>
+        <div class="card south" style="z-index: 3;">S3</div> -->
+
+        <div class="card south-0" style="background-color: red; z-index: 1;">S1</div>
+        <div class="card south-1" style="background-color: blue; z-index: 2;">S2</div>
+        <div class="card south-2" style="background-color: gold; z-index: 3;">S3</div>
         
         <div class="card west" style="z-index: 2;">3</div>
 
