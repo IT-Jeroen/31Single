@@ -32,23 +32,6 @@
     left: 0px;
 }
 
-.card {
-    width: var(--card-width);
-    height: var(--card-height);
-    background-color: white;
-    border: 1px solid black;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    
-}
-
-.card:hover{
-    background-color: blueviolet;
-    z-index: 100;
-    transform: translate(2px, -25px);
-}
-
 .card-holder{
     display: flex;
     position: absolute;
@@ -56,55 +39,16 @@
     left: 0px;
 }
 
-/* 
-Other games don't change the z-index
-The z-index gets in the way. (1 directional)
-Front card will cover multiple back cards in a stacked layer
-*/
 
-/* .card-holder:hover{
-    z-index: 100;
-} */
-
-.hover-full{
-    /* display: flex; */
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: var(--card-width);
-    height: var(--card-height);
-    background-color: white;
-}
-
-.hover-stacked{
-    /* display: flex; */
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: var(--card-offset);
-    height: var(--card-height);
-    overflow: hidden;
-    background-color: white;
-}
-
-/* Still not working as z-index takes the whole visible element into account */
-.hover-stacked:hover{
-    z-index: 100;
-    overflow: visible;
-    /* background-color: purple; */
-}
-
-
-.card-simple{
+.card{
     width: var(--card-width);
     height: var(--card-height);
     background-color: white;
     border: 1px solid black;
 }
 
-.card-simple:hover{
+.card:hover{
     background-color: blueviolet;
-    /* z-index: 100; */
     transform: translate(2px, -25px);
     transition: transform 0.1s ease-in-out;
 }
