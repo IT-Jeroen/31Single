@@ -20,15 +20,7 @@
 .background {
     background-color: #1a1a1a;
 }
-/* .test{
-    width: 600px;
-    height: 600px;
-    background-color: red;
-} */
 
-.rotate{
-    transform: rotate(0deg);
-}
 
 .playfield{
     width: var(--field-size);
@@ -58,56 +50,11 @@
     border: 1px solid black;
 }
 
-/* .move{
-    transform: translate(0px, 600px);
-    transition: transform 0.6s ease-in-out;
-} */
-
 .card:hover{
     background-color: blueviolet;
     transform: translate(2px, -25px);
-    /* transition: transform 0.1s ease-in-out; */
+    transition: transform 0.1s ease-in-out;
 }
-
-.deck{
-    transform: translate(calc(var(--center-point) - var(--half-card-width)), calc(var(--center-point) - var(--half-card-height)))
-}
-
-.deck-0{
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    /* transition: transform 0.6s ease-in-out; */
-}
-
-.deck-1{
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    /* transition: transform 0.6s ease-in-out; */
-}
-
-.deck-2{
-    position: absolute;
-    top: 1px;
-    left: -2px;
-    /* transition: transform 0.6s ease-in-out; */
-}
-
-.deck-3{
-    position: absolute;
-    top: 2px;
-    left: 1px;
-    transition: transform 0.6s ease-in-out;
-}
-
-.deck-4{
-    position: absolute;
-    top: 1px;
-    left: 1px;
-    transition: transform 0.6s ease-in-out;
-}
-
 
 .offset-0{
     transform: translate(calc(var(--card-offset) * 0), 0px);
@@ -152,7 +99,6 @@
 .centre-3{
     transform: translate(calc((var(--card-width) + var(--card-margin)) * 3 ), 0px);
 }
-
 
 .centre{
     /* transform: translate(calc(var(--center-point) - var(--half-card-width)), calc(var(--center-point) - var(--half-card-height))); */
