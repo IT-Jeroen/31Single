@@ -12,18 +12,18 @@
     --delta-card-width-height: calc(var(--half-card-height) - var(--half-card-width));
     --card-margin: 10px;
     --card-offset: 25px;
-    --cards-inhand: 3;
+    --cards-inhand: 4;
+    --cards-in-hand-north: 5;
+    --cards-in-hand-east: 4;
+    --cards-in-hand-south: 7;
+    --cards-in-hand-west: 2;
+
 }
 
 .background {
     background-color: #1a1a1a;
 }
 
-.test{
-    width: 50vw;
-    height: 50vh;
-    background-color: red;
-}
 
 .playfield{
     width: var(--field-size);
@@ -58,21 +58,6 @@
     background-color: blueviolet;
 }
 
-.test-card{
-    width: var(--card-width);
-    height: var(--card-height);
-    background-color: white;
-}
-
-.test-card:hover{
-    z-index: 100;
-    background-color: blueviolet;
-}
-
-
-.stack{
-    transform: translate(var(--card-offset), 0px)
-}
 
 .offset-0{
     transform: translate(calc(var(--card-offset) * 0), 0px)
@@ -90,132 +75,40 @@
     transform: translate(calc(var(--card-offset) * 3), 0px)
 }
 
+.offset-4{
+    transform: translate(calc(var(--card-offset) * 4), 0px)
+}
+
+.offset-5{
+    transform: translate(calc(var(--card-offset) * 5), 0px)
+}
+
+.offset-6{
+    transform: translate(calc(var(--card-offset) * 6), 0px)
+}
+
 .centre{
     transform: translate(calc(var(--center-point) - var(--half-card-width)), calc(var(--center-point) - var(--half-card-height)));
     transition: transform 0.6s ease-in-out;
 }
 
-.north {
-    /* transform: translate(calc(var(--center-point) - var(--half-card-width)), 0px); */
-    transform: translate(calc(var(--center-point) - calc(var(--half-card-width) * var(--cards-inhand))), 0px)
+
+.south{
+    /* cards in hand - 1*/
+    transform: translate(calc(var(--center-point) - calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-south) - 1)) / 2)), calc(var(--field-size) - var(--card-height))) rotate(0deg);
 }
 
-.north-a {
-    transform: translate(calc(var(--center-point) - calc((var(--half-card-width) - var(--card-offset)) * var(--cards-inhand))), 0px);
+.north{
+    /* cards in hand - 1*/
+    transform: translate(calc(var(--center-point) + calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-north) - 1)) / 2)), var(--card-height)) rotate(180deg);
 }
 
 .west{
-    /* transform: translate(var(--delta-card-width-height), calc(var(--center-point) - var(--half-card-height))) rotate(90deg); */
-    transform: translate(calc(var(--half-card-height) + calc(var(--half-card-width) * var(--cards-inhand) * -1)), calc(var(--center-point) - var(--half-card-height))) rotate(90deg);
-}
-
-.west-a{
-    transform: translate(var(--card-height), calc(var(--center-point) - var(--half-card-height))) rotate(90deg);
-    /* transform: translate(calc(var(--half-card-height) + calc(var(--half-card-width) * var(--cards-inhand) * -1)), calc(var(--center-point) - var(--half-card-height))) rotate(90deg); */
+    /* cards in hand - 1*/
+    transform: translate(var(--card-height), calc(var(--center-point) - calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-west) - 1)) / 2))) rotate(90deg);
 }
 
 .east{
-    transform: translate(calc(var(--field-size) - var(--card-width) - var(--delta-card-width-height)), calc(var(--center-point) - var(--half-card-height))) rotate(-90deg);
-}
-
-.east-a{
-    transform: translate(calc(var(--field-size) - var(--card-height)), calc(var(--center-point) + calc((var(--card-width) + var(--card-offset) * 3) / 2))) rotate(270deg);
-}
-
-.east-0{
-    /* Non Centered Hand, Non stacked */
-    /* transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)),calc(var(--center-point) + calc(var(--card-width) * 0))) rotate(-90deg); */
-
-    /* Centered Hand, Non stacked */
-    /* transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)),calc(calc(var(--center-point) + calc(var(--card-width) * 0)) - calc(var(--half-card-width) * var(--cards-inhand)))) rotate(-90deg); */
-
-    /* Non Centered Hand, Stacked */
-    /* transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)), calc(var(--center-point) + calc(var(---card-offset) * 0))) rotate(-90deg); */
-
-    /* Non Centered Hand, Stacked */
-    /* transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)), calc(var(--center-point) + calc(var(---card-offset) * 0) + calc(var(--card-offset) * var(--cards-inhand)))) rotate(-90deg); */
-    transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)), calc(var(--center-point) - var(--half-card-width) - calc(var(--card-offset) * 0))) rotate(-90deg);
-
-    /* transition: transform 0.6s ease-in-out; */
-}   
-
-.east-1{
-    /* Non Centered Hand, Non stacked */
-    /* transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)),calc(var(--center-point) + calc(var(--card-width) * 1))) rotate(-90deg); */
-
-    /* Centered Hand, Non stacked */
-    /* transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)),calc(calc(var(--center-point) + calc(var(--card-width) * 1)) - calc(var(--half-card-width) * var(--cards-inhand)))) rotate(-90deg); */
-
-    /* Non Centered Hand, Stacked */
-    /* transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)), calc(var(--center-point) + calc(var(---card-offset) * 1))) rotate(-90deg); */
-
-    /* Non Centered Hand, Stacked */
-    /* transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)), calc(var(--center-point) + calc(var(---card-offset) * 1) + calc(var(--card-offset) * var(--cards-inhand)))) rotate(-90deg); */
-    transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)), calc(var(--center-point) - var(--half-card-width) - calc(var(--card-offset) * 1))) rotate(-90deg);
-}
-
-.east-2{
-    /* Non Centered Hand, Non stacked */
-    /* transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)),calc(var(--center-point) + calc(var(--card-width) * 2))) rotate(-90deg); */
-
-    /* Centered Hand, Non stacked */
-    /* transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)),calc(calc(var(--center-point) + calc(var(--card-width) * 2)) - calc(var(--half-card-width) * var(--cards-inhand)))) rotate(-90deg); */
-
-    /* Non Centered Hand, Stacked */
-    /* transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)), calc(var(--center-point) + calc(var(---card-offset) * 2))) rotate(-90deg); */
-    /* Non Centered Hand, Stacked */
-    /* transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)), calc(var(--center-point) + calc(var(---card-offset) * 2) + calc(var(--card-offset) * var(--cards-inhand)))) rotate(-90deg); */
-    transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)), calc(var(--center-point) - var(--half-card-width) - calc(var(--card-offset) * 2))) rotate(-90deg);
-}
-
-.east-3 {
-    transform: translate(calc(var(--field-size) - var(--card-height) + var(--delta-card-width-height)), calc(var(--center-point) - var(--half-card-width) - calc(var(--card-offset) * 3))) rotate(-90deg);
-}
-
-
-
-.south {
-    transform: translate(calc(var(--center-point) - var(--half-card-width)), calc(var(--field-size) - var(--card-height)));
-}
-
-.south-0 {
-    /* Non Centered Hand, Non stacked */
-    /* transform: translate(calc(var(--center-point) + calc(var(--card-width) * 0)), calc(var(--field-size) - var(--card-height))); */
-
-    /* Centered Hand, Non stacked */
-    /* transform: translate(calc(var(--center-point) + calc(var(--card-width) * 0) - calc(var(--half-card-width) * var(--cards-inhand))), calc(var(--field-size) - var(--card-height))); */
-
-    /* Non Centered Hand, Stacked */
-    /* transform: translate(calc(var(--center-point) + calc(var(--card-offset) * 0)), calc(var(--field-size) - var(--card-height))); */
-
-    /* Centered Hand, Stacked */
-    transform: translate(calc(var(--center-point) + calc(var(--card-offset) * 0) - calc(var(--card-offset) * var(--cards-inhand))), calc(var(--field-size) - var(--card-height)));
-}
-
-.south-1 {
-    /* Non Centered Hand, Non stacked */
-    /* transform: translate(calc(var(--center-point) + calc(var(--card-width) * 1)), calc(var(--field-size) - var(--card-height))); */
-
-    /* Centered Hand, Non stacked */
-    /* transform: translate(calc(var(--center-point) + calc(var(--card-width) * 1) - calc(var(--half-card-width) * var(--cards-inhand))), calc(var(--field-size) - var(--card-height))); */
-
-    /* Non Centered Hand, Stacked */
-    /* transform: translate(calc(var(--center-point) + calc(var(--card-offset) * 1)), calc(var(--field-size) - var(--card-height))); */
-
-    /* Centered Hand, Stacked */
-    transform: translate(calc(var(--center-point) + calc(var(--card-offset) * 1) - calc(var(--card-offset) * var(--cards-inhand))), calc(var(--field-size) - var(--card-height)));
-}
-
-.south-2 {
-    /* Non Centered Hand, Non stacked */
-    /* transform: translate(calc(var(--center-point) + calc(var(--card-width) * 2)), calc(var(--field-size) - var(--card-height))); */
-
-    /* Centered Hand, Non stacked */
-    /* transform: translate(calc(var(--center-point) + calc(var(--card-width) * 2) - calc(var(--half-card-width) * var(--cards-inhand))), calc(var(--field-size) - var(--card-height))); */
-
-    /* Non Centered Hand, Stacked */
-    /* transform: translate(calc(var(--center-point) + calc(var(--card-offset) * 2)), calc(var(--field-size) - var(--card-height))); */
-
-    /* Centered Hand, Stacked */
-    transform: translate(calc(var(--center-point) + calc(var(--card-offset) * 2) - calc(var(--card-offset) * var(--cards-inhand))), calc(var(--field-size) - var(--card-height)));
+    /* cards in hand - 1*/
+    transform: translate(calc(var(--field-size) - var(--card-height)), calc(var(--center-point) + calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-east) - 1)) / 2))) rotate(270deg);
 }
