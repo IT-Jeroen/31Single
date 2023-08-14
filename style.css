@@ -1,5 +1,5 @@
 :root{
-    --field-size: 1200px;
+    --field-size: 1000px;
     --center-point: calc(var(--field-size)/2);
     --card-width: calc(var(--field-size)/10);
     --half-card-width:calc(var(--card-width)/2);

@@ -17,6 +17,9 @@ startGame.addEventListener('click', ()=> {
     dealCards(dealingCards);
 })
 
+/* Build playfield dynamicaly and query viewport dimensions
+Set playfield dimensions according to smallest value
+*/
 
 function dealCards(num){
     for (let i = 0; i < num; i++){
@@ -51,7 +54,7 @@ function repositionStarElem(startElem, endElem, location=''){
     console.log('End',rectEnd.x, rectEnd.y);
     console.log('Delta', rectEnd.x - rectStart.x, rectEnd.y - rectStart.y)
 
-    let fieldSize = 1200;
+    let fieldSize = 1000;
     let cardWidth = fieldSize / 10;
     let cardHeight = cardWidth * 1.3;
     let offset = ((cardHeight - cardWidth)/ 2)
