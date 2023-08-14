@@ -1,63 +1,43 @@
 const players = [
-    {"id":'012345', "name":'Owen', "location": 'south', 'cards-in-hand':[], 'wins': 0, 'orientation': '0deg' },
-    {"id":'012345', "name":'Ziva', "location": 'west', 'cards-in-hand':[], 'wins': 0, 'orientation': '90deg'  },
-    {"id":'012345', "name":'Dad', "location": 'north', 'cards-in-hand':[], 'wins': 0, 'orientation': '180deg'  },
-    {"id":'012345', "name":'Mum', "location": 'east', 'cards-in-hand':[], 'wins': 0, 'orientation': '270deg'  }
+    {"id":'012345', "name":'Owen', "location": 'south', 'cards-in-hand':{}, 'wins': 0, 'orientation': '0deg' },
+    {"id":'012345', "name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'wins': 0, 'orientation': '90deg'  },
+    {"id":'012345', "name":'Dad', "location": 'north', 'cards-in-hand':{}, 'wins': 0, 'orientation': '180deg'  },
+    {"id":'012345', "name":'Mum', "location": 'east', 'cards-in-hand':{}, 'wins': 0, 'orientation': '270deg'  }
 ]
+
 
 const dealingCards = 3;
 
 const playFieldElem = document.querySelector('#playfield')
 const startGame = document.querySelector('#start')
 const cardDeck = document.querySelector('#deck');
-// const topDeckCard = cardDeck.lastElementChild
 
 startGame.addEventListener('click', ()=> {
     // createPlayers(players);
     dealCards(dealingCards);
 })
 
-/* Build playfield dynamicaly and query viewport dimensions
-Set playfield dimensions according to smallest value
-*/
-
-// function dealCards(num){
-//     for (let i = 0; i < num; i++){
-//         players.forEach((player,index)=>{
-//             const playerHand = document.querySelector(`#${player.name}`);
-//             const playerCardHolder = createCardHolder(['card-holder',`offset-${i}`]);
-//             const playerCard = createCard(["card"])
-//             addChildElement(playerHand, playerCardHolder);
-
-//             const deckElem = createCard(["card","deck-3"]);
-//             addChildElement(cardDeck,deckElem);
-
-//             repositionStarElem(deckElem, playerCardHolder, player.location);
-
-//             setTimeout(() => {
-//                 addChildElement(playerCardHolder,playerCard);
-//                 // deckElem.remove();
-//               }, 600);
-//         })
-//     }
-//     console.log(players)
-// }
 
 function dealCards(num){
+    let id = 0;
+
     for (let i = 0; i < num; i++){
         players.forEach((player,index)=>{
             // create deck card
-            const deckElem = createCard(["card","deck-3"]);
+            const deckElem = createCard(["card","deck-deal"]);
+            addIdToElement(deckElem, id)
             addChildElement(playFieldElem,deckElem);
 
+            // add card to player
+            player["cards-in-hand"][id] = {x:0, y:0};
+
             // calc player card position
-            let cardPosition = calcCardPosition(0, player.location);
+            calcCardPositions(player)
 
             // move deck card to player
-            stackToPlayer(deckElem,cardPosition, player.orientation);
+            stackToPlayer(player);
 
-            // add card to player
-            player["cards-in-hand"].push(deckElem);
+            id += 1;
         })
     }
     console.log(players)
@@ -76,79 +56,69 @@ let eastTop = center - (cardHeight /2);
 let deckOriginX = center - (cardWidth /2);
 let deckOriginY = center - (cardHeight /2);
 
-function stackToPlayer(cardElem,cardPos, orientation){
-    cardElem.style.transform = `translate(${cardPos.x}px, ${cardPos.y}px) rotate(${orientation})`;
+function stackToPlayer(player){
+
+    let cardsInHand = player['cards-in-hand']
+
+    Object.keys(cardsInHand).forEach(key =>{
+        const cardPos = cardsInHand[key];
+        const cardElem = document.getElementById(`${key}`);
+        cardElem.style.transform = `translate(${cardPos.x}px, ${cardPos.y}px) rotate(${player.orientation})`;
+    })
 }
 
 
-function calcCardPosition(cardsInHand, location, stacked=true){
-    const calculatedPosition = {x:0, y:0};
+function calcCardPositions(player, stacked=true){
+    let cardsInHand = player['cards-in-hand'];
+    let handWidth = 0;
 
-    if (location == 'south'){
-        // calculatedPosition.x = center;
-        calculatedPosition.y = southTop;
+    if (stacked){
+        handWidth = cardWidth + ((Object.keys(cardsInHand).length -1) * stackOffset);
+    }
+    else{
+        handWidth = cardWidth * cardsInHand.length;
+    }
+    
+    let emptySpace = center - deckOriginX - (handWidth /2)
+
+    if (player.location == 'south'){
+        Object.keys(cardsInHand).forEach((key, index) => {
+            player['cards-in-hand'][key].y = southTop;
+            player['cards-in-hand'][key].x = emptySpace + (index * stackOffset);
+        })
     }
 
-    if (location == 'west'){
-        calculatedPosition.x = westTop;
-        // calculatedPosition.y = center;
+    if (player.location == 'west'){
+        Object.keys(cardsInHand).forEach((key, index) => {
+            player['cards-in-hand'][key].x = westTop;
+            player['cards-in-hand'][key].y = emptySpace + (index * stackOffset);
+        })
+
     }
 
-    if (location == 'north'){
-        // calculatedPosition.x = center;
-        calculatedPosition.y = northTop;
+    if (player.location == 'north'){
+        Object.keys(cardsInHand).forEach((key, index) => {
+            player['cards-in-hand'][key].y = northTop;
+            player['cards-in-hand'][key].x = emptySpace + (index * stackOffset);
+        })
+
     }
-    if (location == 'east'){
-        calculatedPosition.x = eastTop;
-        // calculatedPosition.y = center;
+    if (player.location == 'east'){
+        Object.keys(cardsInHand).forEach((key, index) => {
+            player['cards-in-hand'][key].x = eastTop;
+            player['cards-in-hand'][key].y = emptySpace + (index * stackOffset);
+        })
+
     }
 
-    return calculatedPosition
+
+    return cardsInHand
 }
-
-
 
 
 function playerToStack(player){
 
 }
-
-// function repositionStarElem(startElem, endElem, location=''){
-
-//     console.log(location)
-//     var rectStart = startElem.getBoundingClientRect();
-//     console.log('Start',rectStart.x, rectStart.y, rectStart.height);
-//     var rectEnd = endElem.getBoundingClientRect();
-//     console.log('End',rectEnd.x, rectEnd.y);
-//     console.log('Delta', rectEnd.x - rectStart.x, rectEnd.y - rectStart.y)
-
-//     let fieldSize = 1000;
-//     let cardWidth = fieldSize / 10;
-//     let cardHeight = cardWidth * 1.3;
-//     let offset = ((cardHeight - cardWidth)/ 2);
-//     let center = fieldSize / 2;
-//     let southTop = fieldSize - cardHeight;
-//     let westTop = 0 + cardHeight;
-//     let northTop = 0 + cardHeight;
-//     let eastTop = fieldSize - cardHeight;
-//     // startElem.style.transform = `translate(${rectEnd.left - rectStart.left}px, ${rectEnd.top - rectStart.top}px)`;
-
-//     if (location == 'south'){
-//         startElem.style.transform = `translate(${rectEnd.x - rectStart.x}px, ${rectEnd.y- rectStart.y}px)`;
-//     }
-//     if (location == 'west'){
-//         // startElem.style.transform = `translate(${rectEnd.x - rectStart.x - rectStart.width - offset}px, ${rectEnd.y - rectStart.y - offset}px) rotate(90deg)`;
-//         startElem.style.transform = `translate(${rectEnd.x - rectStart.x}px, ${rectEnd.y - rectStart.y}px)`;
-//     }
-//     if (location == 'north'){
-//         // startElem.style.transform = `translate(${rectEnd.x - rectStart.x - rectStart.width}px, ${rectEnd.y - rectStart.y - rectStart.height}px) rotate(180deg)`;
-//         startElem.style.transform = `translate(${rectEnd.x - rectStart.x}px, ${rectEnd.y - rectStart.y}px)`;
-//     }
-//     if (location == 'east'){
-//         // startElem.style.transform = `translate(${rectEnd.x - rectStart.x + offset}px, ${rectEnd.y - rectStart.y - rectStart.width -offset}px) rotate(270deg)`;
-//         startElem.style.transform = `translate(${rectEnd.x - rectStart.x}px, ${rectEnd.y - rectStart.y}px)`;
-//     }
-// }
 
 
 function createPlayers(players){
@@ -171,8 +141,6 @@ function createCard(classNames){
     for(let item of classNames){
         addClassToElement(cardElem, item);
     }
-    // addClassToElement(cardElem, "card");
-    // addClassToElement(cardElem, className);
 
     return cardElem;
 }
@@ -183,8 +151,6 @@ function createCardHolder(classNames){
     for(let item of classNames){
         addClassToElement(cardHolderElem, item);
     }
-    // addClassToElement(cardHolderElem, 'card-holder');
-    // addClassToElement(cardHolderElem, classLocation);
 
     return cardHolderElem;
 }

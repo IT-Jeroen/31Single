@@ -64,10 +64,10 @@
     border: 1px solid black;
 }
 
-/* .move{
+.animated{
     transform: translate(0px, 600px);
     transition: transform 0.6s ease-in-out;
-} */
+}
 
 .card:hover{
     background-color: blueviolet;
@@ -100,20 +100,20 @@
     /* transition: transform 0.6s ease-in-out; */
 }
 
-.deck-3{
-    position: absolute;
-    top: var(--deck-originY);
-    left: var(--deck-originX);
-    transition: transform 0.6s ease-in-out;
-}
 
-.deck-4{
+.deck-3{
     position: absolute;
     top: calc(var(--deck-originY) + 1px);
     left: calc(var(--deck-originX) + 1px);
     transition: transform 0.6s ease-in-out;
 }
 
+.deck-deal{
+    position: absolute;
+    top: var(--deck-originY);
+    left: var(--deck-originX);
+    transition: transform 0.6s ease-in-out;
+}
 
 .offset-0{
     transform: translate(calc(var(--card-offset) * 0), 0px);
