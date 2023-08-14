@@ -45,7 +45,6 @@ function dealCards(num){
 
 
 function repositionStarElem(startElem, endElem, location=''){
-    /* West North East different orientation */
 
     console.log(location)
     var rectStart = startElem.getBoundingClientRect();
@@ -57,7 +56,12 @@ function repositionStarElem(startElem, endElem, location=''){
     let fieldSize = 1000;
     let cardWidth = fieldSize / 10;
     let cardHeight = cardWidth * 1.3;
-    let offset = ((cardHeight - cardWidth)/ 2)
+    let offset = ((cardHeight - cardWidth)/ 2);
+    let center = fieldSize / 2;
+    let southTop = fieldSize - cardHeight;
+    let westTop = 0 + cardHeight;
+    let northTop = 0 + cardHeight;
+    let eastTop = fieldSize - cardHeight;
     // startElem.style.transform = `translate(${rectEnd.left - rectStart.left}px, ${rectEnd.top - rectStart.top}px)`;
 
     if (location == 'south'){
@@ -65,12 +69,15 @@ function repositionStarElem(startElem, endElem, location=''){
     }
     if (location == 'west'){
         startElem.style.transform = `translate(${rectEnd.x - rectStart.x - rectStart.width - offset}px, ${rectEnd.y - rectStart.y - offset}px) rotate(90deg)`;
+        // startElem.style.transform = `translate(${rectEnd.x - rectStart.x}px, ${rectEnd.y - rectStart.y}px)`;
     }
     if (location == 'north'){
         startElem.style.transform = `translate(${rectEnd.x - rectStart.x - rectStart.width}px, ${rectEnd.y - rectStart.y - rectStart.height}px) rotate(180deg)`;
+        // startElem.style.transform = `translate(${rectEnd.x - rectStart.x}px, ${rectEnd.y - rectStart.y}px)`;
     }
     if (location == 'east'){
         startElem.style.transform = `translate(${rectEnd.x - rectStart.x + offset}px, ${rectEnd.y - rectStart.y - rectStart.width -offset}px) rotate(270deg)`;
+        // startElem.style.transform = `translate(${rectEnd.x - rectStart.x}px, ${rectEnd.y - rectStart.y}px)`;
     }
 }
 

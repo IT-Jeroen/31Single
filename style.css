@@ -7,6 +7,10 @@
     --half-card-height: calc(var(--card-height)/2);
     --card-offset: 25px;
     --card-margin: 5px;
+    --south-top: calc(var(--field-size - var(--card-height)));
+    --west-top: calc(0px + var(--card-height));
+    --north-top: calc(0px + var(--card-height));
+    --eastTop: calc(var(--field-size - var(--card-height)));
     --cards-inhand: 3;
     --max-cards-in-hand: 4;
     --cards-in-hand-centre: 3;
@@ -164,19 +168,23 @@
 .south{
     /* cards in hand - 1*/
     transform: translate(calc(var(--center-point) - calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-south) - 1)) / 2)), calc(var(--field-size) - var(--card-height))) rotate(0deg);
+    /* transform: translate(calc(var(--center-point) - calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-south) - 1)) / 2)), calc(var(--field-size) - var(--card-height))); */
 }
 
 .north{
     /* cards in hand - 1*/
     transform: translate(calc(var(--center-point) + calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-north) - 1)) / 2)), var(--card-height)) rotate(180deg);
+    /* transform: translate(calc(var(--center-point) + calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-north) - 1)) / 2)), var(--card-height)); */
 }
 
 .west{
     /* cards in hand - 1*/
     transform: translate(var(--card-height), calc(var(--center-point) - calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-west) - 1)) / 2))) rotate(90deg);
+    /* transform: translate(var(--card-height), calc(var(--center-point) - calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-west) - 1)) / 2))); */
 }
 
 .east{
     /* cards in hand - 1*/
     transform: translate(calc(var(--field-size) - var(--card-height)), calc(var(--center-point) + calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-east) - 1)) / 2))) rotate(270deg);
+    /* transform: translate(calc(var(--field-size) - var(--card-height)), calc(var(--center-point) + calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-east) - 1)) / 2))); */
 }
