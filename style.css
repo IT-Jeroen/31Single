@@ -11,6 +11,8 @@
     --west-top: calc(0px + var(--card-height));
     --north-top: calc(0px + var(--card-height));
     --eastTop: calc(var(--field-size - var(--card-height)));
+    --deck-originX: calc(var(--center-point) - var(--half-card-width));
+    --deck-originY: calc(var(--center-point) - var(--half-card-height));
     --cards-inhand: 3;
     --max-cards-in-hand: 4;
     --cards-in-hand-centre: 3;
@@ -73,42 +75,42 @@
     /* transition: transform 0.1s ease-in-out; */
 }
 
-.deck{
+/* .deck{
     transform: translate(calc(var(--center-point) - var(--half-card-width)), calc(var(--center-point) - var(--half-card-height)))
-}
+} */
 
 .deck-0{
     position: absolute;
-    top: 2px;
-    left: 2px;
+    top: calc(var(--deck-originY) + 2px);
+    left: calc(var(--deck-originX) + 2px);
     /* transition: transform 0.6s ease-in-out; */
 }
 
 .deck-1{
     position: absolute;
-    top: -2px;
-    left: -2px;
+    top: calc(var(--deck-originY) - 2px);
+    left: calc(var(--deck-originX) - 2px);
     /* transition: transform 0.6s ease-in-out; */
 }
 
 .deck-2{
     position: absolute;
-    top: 1px;
-    left: -2px;
+    top: calc(var(--deck-originY) + 1px);
+    left: calc(var(--deck-originX) - 2px);
     /* transition: transform 0.6s ease-in-out; */
 }
 
 .deck-3{
     position: absolute;
-    top: 2px;
-    left: 1px;
+    top: var(--deck-originY);
+    left: var(--deck-originX);
     transition: transform 0.6s ease-in-out;
 }
 
 .deck-4{
     position: absolute;
-    top: 1px;
-    left: 1px;
+    top: calc(var(--deck-originY) + 1px);
+    left: calc(var(--deck-originX) + 1px);
     transition: transform 0.6s ease-in-out;
 }
 
