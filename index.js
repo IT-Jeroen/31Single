@@ -13,30 +13,32 @@ const startGame = document.querySelector('#start')
 const cardDeck = document.querySelector('#deck');
 
 startGame.addEventListener('click', ()=> {
-    // createPlayers(players);
     dealCards(dealingCards);
 })
 
+
+function dealCard(player, id){
+    // create deck card
+    const deckElem = createCard(["card","deck-deal", "transition"]);
+    addIdToElement(deckElem, id)
+    addChildElement(playFieldElem,deckElem);
+
+    // add card to player
+    player["cards-in-hand"][id] = {x:0, y:0};
+
+    // calc player card position
+    calcCardPositions(player)
+    setTimeout(()=>{
+        // move deck card to player
+        stackToPlayer(player)},10)
+}
 
 function dealCards(num){
     let id = 0;
 
     for (let i = 0; i < num; i++){
         players.forEach((player,index)=>{
-            // create deck card
-            const deckElem = createCard(["card","deck-deal"]);
-            addIdToElement(deckElem, id)
-            addChildElement(playFieldElem,deckElem);
-
-            // add card to player
-            player["cards-in-hand"][id] = {x:0, y:0};
-
-            // calc player card position
-            calcCardPositions(player)
-
-            // move deck card to player
-            stackToPlayer(player);
-
+            dealCard(player, id);
             id += 1;
         })
     }
@@ -116,25 +118,6 @@ function calcCardPositions(player, stacked=true){
 }
 
 
-function playerToStack(player){
-
-}
-
-
-function createPlayers(players){
-    players.forEach((player,index)=>{
-        createHand(player);
-    })
-}
-
-function createHand(player){
-    const handElem = createElement('div');
-    addIdToElement(handElem, player.name);
-    addClassToElement(handElem, 'start-pos');
-    addClassToElement(handElem, player.location);
-    addChildElement(playFieldElem, handElem);
-}
-
 function createCard(classNames){
     const cardElem = createElement('div');
 
@@ -143,16 +126,6 @@ function createCard(classNames){
     }
 
     return cardElem;
-}
-
-function createCardHolder(classNames){
-    const cardHolderElem = createElement('div')
-
-    for(let item of classNames){
-        addClassToElement(cardHolderElem, item);
-    }
-
-    return cardHolderElem;
 }
 
 function createElement(elemType){

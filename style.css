@@ -1,3 +1,6 @@
+/* https://stackoverflow.com/questions/68294940/inline-css-transitions-animation */
+
+
 :root{
     --field-size: 1000px;
     --center-point: calc(var(--field-size)/2);
@@ -112,6 +115,7 @@
     position: absolute;
     top: var(--deck-originY);
     left: var(--deck-originX);
+    /* transform: translate(var(--deck-originX),var(--deck-originY)); */
     transition: transform 0.6s ease-in-out;
 }
 
@@ -189,4 +193,13 @@
     /* cards in hand - 1*/
     transform: translate(calc(var(--field-size) - var(--card-height)), calc(var(--center-point) + calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-east) - 1)) / 2))) rotate(270deg);
     /* transform: translate(calc(var(--field-size) - var(--card-height)), calc(var(--center-point) + calc((var(--card-width) + var(--card-offset) * (var(--cards-in-hand-east) - 1)) / 2))); */
+}
+
+.transition {
+	-webkit-transition: deck-deal 1000ms ease-out, transform 1000ms ease-out;
+	-moz-transition:    deck-deal 1000ms ease-out, transform 1000ms ease-out;
+	-ms-transition:     deck-deal 1000ms ease-out, transform 1000ms ease-out;
+	-o-transition:      deck-deal 1000ms ease-out, transform 1000ms ease-out;
+	transition:         deck-deal 1000ms ease-out, transform 1000ms ease-out;
+
 }

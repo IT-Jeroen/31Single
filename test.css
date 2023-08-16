@@ -1,0 +1,21 @@
+.square{
+    background-color: red;
+    width: 200px;
+    height: 200px;
+    
+}
+
+.new-square{
+    background-color: red;
+    width: 200px;
+    height: 200px;
+    
+}
+
+.transition {
+    /* transform: translate(50vw, 50vh); */
+    position: absolute;
+    left: 50vw;
+    top: 50vh;
+    transition: transform 0.6s ease-in-out;
+}

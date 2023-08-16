@@ -1,0 +1,191 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- <link rel="stylesheet" href="test.css"> -->
+        <style>
+            body{
+                background-color: black;
+            }
+            .new-square{
+                background-color: red;
+                width: 200px;
+                height: 200px;
+                
+            }
+
+            .transition {
+                /* transform: translate(50vw, 50vh); */
+                position: absolute;
+                left: 50vw;
+                top: 50vh;
+                transition: transform 0.6s ease-in-out;
+            }
+        </style>
+        <title>Document</title>
+    </head>
+    <body>
+        <button id="create-square">Create Square</button>
+        <button id="move-square">Move Square</button>
+        <button id="create-and-move-square">Create and Move Square</button>
+        <button id="interval">Interval</button>
+        <div class="playfield">
+        </div>
+    </body>
+    <script>
+        const createSquare = document.querySelector('#create-square');
+        const moveSquare = document.querySelector('#move-square');
+        const createMoveSquare = document.querySelector('#create-and-move-square');
+        const interValBtn = document.querySelector('#interval');
+        const playfield = document.querySelector('.playfield');
+        
+        createSquare.addEventListener('click', ()=> {
+            // create new element
+            const newSquare = document.createElement('div');
+            // add classes to new element
+            newSquare.classList.add('new-square');
+            newSquare.classList.add('transition');
+            // add new element to playfield div
+            playfield.appendChild(newSquare);
+        });
+
+        function moveSquares(elem, tx, ty){
+            elem.style.transform = `translate(${tx}, ${ty})`;
+            }
+
+            // only deal cards needs an interval //
+            // move cards doesn't need an interval //
+        function dealCards(timing){
+            const allSquares = document.querySelectorAll('.new-square');
+            let i = 0;
+            let cardsInHand = 0;
+            const numPlayers = 4;
+
+            const intervalID = setInterval(()=>{
+                if (i == allSquares.length){
+                clearInterval(intervalID);
+                }
+                else{
+                    if (i - (cardsInHand * numPlayers) == 0){
+                        // south
+                        moveSquares(allSquares[i], "0px", "200px");
+                    }
+                    if (i - (cardsInHand * numPlayers) == 1){
+                        // west
+                        moveSquares(allSquares[i], "-200px", "0px");
+                    }
+                    if (i - (cardsInHand * numPlayers) == 2){
+                        // north
+                        moveSquares(allSquares[i], "0px", "-200px");
+                    }
+                    if (i - (cardsInHand * numPlayers) == 3){
+                        // east
+                        moveSquares(allSquares[i], "200px", "0px");
+                    }
+                    // moveSquares(allSquares[i], "-500px", "0px");
+
+                    i += 1;
+                    if (i % numPlayers == 0){
+                        cardsInHand += 1;
+                    }
+                }
+            }, timing);
+        }
+
+        moveSquare.addEventListener('click', ()=>{
+            // const newSquare = document.querySelectorAll('.new-square');
+            // //move element to new pos
+            // newSquare[newSquare.length -1].style.transform = "translate(-40vw, -40vh)";
+            dealCards(100);
+        })
+
+        var counter = 0
+        createMoveSquare.addEventListener('click', ()=> {
+            // create new element
+            const newSquare = document.createElement('div');
+            playfield.appendChild(newSquare);
+            newSquare.classList.add('transition');
+            // add classes to new element
+            newSquare.classList.add('new-square')
+            if (counter % 2 === 0){
+                newSquare.style.backgroundColor = "yellow";
+            }
+            else {
+                newSquare.style.backgroundColor = "blue";
+            }
+            // move square
+            newSquare.style.transform = "translate(-30vw, -30vh)";
+            // const moveSquare = document.querySelectorAll('.new-square');
+            // moveSquare[moveSquare.length -1].style.transform = "translate(-30vw, -30vh)";
+            counter += 1;
+        });
+
+        function squareFn(id){
+            // create new element
+            const newSquare = document.createElement('div');
+            // add classes to new element
+            newSquare.classList.add('new-square');
+            newSquare.classList.add('transition');
+            newSquare.id = id;
+
+            // add new element to playfield div
+            playfield.appendChild(newSquare);
+            
+        }
+
+        function moveSquareFn(id, tx, ty){
+            // const newSquares = document.querySelectorAll('.new-square');
+            // newSquares[newSquares.length -1].style.transform = "translate(-40vw, -40vh)";
+            const newSquare = document.getElementById(id);
+            newSquare.style.transform = `translate(${tx}vw, ${ty}vh)`;
+        }
+
+        function interValCards(maxLoop, timing, offsetTiming=10){
+
+            let timingA = timing;
+            let timingB = timing + offsetTiming;
+            let counterA = 0;
+            let counterB = 0;
+
+            const aId = setInterval(()=>{
+            
+                if (counterA == maxLoop){
+                    clearInterval(aId);
+                } else{
+                    squareFn(counterA);
+                }
+
+                counterA += 1;
+                }, timingA);
+
+            const bId = setInterval(()=>{
+            
+                if (counterB == maxLoop){
+                    clearInterval(bId);
+                } else{
+                    if(counterB == 0){
+                        moveSquareFn(counterB, 0, 20);
+                    }
+                    if(counterB == 1){
+                        moveSquareFn(counterB, -20, 0);
+                    }
+                    if(counterB == 2){
+                        moveSquareFn(counterB, 0, -20);
+                    }
+                    if(counterB == 3){
+                        moveSquareFn(counterB, 20, 0);
+                    }
+                    
+                }
+
+                counterB += 1;
+                }, timingB);
+        }
+
+        interValBtn.addEventListener('click',()=>{
+            interValCards(4, 300);
+        })
+
+    </script>
+    </html>
