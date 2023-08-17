@@ -116,8 +116,10 @@ function dealPlayerCards(players,timing){
       else{
           if (i - (cardsInHand * numPlayers) == 0){
               // south
-              players[i - (cardsInHand * numPlayers)]['cards-in-hand'][id] = allSquares[i];
-              moveSquares(allSquares[i], "0px", "200px");
+              players[i - (cardsInHand * numPlayers)]['cards-in-hand'][i] = allSquares[i];
+              calcCardPositions();
+              moveCardsInHand();
+              moveCard(allSquares[i], "0px", "200px");
           }
           if (i - (cardsInHand * numPlayers) == 1){
               // west
@@ -139,3 +141,42 @@ function dealPlayerCards(players,timing){
       }
   }, timing);
 }
+
+function createDeckCards(numCards, minValue, maxValue='A'){
+    const cardValues = ['2','3','4','5','6','7','8','9','10','J', 'Q', 'K', 'A'];
+    const cardSymbols = ['Clubs', 'Diamonds', 'Hearths', 'Spades'];
+
+    const min = cardValues.indexOf(minValue);
+    const max = cardValues.indexOf(maxValue)+1;
+    const cardRange = cardValues.slice(min, max);
+
+    let cardsInGame = [];
+    const cardsInDeck = [];
+
+    cardRange.forEach(value => {
+        cardSymbols.forEach(symbol => {
+            cardsInGame.push(`${symbol}-${value}`);
+        })
+    })
+
+    console.log(cardRange);
+    console.log(cardsInGame.length);
+
+    for (let i= 0; i < numCards; i++){
+        let pickIndex = Math.floor(Math.random() * (cardsInGame.length - i))
+        cardsInDeck.push(cardsInGame[pickIndex]);
+        cardsInGame.splice(pickIndex, 1);
+
+    }
+
+    console.log(cardsInGame.length);
+    console.log(cardsInDeck);
+}
+
+// createDeckCards(15, '7');
+// ['Diamonds-7', 'Hearths-8', 'Clubs-J', 'Diamonds-10', 'Clubs-10', 'Hearths-Q', 'Hearths-7', 'Hearths-J', 'Clubs-7', 'Hearths-9', 'Diamonds-9', 'Clubs-9', 'Hearths-10', 'Spades-8', 'Diamonds-8']
+
+let arr = [[0,1],[0,1],[0,1]];
+let bank = [0,1]
+let newArr = [...arr].push(bank)
+console.log(arr)
