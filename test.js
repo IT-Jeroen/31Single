@@ -176,7 +176,5 @@ function createDeckCards(numCards, minValue, maxValue='A'){
 // createDeckCards(15, '7');
 // ['Diamonds-7', 'Hearths-8', 'Clubs-J', 'Diamonds-10', 'Clubs-10', 'Hearths-Q', 'Hearths-7', 'Hearths-J', 'Clubs-7', 'Hearths-9', 'Diamonds-9', 'Clubs-9', 'Hearths-10', 'Spades-8', 'Diamonds-8']
 
-let arr = [[0,1],[0,1],[0,1]];
-let bank = [0,1]
-let newArr = [...arr].push(bank)
-console.log(arr)
+let str = 'abcd'
+console.log(str.slice(0,str.length))

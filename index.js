@@ -50,13 +50,54 @@ startGame.addEventListener('click', ()=> {
     dealCards(groupPlayers);
 })
 
+function addMouseEvent(players){
+
+}
+
+function mouseOverEvent(elem){
+    let oldMatrix = [];
+    let newMatrix = [];
+    let matrixStr = ''
+
+    elem.addEventListener(
+        "mouseenter",
+        (event) => {
+        const targetElem = event.target
+        oldMatrix = targetElem.getAttribute('style').split(/\s/);
+        oldMatrix = oldMatrix.map(item => item.replace(',',''));
+        console.log(oldMatrix);
+        let offsetX = 5;
+        let offsetY = 25;
+
+        newMatrix = [...oldMatrix]
+        newMatrix[13] = Number(oldMatrix[13]) - offsetX;
+        newMatrix[14] = Number(oldMatrix[14]) - offsetY;
+            
+        console.log(newMatrix.slice(1).toString())
+        matrixStr = newMatrix.slice(1).toString()
+        targetElem.style.transform = matrixStr.slice(0, matrixStr.length -1);
+        },
+        false,
+      );
+
+      elem.addEventListener(
+        "mouseleave",
+        (event) => {
+        const targetElem = event.target
+            matrixStr = oldMatrix.slice(1).toString();
+            targetElem.style.transform = matrixStr.slice(0, matrixStr.length -1);
+        },
+        false,
+      );
+}
 
 // Create Deck Elements //
 function createDeck(numDeck, orientation, postion){
 
     for (let i = 0; i < numDeck; i++){
         const cardElem = createCard(["card"]);
-        
+        addMouseOver(cardElem);
+
         cardElem.style.transform = `matrix3d(
             ${orientation[0]},
             ${orientation[1]},
@@ -260,6 +301,8 @@ function calcCardPositions(player, stacked=true){
         Object.keys(cardsInHand).forEach((cardId, index) => {
             player['cards-in-hand'][cardId].y = southTop;
             player['cards-in-hand'][cardId].x = emptySpace + (index * cardOffSet);
+            // Adding event on top of event
+            // addMouseOver(player['cards-in-hand'][cardId].elem);
         })
     }
 
