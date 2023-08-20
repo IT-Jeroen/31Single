@@ -15,15 +15,6 @@ let matrix180Flipped = [1,0,0,0,-1,0,-1]; // 180 degree z axis
 let matrix270Flipped = [0,1,0,1,0,0,-1]; // 270 degree z axis
 
 
-// ID is important reference //
-// const players = [
-//     {"id":'0', "name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0},
-//     {"id":'1', "name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix90},
-//     {"id":'2', "name":'Dad', "location": 'north', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix180},
-//     {"id":'3', "name":'Mum', "location": 'east', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix270}
-// ]
-// const playerBank = {"id":'4', "name":'Bank', "location": 'center', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0};
-
 // Keep players key a string or a number //
 // Will be better to keep string if players becomes a json object //
 const players = {
@@ -34,8 +25,9 @@ const players = {
     '4': {"name":'Bank', "location": 'center', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0},
 }
 
+// cardID = "Clubs-8": Object { elem: div.card, x: 425, y: 870 } //
+
 const numPlayersCards = 5;
-// const cardsInGame = (players.length + 1) * numPlayersCards;
 const cardsInGame = (Object.keys(players).length) * numPlayersCards;
 
 const playFieldElem = document.querySelector('#playfield')
@@ -45,29 +37,37 @@ let fieldSize = 1000;
 let cardWidth = fieldSize / 10;
 let cardHeight = cardWidth * 1.3;
 let stackOffset = 25;
+let hoverOffsetX = 5;
+let hoverOffsetY = 25
 let center = fieldSize / 2;
 let southTop = fieldSize - cardHeight;
 let westTop = (cardHeight - cardWidth) /2;
 let northTop = 0;
 let eastTop = fieldSize - cardHeight + ((cardHeight - cardWidth) /2);
 const deckPos = {'x': center - (cardWidth /2), 'y':center - (cardHeight /2)};
+const clickCardOffset = 5;
+const cardPickedBank = [];
+const cardPickPlayer = [];
 
 
 startGame.addEventListener('click', ()=> {
     createDeck(cardsInGame, matrix0, deckPos);
-
-    // let groupPlayers = [...players];
-    // groupPlayers.push(playerBank);
-    // dealCards(groupPlayers);
     dealCards(players);
 })
 
-function getPlayerById (id){
-    return players[id];
-}
 
 function filterPlayers(field, valuesArr, filterOut=true){
-    // Conversion to lower Case //
+    // Conversion to lower Case ??? //
+
+    if (field == 'key'){
+        if (filterOut){
+            return Object.fromEntries(Object.entries(players).filter(([k,v]) => !valuesArr.includes(k)));
+        }
+        else{
+            return Object.fromEntries(Object.entries(players).filter(([k,v]) => valuesArr.includes(k)));
+        }
+    }
+    
     if (filterOut){
         return Object.fromEntries(Object.entries(players).filter(([k,v]) => !valuesArr.includes(v[field])));
     } else {
@@ -75,31 +75,42 @@ function filterPlayers(field, valuesArr, filterOut=true){
     }
 }
 
-// Needs to be local Client based //
-// Every Card going into the bank needs a mouseEvent //
-// Every Card going into player South Hands needs a mouseEvent
-function mouseOverEvent(elem){
-    let oldMatrix = [];
-    let newMatrix = [];
+
+function cardHoverEffect(hoverElem, reverse=false){
     let matrixStr = ''
+    let targetStyle = hoverElem.getAttribute('style').split(/\s/);
+    targetStyle = targetStyle.map(item => item.replace(',',''));
+    const transform = targetStyle[0];
+    const matrix3D = targetStyle.slice(1, targetStyle.length-2);
+    const zIndex = targetStyle.slice(targetStyle.length -2);
+
+
+    let hoverX = hoverOffsetX;
+    let hoverY = hoverOffsetY
+
+    if (reverse){
+        hoverX = -1 * hoverX;
+        hoverY = -1 * hoverY;
+    }
+
+    matrix3D[12] = Number(matrix3D[12]) - hoverX;
+    matrix3D[13] = Number(matrix3D[13]) - hoverY;
+
+    matrixStr = `${transform} ${matrix3D.toString()} ${zIndex.toString().replace(',', '')}}`;
+    
+    return matrixStr;
+}
+
+
+
+function mouseOverEvent(elem){
 
     elem.addEventListener(
         "mouseenter",
         (event) => {
-        const targetElem = event.target
-        oldMatrix = targetElem.getAttribute('style').split(/\s/);
-        oldMatrix = oldMatrix.map(item => item.replace(',',''));
-        console.log(oldMatrix);
-        let offsetX = 5;
-        let offsetY = 25;
-
-        newMatrix = [...oldMatrix]
-        newMatrix[13] = Number(oldMatrix[13]) - offsetX;
-        newMatrix[14] = Number(oldMatrix[14]) - offsetY;
-            
-        console.log(newMatrix.slice(1).toString())
-        matrixStr = newMatrix.slice(1).toString()
-        targetElem.style.transform = matrixStr.slice(0, matrixStr.length -1);
+            // const targetElem = event.target;
+            // targetElem.style = cardHoverEffect(targetElem);
+            event.target.style = cardHoverEffect(event.target);
         },
         false,
       );
@@ -107,18 +118,101 @@ function mouseOverEvent(elem){
       elem.addEventListener(
         "mouseleave",
         (event) => {
-        const targetElem = event.target
-            matrixStr = oldMatrix.slice(1).toString();
-            targetElem.style.transform = matrixStr.slice(0, matrixStr.length -1);
+            // const targetElem = event.target
+            // targetElem.style = cardHoverEffect(targetElem, reverse=true);
+            event.target.style = cardHoverEffect(event.target, reverse=true);
         },
         false,
       );
 }
 
-// Every Cards going out the Bank needs to have a mouseEvent removed
+// Every Cards going out the other players needs to have a mouseEvent removed
 function removeMouseOverEvent(elem){
 
 }
+
+
+function swapCards(elemBank,elemPlayer){
+    const player = players['0'];
+    const bank = players['4'];
+    let playerCardID = '';
+    let bankCardID = '';
+    let timing = 500;
+
+    for (const [id, card] of Object.entries(player['cards-in-hand'])) {
+        if (elemPlayer == card.elem ){
+            playerCardID = id;
+        }     
+    }
+
+      for (const [id, card] of Object.entries(bank['cards-in-hand'])) {
+        if (elemBank == card.elem ){
+            bankCardID = id; 
+        }  
+    }
+
+    if (playerCardID){
+        players['0']['cards-in-hand'][bankCardID] = players['4']['cards-in-hand'][bankCardID];
+        delete players['4']['cards-in-hand'][bankCardID];
+    }
+
+    if (bankCardID){
+        players['4']['cards-in-hand'][playerCardID] = players['0']['cards-in-hand'][playerCardID];
+        delete players['0']['cards-in-hand'][playerCardID]; 
+    }
+
+    setTimeout(()=>{
+        calcCardPositions(players['0']);
+        calcCardPositions(players['4'], stacked=false);
+    },500);
+    
+    cardPickedBank.pop();
+    cardPickPlayer.pop();
+
+    setTimeout(()=>{
+        repositionCards(['0', '4']);
+    },timing)
+
+} 
+
+
+function cardClickEvent(elem){
+    const bankY = deckPos.y;
+    const southY = southTop;
+
+    elem.addEventListener('click', (event)=>{
+        const targetElem = event.target
+        const stringMatrix = targetElem.getAttribute('style');
+        let matrixArray = stringMatrix.split(/\s/);
+        matrixArray = matrixArray.map(item => item.replace(',',''));
+        const targetY = Number(matrixArray[14]);
+
+        if (targetY + hoverOffsetY - bankY < clickCardOffset && targetY + hoverOffsetY - bankY > -1 * clickCardOffset){
+            if (cardPickedBank.length == 0){
+                cardPickedBank.push(targetElem);
+            }else{
+                const unPickBankElem = cardPickedBank.pop();
+                cardPickedBank.push(targetElem);
+            }
+        }
+        if (targetY + hoverOffsetY - southY < clickCardOffset && targetY + hoverOffsetY - southY > -1 * clickCardOffset){
+            if (cardPickPlayer.length == 0){
+                cardPickPlayer.push(targetElem);
+            }else{
+                const unPickPlayerElem = cardPickPlayer.pop();
+                cardPickPlayer.push(targetElem);
+            }
+
+        }
+
+        if (cardPickedBank.length == 1 && cardPickPlayer.length == 1){
+            swapCards(cardPickedBank[0], cardPickPlayer[0]);
+        }
+
+
+    })
+}
+
 
 // Create Deck Elements //
 function createDeck(numDeck, orientation, postion){
@@ -201,22 +295,21 @@ function dealCards(players){
         
         // add card to player hand //
         players[`${playerID}`]['cards-in-hand'][cardId] = {'elem': cardElem, 'x':0, 'y':0};
-        // calc cardPosition //
 
         if (players[`${playerID}`].name == 'Bank'){
-            // add card to player hand //
-            players[`${playerID}`]['cards-in-hand'][cardId] = {'elem': cardElem, 'x':0, 'y':0};
             // add hover mouse event //
             mouseOverEvent(cardElem);
+            // add click card event //
+            cardClickEvent(cardElem);
             // calc cardPosition //
             calcCardPositions(players[`${playerID}`], stacked=false);
         }else{
             if (players[`${playerID}`].location == 'south'){
                 // add hover mouse event //
                 mouseOverEvent(cardElem);
+                // add click card event //
+                cardClickEvent(cardElem);
             }
-            // add card to player hand //
-            players[`${playerID}`]['cards-in-hand'][cardId] = {'elem': cardElem, 'x':0, 'y':0};
             // calc cardPosition //
             calcCardPositions(players[`${playerID}`]);
         }
@@ -228,8 +321,8 @@ function dealCards(players){
         }
 
     })
+
     // position cards
-    // let bank = players.splice(-1)
     const bank = filterPlayers('name', ['Bank'], filterOut=false);
     const nonBankPlayers = filterPlayers('name', ['Bank']);
 
@@ -238,29 +331,58 @@ function dealCards(players){
         dealingCards(bank, timing);
     },(allCards.length + 1)*timing);
     
-
-    console.log(players)
-    // console.log(playerBank)
 }
+
+
+function repositionCards(playersID){
+    let zIndex = 1;
+
+    playersID.forEach(id => {
+        const orientation = players[id].orientation;
+        const cardsID = Object.keys(players[id]['cards-in-hand'])
+
+        cardsID.forEach(cardID =>{
+            let card = players[id]['cards-in-hand'][cardID]
+            card.elem.style = `transform: matrix3d(
+                ${orientation[0]},
+                ${orientation[1]},
+                ${orientation[2]},
+                0,
+                ${orientation[3]},
+                ${orientation[4]},
+                0,
+                0,
+                ${orientation[5]},
+                0,
+                ${orientation[6]},
+                0,
+                ${card.x},
+                ${card.y},
+                0,
+                1
+                ); z-index: ${zIndex};`;
+            
+            zIndex += 1;
+        });
+    })
+}
+
 
 function dealingCards(players, timing){
     let i = 0;
     const playersID = Object.keys(players)
-    // let playerID = 0;
     let playerIndex = 0;
+    let zIndex = 1;
     let cardIndex = 0;
-    let cardsToDeal = 0;
+    let numCardsToDeal = 0;
     
-    for (const [id, player] of Object.entries(players)) {
-        cardsToDeal += Object.keys(player['cards-in-hand']).length;
-      }
 
-    // players.forEach(player =>{
-    //     cardsToDeal +=  Object.keys(player['cards-in-hand']).length;
-    // })
+    playersID.forEach(id => {
+        numCardsToDeal += Object.keys(players[id]['cards-in-hand']).length;
+    })
 
     const intervalID = setInterval(()=>{
-        if (i == cardsToDeal -1){
+        if (i == numCardsToDeal -1){
             clearInterval(intervalID);
         }
         
@@ -272,25 +394,30 @@ function dealingCards(players, timing){
         const card = player['cards-in-hand'][cardId];
         const orientation = player.orientation;
 
+        // TEMP ELEMENT
         const text = document.createTextNode(cardId);
         addChildElement(card.elem, text);   
 
+        // card.elem.style.transform = `matrix3d(
+        //     ${orientation[0]},
+        //     ${orientation[1]},
+        //     ${orientation[2]},
+        //     0,
+        //     ${orientation[3]},
+        //     ${orientation[4]},
+        //     0,
+        //     0,
+        //     ${orientation[5]},
+        //     0,
+        //     ${orientation[6]},
+        //     0,
+        //     ${card.x},
+        //     ${card.y},
+        //     0,
+        //     1
+        //     )`; 
 
-
-        
-        // const cardIds = Object.keys(players[playerIndex]['cards-in-hand']);
-        // const cardIds = players[playerIndex]['cards-in-hand'];
-        // const card = players[playerIndex]['cards-in-hand'][cardIds[cardIndex]];
-
-        // const cardElem = card.elem
-        // const orientation = players[playerIndex].orientation
-
-        // const text = document.createTextNode(cardIds[cardIndex]);
-
-        // addChildElement(cardElem, text);    
-        
-        // cardElem.style.transform = `matrix3d(
-        card.elem.style.transform = `matrix3d(
+        card.elem.style = `transform: matrix3d(
             ${orientation[0]},
             ${orientation[1]},
             ${orientation[2]},
@@ -307,8 +434,9 @@ function dealingCards(players, timing){
             ${card.y},
             0,
             1
-            )`; 
-
+            ); z-index: ${zIndex};`;
+        
+        zIndex += 1;
 
 
         playerIndex += 1;
@@ -317,23 +445,10 @@ function dealingCards(players, timing){
             cardIndex += 1;
             playerIndex = 0;
         }
-         
-        // if (playerIndex == players.length){
-        //     cardIndex += 1;
-        //     playerIndex = 0;
-        // }
-
-        // playerID += 1;
-
-        // if (playersID[playerIndex] == Number(playersID[playersID.length-1])+1){
-        //     playerIndex = 0;
-        // }
 
         i += 1;
     }, timing);
-
-    
-  }
+}
   
 
 function calcCardPositions(player, stacked=true){
@@ -391,9 +506,6 @@ function calcCardPositions(player, stacked=true){
         })
 
     }
-
-
-    // return cardsInHand
 }
 
 
