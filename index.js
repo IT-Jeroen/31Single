@@ -107,7 +107,6 @@ function cardHoverEffect(hoverElem, reverse=false){
     const matrix3D = targetStyle.slice(1, targetStyle.length-2);
     const zIndex = targetStyle.slice(targetStyle.length -2);
 
-
     let hoverX = hoverOffsetX;
     let hoverY = hoverOffsetY
 
@@ -126,16 +125,14 @@ function cardHoverEffect(hoverElem, reverse=false){
 
 
 
-function mouseOverEvent(elem, allowHoverUp=true, allowHoverDown=true){
+function mouseOverEvent(elem){
 
     elem.addEventListener(
         "mouseenter",
         (event) => {
-            // event.target.style = cardHoverEffect(event.target);
-            // if (allowHoverUp){
+            // Hover UP //
             const cardID = findCardID(elem);
-            // console.log('Card ID',cardID)
-            if (cardsDB[cardID].access){
+            if (cardsDB[cardID].access && !cardsDB[cardID].picked){
                 event.target.style = cardHoverEffect(event.target);
             }
         },
@@ -145,11 +142,9 @@ function mouseOverEvent(elem, allowHoverUp=true, allowHoverDown=true){
       elem.addEventListener(
         "mouseleave",
         (event) => {
-            // event.target.style = cardHoverEffect(event.target, reverse=true);
-            // if (allowHoverDown){
+            // Hover DOWN //
             const cardID = findCardID(elem);
-            // console.log('Card ID', cardID)
-            if (cardsDB[cardID].access){
+            if (cardsDB[cardID].access && !cardsDB[cardID].picked){
                 event.target.style = cardHoverEffect(event.target, reverse=true);
             }
         },
@@ -157,49 +152,6 @@ function mouseOverEvent(elem, allowHoverUp=true, allowHoverDown=true){
       );
 }
 
-
-// function swapCards(elemBank,elemPlayer){
-//     const player = players['0'];
-//     const bank = players['4'];
-//     let playerCardID = '';
-//     let bankCardID = '';
-//     let timing = 500;
-
-//     for (const [id, card] of Object.entries(player['cards-in-hand'])) {
-//         if (elemPlayer == card.elem ){
-//             playerCardID = id;
-//         }     
-//     }
-
-//       for (const [id, card] of Object.entries(bank['cards-in-hand'])) {
-//         if (elemBank == card.elem ){
-//             bankCardID = id; 
-//         }  
-//     }
-
-//     if (playerCardID){
-//         players['0']['cards-in-hand'][bankCardID] = players['4']['cards-in-hand'][bankCardID];
-//         delete players['4']['cards-in-hand'][bankCardID];
-//     }
-
-//     if (bankCardID){
-//         players['4']['cards-in-hand'][playerCardID] = players['0']['cards-in-hand'][playerCardID];
-//         delete players['0']['cards-in-hand'][playerCardID]; 
-//     }
-
-//     setTimeout(()=>{
-//         calcCardPositions(players['0']);
-//         calcCardPositions(players['4'], stacked=false);
-//     },500);
-    
-//     cardPickedBank.pop();
-//     cardPickPlayer.pop();
-
-//     setTimeout(()=>{
-//         repositionCards(['0', '4']);
-//     },timing)
-
-// } 
 
 function swapCards(bankCardID,playerCardID){
     const timingRepos = 700;
@@ -216,16 +168,24 @@ function swapCards(bankCardID,playerCardID){
     // add bankCardID to Player
     players[playerID]['cards-in-hand'][bankCardID] = players[bankID]['cards-in-hand'][bankCardID];
     // players[playerID]['cards-in-hand'][bankCardID] = {'x': 0, 'y': 0};
+    // reset location //
+    cardsDB[bankCardID].location = playerLocation;
 
     // add playerCardID to Bank
     players[bankID]['cards-in-hand'][playerCardID] = players[playerID]['cards-in-hand'][playerCardID];
     // players[bankID]['cards-in-hand'][playerCardID] = {'x': 0, 'y': 0};
+    // reset location //
+    cardsDB[playerCardID].location = bankLocation;
 
     // remove bankCardID from Bank
     delete players[bankID]['cards-in-hand'][bankCardID];
+    // reset pick //
+    cardsDB[playerCardID].picked = false;
 
     // remove playerCardID from Player
     delete players[playerID]['cards-in-hand'][playerCardID]
+    // reset pick //
+    cardsDB[bankCardID].picked = false;
 
     setTimeout(()=>{
         calcCardPositions(players[playerID]);
@@ -235,9 +195,10 @@ function swapCards(bankCardID,playerCardID){
     cardPickedBank.pop();
     cardPickPlayer.pop();
 
+
     setTimeout(()=>{
         repositionCards([playerID, bankID]);
-    },timingRepos)
+    },timingRepos);
     
 }
 
@@ -253,13 +214,14 @@ function pickCardEvent(pickedElem){
             cardsDB[cardID].picked = true;
         }else{
             if (cardID == cardPickedBank[0]){
+                const unPickSameBankID = cardPickedBank.pop();
+                cardsDB[unPickSameBankID].picked = false;
+            }else{
                 const unPickBankID = cardPickedBank.pop();
                 cardsDB[unPickBankID].picked = false;
-            }else{
-                const unPickID = cardPickedBank.pop();
-                cardsDB[unPickID].picked = false;
                 cardPickedBank.push(cardID); // cardPickedBank.push(pickedElem);
                 cardsDB[cardID].picked = true;
+                triggerLeaveEffect(cardsDB[unPickBankID].elem);
             }
 
         }
@@ -271,67 +233,39 @@ function pickCardEvent(pickedElem){
             cardsDB[cardID].picked = true;
         }else{
             if (cardID == cardPickPlayer[0]){
+                const unPickSamePlayerID = cardPickPlayer.pop();
+                cardsDB[unPickSamePlayerID].picked = false;
+            }else{
                 const unPickPlayerID = cardPickPlayer.pop();
                 cardsDB[unPickPlayerID].picked = false;
-            }else{
-                const unPickID = cardPickPlayer.pop();
-                cardsDB[unPickID].picked = false;
                 cardPickPlayer.push(cardID); // cardPickPlayer.push(pickedElem);
                 cardsDB[cardID].picked = true;
+                triggerLeaveEffect(cardsDB[unPickPlayerID].elem);
             }
             
         }
     }
-    console.log(cardsDB);
+    // console.log(cardsDB);
 }
 
+function triggerLeaveEffect(elem){
+    const hoverDown = new Event("mouseleave");
+    elem.dispatchEvent(hoverDown);
+}
 
 function cardClickEvent(elem){
-    // const bankY = deckPos.y;
-    // const southY = southTop;
 
     elem.addEventListener('click', (event)=>{
-        // // const targetElem = event.target
-        // const cardID = findCardID(event.target)
-        // const stringMatrix = event.target.getAttribute('style');
-        // let matrixArray = stringMatrix.split(/\s/);
-        // matrixArray = matrixArray.map(item => item.replace(',',''));
-        // const targetY = Number(matrixArray[14]);
-
-        // if (targetY + hoverOffsetY - bankY < clickCardOffset && targetY + hoverOffsetY - bankY > -1 * clickCardOffset){
-        //     if (cardPickedBank.length == 0){
-        //         cardPickedBank.push(event.target);
-        //         cardsDB[cardID].picked = true;
-        //     }else{
-        //         const unPickBankElem = cardPickedBank.pop();
-        //         const unPickID = findCardID(unPickBankElem);
-        //         cardsDB[unPickID].picked = false;
-        //         cardPickedBank.push(event.target);
-        //         cardsDB[cardID].picked = true;
-        //     }
-        // }
-        // if (targetY + hoverOffsetY - southY < clickCardOffset && targetY + hoverOffsetY - southY > -1 * clickCardOffset){
-        //     if (cardPickPlayer.length == 0){
-        //         cardPickPlayer.push(event.target);
-        //         cardsDB[cardID].picked = true;
-        //     }else{
-        //         const unPickPlayerElem = cardPickPlayer.pop();
-        //         const unPickID = findCardID(unPickPlayerElem);
-        //         cardsDB[unPickID].picked = false;
-        //         cardPickPlayer.push(event.target);
-        //         cardsDB[cardID].picked = true;
-        //     }
-
-        // }
-
         const cardID = findCardID(event.target);
         if (cardsDB[cardID].access){
             pickCardEvent(event.target);
         }
-        // pickCardEvent(event.target);
 
+        // Needs a different trigger (in Game button ?)//
         if (cardPickedBank.length == 1 && cardPickPlayer.length == 1){
-            swapCards(cardPickedBank[0], cardPickPlayer[0]);
+            setTimeout(()=>{
+                swapCards(cardPickedBank[0], cardPickPlayer[0]);
+            },500);
         }
 
 
@@ -418,38 +352,21 @@ function dealCards(players){
         let cardId = deckCardValues[index];
         // add card to DB //
         addToCardDB(cardId, cardElem);
-        
-
-
         // add card to player hand //
         // players[`${playerID}`]['cards-in-hand'][cardId] = {'elem': cardElem, 'x':0, 'y':0};
         players[`${playerID}`]['cards-in-hand'][cardId] = {'x':0, 'y':0};
         cardsDB[cardId].location = players[`${playerID}`].location;
-
         // add hover mouse event //
         mouseOverEvent(cardElem);
-
         // add click card event //
         cardClickEvent(cardElem);
 
-
-
         if (players[`${playerID}`].name == 'Bank'){
-            // add hover mouse event //
-            // mouseOverEvent(cardElem);
-            // add click card event //
-            // cardClickEvent(cardElem);
-            // calc cardPosition //
             calcCardPositions(players[`${playerID}`], stacked=false);
             // give player acces to card //
             cardsDB[cardId].access = true;
         }else{
             if (players[`${playerID}`].location == 'south'){
-                // add hover mouse event //
-                // mouseOverEvent(cardElem);
-                // add click card event //
-                // cardClickEvent(cardElem);
-                // give player acces to card //
                 cardsDB[cardId].access = true;
             }
             // calc cardPosition //
@@ -463,9 +380,6 @@ function dealCards(players){
         }
 
     })
-
-    // console.log(cardsDB);
-    // console.log(players);
 
     // position cards
     const bank = filterPlayers('name', ['Bank'], filterOut=false);
@@ -487,11 +401,8 @@ function repositionCards(playersID){
         const cardsID = Object.keys(players[id]['cards-in-hand'])
 
         cardsID.forEach(cardID =>{
-            // cardID = "Clubs-8": Object {x: 425, y: 870 } //  
             const cardElem = cardsDB[cardID].elem;
             const cardPos = players[id]['cards-in-hand'][cardID];
-            // const card = players[id]['cards-in-hand'][cardID];
-            // card.elem.style = `transform: matrix3d(
             cardElem.style = `transform: matrix3d(
                 ${orientation[0]},
                 ${orientation[1]},
@@ -535,41 +446,18 @@ function dealingCards(players, timing){
             clearInterval(intervalID);
         }
         
-
         let player = players[`${playersID[playerIndex]}`];
         const cardIds = Object.keys(player['cards-in-hand']);
-        // cardID = "Clubs-8": Object { elem: div.card, x: 425, y: 870 } //
+        // cardID = "Clubs-8": Object {x: 425, y: 870 } // 
         const cardId = cardIds[cardIndex];
         const card = player['cards-in-hand'][cardId];
         const orientation = player.orientation;
 
         // TEMP ELEMENT
         const text = document.createTextNode(cardId);
-        // addChildElement(card.elem, text); 
-        // cardID = "Clubs-8": Object {x: 425, y: 870 } //  
         const cardElem = cardsDB[cardId].elem;
         addChildElement(cardElem, text);
 
-        // card.elem.style.transform = `matrix3d(
-        //     ${orientation[0]},
-        //     ${orientation[1]},
-        //     ${orientation[2]},
-        //     0,
-        //     ${orientation[3]},
-        //     ${orientation[4]},
-        //     0,
-        //     0,
-        //     ${orientation[5]},
-        //     0,
-        //     ${orientation[6]},
-        //     0,
-        //     ${card.x},
-        //     ${card.y},
-        //     0,
-        //     1
-        //     )`; 
-
-        // card.elem.style = `transform: matrix3d(
         cardElem.style = `transform: matrix3d(
             ${orientation[0]},
             ${orientation[1]},
@@ -590,8 +478,6 @@ function dealingCards(players, timing){
             ); z-index: ${zIndex};`;
         
         zIndex += 1;
-
-
         playerIndex += 1;
 
         if (playerIndex == playersID.length){
@@ -605,7 +491,6 @@ function dealingCards(players, timing){
   
 
 function calcCardPositions(player, stacked=true){
-     // let playerCardObj = {cardId:{'elem': cardElem, 'x':cardX, 'y':cardY}};
      // let playerCardObj = {cardId:{'x':cardX, 'y':cardY}};
     let cardsInHand = player['cards-in-hand'];
     let handWidth = 0;
