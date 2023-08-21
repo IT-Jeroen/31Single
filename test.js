@@ -55,7 +55,8 @@ const players = {
 
 
 
-for (const [id, card] of Object.entries(players[0]['cards-in-hand'])) {
- console.log(id, card)
-}
+// for (const [id, card] of Object.entries(players[0]['cards-in-hand'])) {
+//  console.log(id, card)
+// }
 
+console.log(Number('1'))

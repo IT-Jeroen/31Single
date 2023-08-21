@@ -26,6 +26,9 @@ const players = {
 }
 
 // cardID = "Clubs-8": Object { elem: div.card, x: 425, y: 870 } //
+const charValues = {'A':11, 'K':10, 'Q':10, 'J': 10};
+const cardsDB = {};
+
 
 const numPlayersCards = 5;
 const cardsInGame = (Object.keys(players).length) * numPlayersCards;
@@ -103,14 +106,15 @@ function cardHoverEffect(hoverElem, reverse=false){
 
 
 
-function mouseOverEvent(elem){
+function mouseOverEvent(elem, allowHoverUp=true, allowHoverDown=true){
 
     elem.addEventListener(
         "mouseenter",
         (event) => {
-            // const targetElem = event.target;
-            // targetElem.style = cardHoverEffect(targetElem);
-            event.target.style = cardHoverEffect(event.target);
+            // event.target.style = cardHoverEffect(event.target);
+            if (allowHoverUp){
+                event.target.style = cardHoverEffect(event.target);
+            }
         },
         false,
       );
@@ -118,9 +122,10 @@ function mouseOverEvent(elem){
       elem.addEventListener(
         "mouseleave",
         (event) => {
-            // const targetElem = event.target
-            // targetElem.style = cardHoverEffect(targetElem, reverse=true);
-            event.target.style = cardHoverEffect(event.target, reverse=true);
+            // event.target.style = cardHoverEffect(event.target, reverse=true);
+            if (allowHoverDown){
+                event.target.style = cardHoverEffect(event.target, reverse=true);
+            }
         },
         false,
       );
@@ -131,6 +136,15 @@ function removeMouseOverEvent(elem){
 
 }
 
+
+
+function pickedCardEffect(pickedElem, unpick=false){
+    // hover effect in place
+
+    // block hover down effect
+
+
+}
 
 function swapCards(elemBank,elemPlayer){
     const player = players['0'];
@@ -278,7 +292,19 @@ function createDeckCards(numCards, minValue='2', maxValue='A'){
     return cardsInDeck;
 }
 
+function addToCardDB(cardID, cardElem){
+    let splitID = cardID.split('-');
+    let cardSymbol = splitID[0];
+    let cardIcon = splitID[1];
+    let cardValue = Number(cardIcon);
 
+    if (!cardValue){
+        cardValue = charValues[cardIcon];
+    }
+    
+    cardsDB[cardID] = {'elem': cardElem, 'picked':false, 'access':false, 'value':cardValue,'symbol':cardSymbol, 'icon':cardIcon};
+    // return {cardID:{'elem': elem, 'picked':false, 'access':false, 'value':cardValue,'symbol':cardSymbol, 'icon':cardIcon}};
+}
 
 function dealCards(players){
     // Query all card elements
@@ -292,6 +318,8 @@ function dealCards(players){
     allCards.forEach((cardElem, index) =>{
         // pick a card //
         let cardId = deckCardValues[index];
+        // add card to DB //
+        addToCardDB(cardId, cardElem);
         
         // add card to player hand //
         players[`${playerID}`]['cards-in-hand'][cardId] = {'elem': cardElem, 'x':0, 'y':0};
@@ -303,12 +331,16 @@ function dealCards(players){
             cardClickEvent(cardElem);
             // calc cardPosition //
             calcCardPositions(players[`${playerID}`], stacked=false);
+            // give player acces to card //
+            cardsDB[cardId].access = true;
         }else{
             if (players[`${playerID}`].location == 'south'){
                 // add hover mouse event //
                 mouseOverEvent(cardElem);
                 // add click card event //
                 cardClickEvent(cardElem);
+                // give player acces to card //
+                cardsDB[cardId].access = true;
             }
             // calc cardPosition //
             calcCardPositions(players[`${playerID}`]);
@@ -321,6 +353,8 @@ function dealCards(players){
         }
 
     })
+
+    console.log(cardsDB);
 
     // position cards
     const bank = filterPlayers('name', ['Bank'], filterOut=false);
