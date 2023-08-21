@@ -15,8 +15,8 @@ let matrix180Flipped = [1,0,0,0,-1,0,-1]; // 180 degree z axis
 let matrix270Flipped = [0,1,0,1,0,0,-1]; // 270 degree z axis
 
 
-// Keep players key a string or a number //
-// Will be better to keep string if players becomes a json object //
+// cardID = "Clubs-8": Object { elem: div.card, x: 425, y: 870 } //
+// Keep elem cards-in-hand as well for quicker search ??? (cards-in-hand.length vs cards-in cardsDB.length) //
 const players = {
     '0': {"name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0},
     '1': {"name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix90},
@@ -25,9 +25,9 @@ const players = {
     '4': {"name":'Bank', "location": 'center', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0},
 }
 
-// cardID = "Clubs-8": Object { elem: div.card, x: 425, y: 870 } //
 const charValues = {'A':11, 'K':10, 'Q':10, 'J': 10};
-const cardsDB = {};
+// cardID = "Clubs-8": Object { elem: div.card, picked:false, access:true, value:8, symbol:'Clubs', icon:'8'} //
+const cardsDB = {}; // Generated in dealCards() with addToCardDB()
 
 
 const numPlayersCards = 5;
@@ -58,6 +58,26 @@ startGame.addEventListener('click', ()=> {
     dealCards(players);
 })
 
+function addToCardDB(cardID, cardElem){
+    let splitID = cardID.split('-');
+    let cardSymbol = splitID[0];
+    let cardIcon = splitID[1];
+    let cardValue = Number(cardIcon);
+
+    if (!cardValue){
+        cardValue = charValues[cardIcon];
+    }
+    
+    cardsDB[cardID] = {'elem': cardElem, 'picked':false, 'access':false, 'value':cardValue,'symbol':cardSymbol, 'icon':cardIcon, 'location':''};
+    // return {cardID:{'elem': elem, 'picked':false, 'access':false, 'value':cardValue,'symbol':cardSymbol, 'icon':cardIcon}};
+}
+
+
+function findCardID(cardElem){
+
+    return returnID = Object.keys(cardsDB).filter(cardID => cardsDB[cardID].elem == cardElem)[0]
+        
+}
 
 function filterPlayers(field, valuesArr, filterOut=true){
     // Conversion to lower Case ??? //
@@ -112,7 +132,10 @@ function mouseOverEvent(elem, allowHoverUp=true, allowHoverDown=true){
         "mouseenter",
         (event) => {
             // event.target.style = cardHoverEffect(event.target);
-            if (allowHoverUp){
+            // if (allowHoverUp){
+            const cardID = findCardID(elem);
+            // console.log('Card ID',cardID)
+            if (cardsDB[cardID].access){
                 event.target.style = cardHoverEffect(event.target);
             }
         },
@@ -123,7 +146,10 @@ function mouseOverEvent(elem, allowHoverUp=true, allowHoverDown=true){
         "mouseleave",
         (event) => {
             // event.target.style = cardHoverEffect(event.target, reverse=true);
-            if (allowHoverDown){
+            // if (allowHoverDown){
+            const cardID = findCardID(elem);
+            // console.log('Card ID', cardID)
+            if (cardsDB[cardID].access){
                 event.target.style = cardHoverEffect(event.target, reverse=true);
             }
         },
@@ -131,93 +157,178 @@ function mouseOverEvent(elem, allowHoverUp=true, allowHoverDown=true){
       );
 }
 
-// Every Cards going out the other players needs to have a mouseEvent removed
-function removeMouseOverEvent(elem){
 
-}
+// function swapCards(elemBank,elemPlayer){
+//     const player = players['0'];
+//     const bank = players['4'];
+//     let playerCardID = '';
+//     let bankCardID = '';
+//     let timing = 500;
 
+//     for (const [id, card] of Object.entries(player['cards-in-hand'])) {
+//         if (elemPlayer == card.elem ){
+//             playerCardID = id;
+//         }     
+//     }
 
+//       for (const [id, card] of Object.entries(bank['cards-in-hand'])) {
+//         if (elemBank == card.elem ){
+//             bankCardID = id; 
+//         }  
+//     }
 
-function pickedCardEffect(pickedElem, unpick=false){
-    // hover effect in place
+//     if (playerCardID){
+//         players['0']['cards-in-hand'][bankCardID] = players['4']['cards-in-hand'][bankCardID];
+//         delete players['4']['cards-in-hand'][bankCardID];
+//     }
 
-    // block hover down effect
+//     if (bankCardID){
+//         players['4']['cards-in-hand'][playerCardID] = players['0']['cards-in-hand'][playerCardID];
+//         delete players['0']['cards-in-hand'][playerCardID]; 
+//     }
 
+//     setTimeout(()=>{
+//         calcCardPositions(players['0']);
+//         calcCardPositions(players['4'], stacked=false);
+//     },500);
+    
+//     cardPickedBank.pop();
+//     cardPickPlayer.pop();
 
-}
+//     setTimeout(()=>{
+//         repositionCards(['0', '4']);
+//     },timing)
 
-function swapCards(elemBank,elemPlayer){
-    const player = players['0'];
-    const bank = players['4'];
-    let playerCardID = '';
-    let bankCardID = '';
-    let timing = 500;
+// } 
 
-    for (const [id, card] of Object.entries(player['cards-in-hand'])) {
-        if (elemPlayer == card.elem ){
-            playerCardID = id;
-        }     
-    }
+function swapCards(bankCardID,playerCardID){
+    const timingRepos = 700;
+    const timingCalc = 500;
+    const bankLocation = cardsDB[bankCardID].location;
+    const bank = filterPlayers('location', bankLocation, filterOut=false);
+    const bankID = Object.keys(bank)[0];
+    const playerLocation = cardsDB[playerCardID].location;
+    const player = filterPlayers('location', playerLocation, filterOut=false);
+    const playerID = Object.keys(player)[0];
 
-      for (const [id, card] of Object.entries(bank['cards-in-hand'])) {
-        if (elemBank == card.elem ){
-            bankCardID = id; 
-        }  
-    }
+    
 
-    if (playerCardID){
-        players['0']['cards-in-hand'][bankCardID] = players['4']['cards-in-hand'][bankCardID];
-        delete players['4']['cards-in-hand'][bankCardID];
-    }
+    // add bankCardID to Player
+    players[playerID]['cards-in-hand'][bankCardID] = players[bankID]['cards-in-hand'][bankCardID];
+    // players[playerID]['cards-in-hand'][bankCardID] = {'x': 0, 'y': 0};
 
-    if (bankCardID){
-        players['4']['cards-in-hand'][playerCardID] = players['0']['cards-in-hand'][playerCardID];
-        delete players['0']['cards-in-hand'][playerCardID]; 
-    }
+    // add playerCardID to Bank
+    players[bankID]['cards-in-hand'][playerCardID] = players[playerID]['cards-in-hand'][playerCardID];
+    // players[bankID]['cards-in-hand'][playerCardID] = {'x': 0, 'y': 0};
+
+    // remove bankCardID from Bank
+    delete players[bankID]['cards-in-hand'][bankCardID];
+
+    // remove playerCardID from Player
+    delete players[playerID]['cards-in-hand'][playerCardID]
 
     setTimeout(()=>{
-        calcCardPositions(players['0']);
-        calcCardPositions(players['4'], stacked=false);
-    },500);
-    
+        calcCardPositions(players[playerID]);
+        calcCardPositions(players[bankID], stacked=false);
+    },timingCalc);
+
     cardPickedBank.pop();
     cardPickPlayer.pop();
 
     setTimeout(()=>{
-        repositionCards(['0', '4']);
-    },timing)
+        repositionCards([playerID, bankID]);
+    },timingRepos)
+    
+}
 
-} 
+
+function pickCardEvent(pickedElem){
+    const cardID = findCardID(pickedElem);
+    const location = cardsDB[cardID].location;
+
+    if (location == 'center'){
+        // Bank [4]
+        if (cardPickedBank.length == 0){
+            cardPickedBank.push(cardID); // cardPickedBank.push(pickedElem);
+            cardsDB[cardID].picked = true;
+        }else{
+            if (cardID == cardPickedBank[0]){
+                const unPickBankID = cardPickedBank.pop();
+                cardsDB[unPickBankID].picked = false;
+            }else{
+                const unPickID = cardPickedBank.pop();
+                cardsDB[unPickID].picked = false;
+                cardPickedBank.push(cardID); // cardPickedBank.push(pickedElem);
+                cardsDB[cardID].picked = true;
+            }
+
+        }
+    }
+    if (location == 'south'){
+        // Local Player [0]
+        if (cardPickPlayer.length == 0){
+            cardPickPlayer.push(cardID); // cardPickPlayer.push(pickedElem);
+            cardsDB[cardID].picked = true;
+        }else{
+            if (cardID == cardPickPlayer[0]){
+                const unPickPlayerID = cardPickPlayer.pop();
+                cardsDB[unPickPlayerID].picked = false;
+            }else{
+                const unPickID = cardPickPlayer.pop();
+                cardsDB[unPickID].picked = false;
+                cardPickPlayer.push(cardID); // cardPickPlayer.push(pickedElem);
+                cardsDB[cardID].picked = true;
+            }
+            
+        }
+    }
+    console.log(cardsDB);
+}
 
 
 function cardClickEvent(elem){
-    const bankY = deckPos.y;
-    const southY = southTop;
+    // const bankY = deckPos.y;
+    // const southY = southTop;
 
     elem.addEventListener('click', (event)=>{
-        const targetElem = event.target
-        const stringMatrix = targetElem.getAttribute('style');
-        let matrixArray = stringMatrix.split(/\s/);
-        matrixArray = matrixArray.map(item => item.replace(',',''));
-        const targetY = Number(matrixArray[14]);
+        // // const targetElem = event.target
+        // const cardID = findCardID(event.target)
+        // const stringMatrix = event.target.getAttribute('style');
+        // let matrixArray = stringMatrix.split(/\s/);
+        // matrixArray = matrixArray.map(item => item.replace(',',''));
+        // const targetY = Number(matrixArray[14]);
 
-        if (targetY + hoverOffsetY - bankY < clickCardOffset && targetY + hoverOffsetY - bankY > -1 * clickCardOffset){
-            if (cardPickedBank.length == 0){
-                cardPickedBank.push(targetElem);
-            }else{
-                const unPickBankElem = cardPickedBank.pop();
-                cardPickedBank.push(targetElem);
-            }
-        }
-        if (targetY + hoverOffsetY - southY < clickCardOffset && targetY + hoverOffsetY - southY > -1 * clickCardOffset){
-            if (cardPickPlayer.length == 0){
-                cardPickPlayer.push(targetElem);
-            }else{
-                const unPickPlayerElem = cardPickPlayer.pop();
-                cardPickPlayer.push(targetElem);
-            }
+        // if (targetY + hoverOffsetY - bankY < clickCardOffset && targetY + hoverOffsetY - bankY > -1 * clickCardOffset){
+        //     if (cardPickedBank.length == 0){
+        //         cardPickedBank.push(event.target);
+        //         cardsDB[cardID].picked = true;
+        //     }else{
+        //         const unPickBankElem = cardPickedBank.pop();
+        //         const unPickID = findCardID(unPickBankElem);
+        //         cardsDB[unPickID].picked = false;
+        //         cardPickedBank.push(event.target);
+        //         cardsDB[cardID].picked = true;
+        //     }
+        // }
+        // if (targetY + hoverOffsetY - southY < clickCardOffset && targetY + hoverOffsetY - southY > -1 * clickCardOffset){
+        //     if (cardPickPlayer.length == 0){
+        //         cardPickPlayer.push(event.target);
+        //         cardsDB[cardID].picked = true;
+        //     }else{
+        //         const unPickPlayerElem = cardPickPlayer.pop();
+        //         const unPickID = findCardID(unPickPlayerElem);
+        //         cardsDB[unPickID].picked = false;
+        //         cardPickPlayer.push(event.target);
+        //         cardsDB[cardID].picked = true;
+        //     }
 
+        // }
+
+        const cardID = findCardID(event.target);
+        if (cardsDB[cardID].access){
+            pickCardEvent(event.target);
         }
+        // pickCardEvent(event.target);
 
         if (cardPickedBank.length == 1 && cardPickPlayer.length == 1){
             swapCards(cardPickedBank[0], cardPickPlayer[0]);
@@ -292,19 +403,6 @@ function createDeckCards(numCards, minValue='2', maxValue='A'){
     return cardsInDeck;
 }
 
-function addToCardDB(cardID, cardElem){
-    let splitID = cardID.split('-');
-    let cardSymbol = splitID[0];
-    let cardIcon = splitID[1];
-    let cardValue = Number(cardIcon);
-
-    if (!cardValue){
-        cardValue = charValues[cardIcon];
-    }
-    
-    cardsDB[cardID] = {'elem': cardElem, 'picked':false, 'access':false, 'value':cardValue,'symbol':cardSymbol, 'icon':cardIcon};
-    // return {cardID:{'elem': elem, 'picked':false, 'access':false, 'value':cardValue,'symbol':cardSymbol, 'icon':cardIcon}};
-}
 
 function dealCards(players){
     // Query all card elements
@@ -321,14 +419,26 @@ function dealCards(players){
         // add card to DB //
         addToCardDB(cardId, cardElem);
         
+
+
         // add card to player hand //
-        players[`${playerID}`]['cards-in-hand'][cardId] = {'elem': cardElem, 'x':0, 'y':0};
+        // players[`${playerID}`]['cards-in-hand'][cardId] = {'elem': cardElem, 'x':0, 'y':0};
+        players[`${playerID}`]['cards-in-hand'][cardId] = {'x':0, 'y':0};
+        cardsDB[cardId].location = players[`${playerID}`].location;
+
+        // add hover mouse event //
+        mouseOverEvent(cardElem);
+
+        // add click card event //
+        cardClickEvent(cardElem);
+
+
 
         if (players[`${playerID}`].name == 'Bank'){
             // add hover mouse event //
-            mouseOverEvent(cardElem);
+            // mouseOverEvent(cardElem);
             // add click card event //
-            cardClickEvent(cardElem);
+            // cardClickEvent(cardElem);
             // calc cardPosition //
             calcCardPositions(players[`${playerID}`], stacked=false);
             // give player acces to card //
@@ -336,9 +446,9 @@ function dealCards(players){
         }else{
             if (players[`${playerID}`].location == 'south'){
                 // add hover mouse event //
-                mouseOverEvent(cardElem);
+                // mouseOverEvent(cardElem);
                 // add click card event //
-                cardClickEvent(cardElem);
+                // cardClickEvent(cardElem);
                 // give player acces to card //
                 cardsDB[cardId].access = true;
             }
@@ -354,7 +464,8 @@ function dealCards(players){
 
     })
 
-    console.log(cardsDB);
+    // console.log(cardsDB);
+    // console.log(players);
 
     // position cards
     const bank = filterPlayers('name', ['Bank'], filterOut=false);
@@ -376,8 +487,12 @@ function repositionCards(playersID){
         const cardsID = Object.keys(players[id]['cards-in-hand'])
 
         cardsID.forEach(cardID =>{
-            let card = players[id]['cards-in-hand'][cardID]
-            card.elem.style = `transform: matrix3d(
+            // cardID = "Clubs-8": Object {x: 425, y: 870 } //  
+            const cardElem = cardsDB[cardID].elem;
+            const cardPos = players[id]['cards-in-hand'][cardID];
+            // const card = players[id]['cards-in-hand'][cardID];
+            // card.elem.style = `transform: matrix3d(
+            cardElem.style = `transform: matrix3d(
                 ${orientation[0]},
                 ${orientation[1]},
                 ${orientation[2]},
@@ -390,8 +505,8 @@ function repositionCards(playersID){
                 0,
                 ${orientation[6]},
                 0,
-                ${card.x},
-                ${card.y},
+                ${cardPos.x},
+                ${cardPos.y},
                 0,
                 1
                 ); z-index: ${zIndex};`;
@@ -430,7 +545,10 @@ function dealingCards(players, timing){
 
         // TEMP ELEMENT
         const text = document.createTextNode(cardId);
-        addChildElement(card.elem, text);   
+        // addChildElement(card.elem, text); 
+        // cardID = "Clubs-8": Object {x: 425, y: 870 } //  
+        const cardElem = cardsDB[cardId].elem;
+        addChildElement(cardElem, text);
 
         // card.elem.style.transform = `matrix3d(
         //     ${orientation[0]},
@@ -451,7 +569,8 @@ function dealingCards(players, timing){
         //     1
         //     )`; 
 
-        card.elem.style = `transform: matrix3d(
+        // card.elem.style = `transform: matrix3d(
+        cardElem.style = `transform: matrix3d(
             ${orientation[0]},
             ${orientation[1]},
             ${orientation[2]},
@@ -486,7 +605,8 @@ function dealingCards(players, timing){
   
 
 function calcCardPositions(player, stacked=true){
-     // let playerCardObj = {cardId:{'elem': cardElem, 'x:':cardX, 'y':cardY}};
+     // let playerCardObj = {cardId:{'elem': cardElem, 'x':cardX, 'y':cardY}};
+     // let playerCardObj = {cardId:{'x':cardX, 'y':cardY}};
     let cardsInHand = player['cards-in-hand'];
     let handWidth = 0;
     let cardOffSet = 0;
