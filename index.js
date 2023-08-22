@@ -202,7 +202,6 @@ function swapCards(bankCardID,playerCardID){
     
 }
 
-
 function pickCardEvent(pickedElem){
     const cardID = findCardID(pickedElem);
     const location = cardsDB[cardID].location;
