@@ -40,16 +40,26 @@ it('returnKeysFromCount() Should return an Array of Key(s) based upon count valu
         '8': 3,
     }
 
+    const attrCountTest4 = {
+        'Hearts': 2,
+        'Clubs': 1,
+    }
+
     const resultAttrCountTest1 =  returnKeysFromCount(attrCountTest1, 1, 'min');
     expect(resultAttrCountTest1).toEqual(expect.arrayContaining(['8','A','10']));
 
     const resultAttrCountTest2a = returnKeysFromCount(attrCountTest2, 2, 'min');
-    expect(resultAttrCountTest2a).toEqual(['8'])
+    expect(resultAttrCountTest2a).toEqual(['8']);
     const resultAttrCountTest2b = returnKeysFromCount(attrCountTest2, 1, 'max');
-    expect(resultAttrCountTest2b).toEqual(['A'])
+    expect(resultAttrCountTest2b).toEqual(['A']);
 
     const resultAttrCountTest3 =  returnKeysFromCount(attrCountTest3, 3, 'min');
     expect(resultAttrCountTest3).toEqual(['8']);
+
+    const resultAttrCountTest4a = returnKeysFromCount(attrCountTest4, 2, 'min');
+    expect(resultAttrCountTest4a).toEqual(['Hearts']);
+    const resultAttrCountTest4b = returnKeysFromCount(attrCountTest4, 1, 'max');
+    expect(resultAttrCountTest4b).toEqual(['Clubs']);
 });
 
 

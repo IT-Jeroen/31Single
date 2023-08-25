@@ -149,21 +149,18 @@ export function playerPass(cardsInHand,lowerSumPassLimit){
     return 'Keep Playing';
 }
 
+
 // When cardsInHand has no matching icons or symbols //
 // Find the combination of playerCard and bankCard with the highest score //
-export function findCardMatch(sortedCardInHandIDs, sortedCardInBankIDs, attr){
-    /////////////// Remove ??? ////////////////////
-    // const sortedCardInHandIDs = sortCardByValue(cardsInHand, true) // []
-    // const sortedCardInBankIDs = sortCardByValue(cardsInBank, true) // []
-    //////////////////////////////////////////////
-
+export function findCardMatch(cardsInHand, cardsInBank, attr){
+    const sortedCardInHandIDs = sortCardByValue(cardsInHand, true) // true returns array of cardIDs only
     let pickBankCard = 'None';
     let keepHandCard = 'None';
+    let dropHandCard = 'None';
     let score = 0;
 
-    // Doesn't need to be sorted  Could be Object.keys(cardsInHand / cardsInBank)//
-    sortedCardInHandIDs.forEach(handID =>{
-        sortedCardInBankIDs.forEach(bankID=>{
+    Object.keys(cardsInHand).forEach(handID =>{
+        Object.keys(cardsInBank).forEach(bankID=>{
             if (cardsDB[handID][attr] == cardsDB[bankID][attr]){
                 let scoreValue = cardsDB[handID].value + cardsDB[bankID].value;
                 if (scoreValue > score){
@@ -176,48 +173,35 @@ export function findCardMatch(sortedCardInHandIDs, sortedCardInBankIDs, attr){
         })
     })
 
-    // Should return [pickBankCard, dropHandCard] //
-    return [pickBankCard, keepHandCard];
+    if (pickBankCard != 'None'){
+        dropHandCard = sortedCardInHandIDs[2];
+        if (keepHandCard == dropHandCard){
+            dropHandCard = sortedCardInHandIDs[1];
+        }
+    }
+
+    return [pickBankCard, dropHandCard];
 }
 
 export function findCardMatch2(cardsInHand, cardsInBank, attr){
-    /////////////// Remove ??? ////////////////////
-    // const sortedCardInHandIDs = sortCardByValue(cardsInHand, true) // []
-    const sortedCardInBankIDs = sortCardByValue(cardsInBank, true) // []
-    console.log('sortedCardInBankIDs:',sortedCardInBankIDs);
-    //////////////////////////////////////////////
     let dropCardInHand = 'None';
     let pickBankCard = 'None';
-    // let matchHandCard = 'None';
-    // let matchAttr = 'None';
+    let dropCardAttrInHand = 'None';
     let score = 0;
 
-    let chaseAttr = [];
-    if (attr == 'icon'){
-        const iconCount = cardAttrCount(cardsInHand, 'icon')
-        chaseAttr = returnKeysFromCount(iconCount, 2, 'min') // Returns []  // returnKeyFromCount(iconCount, 2)
-        const dropCardIcon = returnKeysFromCount(iconCount, 1, 'max'); // Returns [icon]
-        if (dropCardIcon != 'None'){
-            dropCardInHand = findCardIdByAttr( cardsInHand, 'icon', dropCardIcon);
-        }
-        
-    }
-    if (attr == 'symbol'){
-        const symbolCount = cardAttrCount(cardsInHand, 'symbol')
-        chaseAttr = returnKeysFromCount(symbolCount, 2, 'min') // Returns []  // returnKeyFromCount(iconCount, 2) 
-        const dropCardSymbol = returnKeysFromCount(symbolCount, 1, 'max'); // Returns [symbol]
-        if (dropCardSymbol != 'None'){
-            dropCardInHand = findCardIdByAttr( cardsInHand, 'symbol', dropCardSymbol);
-        }
+    const attrCount = cardAttrCount(cardsInHand, attr);
+    const chaseAttr = returnKeysFromCount(attrCount, 2, 'min') // Returns []  // returnKeyFromCount(iconCount, 2) 
+    const dropCardAttr = returnKeysFromCount(attrCount, 1, 'max'); // Returns [symbol]
+    if (dropCardAttr != 'None'){
+        dropCardAttrInHand = findCardIdByAttr(cardsInHand, attr, dropCardAttr[0]);
     }
 
-    sortedCardInBankIDs.forEach(bankID =>{
-
+    Object.keys(cardsInBank).forEach(bankID =>{
         if (cardsDB[bankID][attr] == chaseAttr[0]){
             let scoreValue = cardsDB[bankID].value;
             if (scoreValue > score){
                 pickBankCard = bankID;
-                // matchHandCard = handID;
+                dropCardInHand = dropCardAttrInHand;
                 score = scoreValue;
             }
             
@@ -227,20 +211,14 @@ export function findCardMatch2(cardsInHand, cardsInBank, attr){
     return [pickBankCard, dropCardInHand];
 }
 
-export function findCardMatch3(sortedCardInHandIDs, sortedCardInBankIDs, attr){
-    /////////////// Remove ??? ////////////////////
-    // const sortedCardInHandIDs = sortCardByValue(cardsInHand, true) // []
-    // const sortedCardInBankIDs = sortCardByValue(cardsInBank, true) // []
-    //////////////////////////////////////////////
 
+export function findCardMatch3(cardsInHand, cardsInBank, attr){
     let pickBankCard = 'None';
     let dropHandCard = 'None';
     let score = 0;
-    // const symbolCount = cardAttrCount(cardsInHand, 'symbol')
-    // const chaseAttr = returnKeysFromCount(symbolCount, 3, 'min') // Returns []  // returnKeyFromCount(iconCount, 3) 
 
-    sortedCardInHandIDs.forEach(handID =>{
-        sortedCardInBankIDs.forEach(bankID=>{
+    Object.keys(cardsInHand).forEach(handID =>{
+        Object.keys(cardsInBank).forEach(bankID=>{
             if (cardsDB[handID][attr] == cardsDB[bankID][attr]){
                 if (cardsDB[bankID].value > cardsDB[handID].value && cardsDB[bankID].value > score){
                     pickBankCard = bankID;
@@ -259,150 +237,98 @@ export function findCardMatch3(sortedCardInHandIDs, sortedCardInBankIDs, attr){
 export function pickACard(cardsInHand, cardsInBank){
     const handIconsCount = cardAttrCount(cardsInHand, 'icon');
     const handSymbolsCount = cardAttrCount(cardsInHand, 'symbol');
+    const sortedCardInHandIDs = sortCardByValue(cardsInHand, true) // true returns array of cardIDs only
+    const sortedCardInBankIDs = sortCardByValue(cardsInBank, true) // true returns array of cardIDs only
     
-    //////////////////// Find Card Match ??? ///////////////////////
-    const sortedCardInHandIDs = sortCardByValue(cardsInHand, true) // []
-    const sortedCardInBankIDs = sortCardByValue(cardsInBank, true) // []
-    
-    //////////////////// Drop Hand Card Calc ///////////////////////
     const minBankScore = 28;
     const cardsInHandScore = calculateHand(cardsInHand);
     const cardsInBankScore = calculateHand(cardsInBank);
+    
     if (cardsInBankScore > cardsInHandScore && cardsInBankScore > minBankScore){
-        // console.log('takeBank')
         return ['Take Bank', cardsInBank]
     }
 
     // 3 unique symbols and 3 unique icons (chase symbols first);
     if (Object.keys(handIconsCount).length == 3 && Object.keys(handSymbolsCount).length == 3){
         // Loop through cards in hand and loop through cards in bank to find the highst score combination by symbol
-        // const pickBySymbol = findCardMatch(cardsInHand, cardsInBank, 'symbol');
-        let cardsPicked = findCardMatch(sortedCardInHandIDs, sortedCardInBankIDs, 'symbol');
+        // let cardsPicked = findCardMatch(sortedCardInHandIDs, sortedCardInBankIDs, 'symbol');
+        let cardsPicked = findCardMatch(cardsInHand, cardsInBank, 'symbol');
+        let cardPicked = cardsPicked[0];
+        let dropCardInHand = cardsPicked[1];
 
         // If no matching symbol in bank chase (any) icon
-        if (cardsPicked[0] == 'None'){
+        if (cardPicked == 'None'){
             // const pickByIcon = findCardMatch(cardsInHand, cardsInBank, 'icon');
-            cardsPicked = findCardMatch(sortedCardInHandIDs, sortedCardInBankIDs, 'icon');
+            cardsPicked = findCardMatch(cardsInHand, cardsInBank, 'icon');
+            cardPicked = cardsPicked[0];
+            dropCardInHand = cardsPicked[1];
         }
 
         // If no matching icon in bank either chase highest bank card
-        if (cardsPicked[0] == 'None'){
-            cardsPicked = [sortedCardInBankIDs[0], 'None'];
+        if (cardPicked == 'None'){
+            cardPicked = sortedCardInBankIDs[0];
+            dropCardInHand = sortedCardInHandIDs[2];
         }
 
-        let dropHandCard = sortedCardInHandIDs[sortedCardInHandIDs.length -1];
-        // if match handCard to BankCard == lowest value card in Hand
-        if (cardsPicked[1] == sortedCardInHandIDs[sortedCardInHandIDs.length -1]){
-            dropHandCard = sortedCardInHandIDs[1];
-        }
+        // let dropHandCard = sortedCardInHandIDs[sortedCardInHandIDs.length -1];
+        // // if match handCard to BankCard == lowest value card in Hand
+        // if (cardsPicked[1] == sortedCardInHandIDs[sortedCardInHandIDs.length -1]){
+        //     dropHandCard = sortedCardInHandIDs[1];
+        // }
 
         
-        /// reset score ??? ///
-        return [cardsPicked[0], dropHandCard] // [dropHandCard, cardsPicked[0]] [0,1]
+        return [cardPicked, dropCardInHand] // [dropHandCard, cardsPicked[0]] [0,1]
     }
 
     // 1 unique symbol (score 24 - 31) (1 unique icon == 30.5)
     if (Object.keys(handIconsCount).length == 1 || Object.keys(handSymbolsCount).length == 1){
         
-        // cardsInHandScore = calculateHand(cardsInHand);
         if (cardsInHandScore == 30.5){
+            return ['Player Pass', cardsInHand]
+        }
+        const cardsPicked = findCardMatch3(cardsInHand, cardsInBank, 'symbol');
+        // could be removed //
+        const cardPicked  = cardsPicked[0];
+        const dropCardInHand = cardsPicked[1];
+
+        // if playerScore > X => take a Gamble ? //
+        if (cardPicked  == 'None'){
             //playerPass(cardsInHand,lowerSumPassLimit) // returns playerPass
             return ['Player Pass', cardsInHand]
         }
-        const pickedCards = findCardMatch3(sortedCardInHandIDs, sortedCardInBankIDs, 'symbol')
-        const pickCard = pickedCards[0];
-        const dropCard = pickedCards[1];
 
-        if (pickCard == 'None'){
-            //playerPass(cardsInHand,lowerSumPassLimit) // returns playerPass
-            return ['Player Pass', cardsInHand]
-        }
-
-        return [pickCard, dropCard] //pickedCards; [dropCard, pickCard] [0,1]
+        return [cardPicked , dropCardInHand] //pickedCards; [dropCard, pickCard] [0,1]
     }
-        
 
     // 2 unique symbols or 2 unique icons (chase icons first)
     if (Object.keys(handIconsCount).length == 2 || Object.keys(handSymbolsCount).length == 2){
-        // ??? Either Or ??? //
-        // Chase Icons
-        let cardPicked = findCardMatch2(cardsInHand, cardsInBank, 'icon');
-        let dropCardInHand = cardPicked[1];
+        // Chase Icons first
+        let cardsPicked = findCardMatch2(cardsInHand, cardsInBank, 'icon');
+        let cardPicked = cardsPicked[0];
+        let dropCardInHand = cardsPicked[1];
         
-
         // If no matching icon in bank chase symbol
-        if (cardPicked[0]== 'None'){
-            cardPicked = findCardMatch2(cardsInHand, cardsInBank, 'symbol');
-            if (cardPicked[0] != 'None'){
-                // Favour Icons over Symbols
-                dropCardInHand = cardPicked[1];
-            }
-            
+        if (cardPicked == 'None'){
+            cardsPicked = findCardMatch2(cardsInHand, cardsInBank, 'symbol');
+            cardPicked = cardsPicked[0];
+            dropCardInHand = cardsPicked[1];
         }
 
         // If no matching icon in bank either, chase highest bank card
-        if (cardPicked[0] == 'None'){
-            cardPicked = [sortedCardInBankIDs[0], 'None'];
+        if (cardPicked == 'None'){
+            cardPicked = sortedCardInBankIDs[0];
+            // Find which card to drop //
+            let dropCardAttr = [];
+            if (Object.keys(handSymbolsCount).length < Object.keys(handIconsCount).length){
+                dropCardAttr = returnKeysFromCount(handSymbolsCount, 1, 'max'); // Returns [symbol] // Attr symbol
+                dropCardInHand = findCardIdByAttr(cardsInHand, 'symbol', dropCardAttr[0]);
+            }else{ // Favour Icons //
+                dropCardAttr = returnKeysFromCount(handIconsCount, 1, 'max'); // Returns [symbol] // Attr icon
+                dropCardInHand = findCardIdByAttr(cardsInHand, 'icon', dropCardAttr[0]);
+            }
         }
 
-        
-        // cardsInHandScore = calculateHand(cardsInHand);
-        // cardsInBankScore = calculateHand(cardsInBank);
-        // if (cardsInBankScore > cardsInHandScore && cardsInBankScore > minBankScore){
-        //     console.log('takeBank')
-        // }
-        /// reset score ??? ///
-        return [cardPicked[0], dropCardInHand] //[dropCardInHand, cardPicked] [0, 1]
+        return [cardPicked, dropCardInHand] //[dropCardInHand, cardPicked] [0, 1]
     }
         
 }
-
-// const bankCards8 = {
-//     'Clubs-A': null,
-//     'Diamond-10': null,
-//     'Hearts-8': null,
-// }
-
-// const playerCards8 = {
-//     'Clubs-8': null,
-//     'Diamond-8': null,
-//     'Hearts-A': null,
-// }
-
-// console.log('Eights 8')
-// console.log('Should Return; [Hearts-8, Hearts-A]')
-// // console.log(autoPickCard(playerCards8, bankCards8));
-// console.log(pickACard(playerCards8, bankCards8));
-
-// const bankCardsHearts = {
-//     'Clubs-A': null,
-//     'Diamond-10': null,
-//     'Hearts-8': null,
-// }
-
-// const playerCardsHearts = {
-//     'Clubs-8': null,
-//     'Hearts-9': null,
-//     'Hearts-A': null,
-// }
-// console.log('Hearths')
-// console.log('Should Return; [Hearts-8, Clubs-8]')
-// // console.log(autoPickCard(playerCardsHearts, bankCardsHearts));
-// console.log(pickACard(playerCardsHearts, bankCardsHearts));
-
-// const bankCardsSingles = {
-//     'Clubs-A': null,
-//     'Diamond-10': null,
-//     'Hearts-8': null,
-// }
-
-// const playerCardsSingles = {
-//     'Clubs-8': null,
-//     'Diamond-9': null,
-//     'Hearts-A': null,
-// }
-// console.log('Singles')
-// console.log('Should Return at Random; Hearts-8 || Clubs-A || Diamond-10') // Diamon-10 not showing up.
-// console.log('Should Return at Random; Clubs-8 || Diamond-9 || Clubs-8')
-// // console.log(autoPickCard(playerCardsSingles, bankCardsSingles));
-// console.log(pickACard(playerCardsSingles, bankCardsSingles));

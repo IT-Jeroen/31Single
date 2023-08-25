@@ -2,21 +2,21 @@ import { it, expect, describe } from 'vitest';
 import { findCardMatch, findCardMatch2, findCardMatch3, pickACard, playerPass } from './src/gameLogic.js';
 
 describe('findCardMatch()  When the playerCardsInHand has no matching icons or symbols',()=>{
-    it('It should return an Array with cardIDs where [0] is the pickBankCard and [1] is the card to keep in hand', ()=>{
+    it('It should return an Array with cardIDs where [0] is the pickBankCard and [1] is the dropHandCard', ()=>{
 
-        const playerCards = ['Clubs-8', 'Diamond-10', 'Hearts-A'];
-        const bankCards = ['Clubs-9', 'Diamond-8', 'Hearts-10'];
-        const bankCardsNone = ['Spades-9', 'Spades-8', 'Spades-10'];
+        const playerCards = {'Clubs-8':null, 'Diamond-10':null, 'Hearts-A':null};
+        const bankCards = {'Clubs-9':null, 'Diamond-8':null, 'Hearts-10':null};
+        const bankCardsNone = {'Spades-9':null, 'Spades-8':null, 'Spades-10':null};
 
         const resultSymbol = findCardMatch(playerCards, bankCards, 'symbol');
-        expect(resultSymbol).toEqual(expect.arrayContaining(['Hearts-10', 'Hearts-A']));
+        expect(resultSymbol).toEqual(expect.arrayContaining(['Hearts-10', 'Clubs-8']));
         expect(resultSymbol[0]).toBe('Hearts-10');
-        expect(resultSymbol[1]).toBe('Hearts-A');
+        expect(resultSymbol[1]).toBe('Clubs-8');
 
         const resultIcon = findCardMatch(playerCards, bankCards, 'icon');
-        expect(resultIcon).toEqual(expect.arrayContaining(['Hearts-10', 'Diamond-10']));
+        expect(resultIcon).toEqual(expect.arrayContaining(['Hearts-10', 'Clubs-8']));
         expect(resultIcon[0]).toBe('Hearts-10');
-        expect(resultIcon[1]).toBe('Diamond-10');
+        expect(resultIcon[1]).toBe('Clubs-8');
         
         const resultNone = findCardMatch(playerCards, bankCardsNone, 'symbol');
         expect(resultNone).toEqual(expect.arrayContaining(['None', 'None']));
@@ -46,7 +46,7 @@ describe('findCardMatch2()  When the playerCardsInHand has 2 matching icons or s
         const resultNone = findCardMatch2(playerCardsSymbol, bankCardsNone, 'symbol');
         expect(resultNone).toEqual(expect.arrayContaining(['None', 'None']));
         expect(resultNone[0]).toBe('None');
-        expect(resultNone[1]).toBe('None'); // Fail //
+        expect(resultNone[1]).toBe('None');
     
     });
 });
@@ -54,9 +54,9 @@ describe('findCardMatch2()  When the playerCardsInHand has 2 matching icons or s
 describe('findCardMatch3()  When the playerCardsInHand has 3 matching icons or symbols',()=>{
     it('It should return an Array with cardIDs where [0] is the pickBankCard and [1] is the dropHandCard', ()=>{
 
-        const playerCards = ['Hearts-8', 'Hearts-10', 'Hearts-A'];
-        const bankCards9 = ['Clubs-9', 'Diamond-8', 'Hearts-9'];
-        const bankCardsNone = ['Clubs-9', 'Diamond-8', 'Diamond-9'];
+        const playerCards = {'Hearts-8':null, 'Hearts-10':null, 'Hearts-A':null};
+        const bankCards9 = {'Clubs-9':null, 'Diamond-8':null, 'Hearts-9':null};
+        const bankCardsNone = {'Clubs-9':null, 'Diamond-8':null, 'Diamond-9':null};
         
         const result9 = findCardMatch3(playerCards, bankCards9, 'symbol');
         expect(result9).toEqual(expect.arrayContaining(['Hearts-9', 'Hearts-8']));
@@ -143,7 +143,7 @@ describe('pickACard() The main function that calls the findCardMatch functions',
         const resultNone = pickACard(playerCardsSymbol, bankCardsNone);
         expect(resultNone).toEqual(expect.arrayContaining(['Diamond-9', 'Diamond-10']));
         expect(resultNone[0]).toBe('Diamond-9');
-        expect(resultNone[1]).toBe('Diamond-10'); //  Fail //
+        expect(resultNone[1]).toBe('Diamond-10');
     });
 
     it('findCardMatch3() It should return an Array with cardIDs where [0] is the pickBankCard and [1] is the dropHandCard Or pass with cardsInHand', ()=>{
