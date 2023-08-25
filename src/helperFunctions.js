@@ -53,16 +53,6 @@ export function returnKeysFromCount(attrCount, countValue, minMax){
 }
 
 
-export function playerPass(cardsInHand,lowerSumPassLimit){
-    const handValue = calculateHand(cardsInHand);
-    if (handValue > lowerSumPassLimit){
-        return 'Player Pass';
-    }
-    return 'Keep Playing';
-}
-
-
-
 export function findCardIdByAttr(cardsInHand, attr, attrValue){
     let cardFoundID = 'None';
 

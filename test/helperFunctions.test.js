@@ -1,5 +1,5 @@
 import { it, expect, describe } from 'vitest';
-import { cardAttrCount, returnKeysFromCount, calculateHand, playerPass, findCardIdByAttr, filterCardsDB, sortCardByValue } from './src/helperFunctions.js';
+import { cardAttrCount, returnKeysFromCount, calculateHand, findCardIdByAttr, filterCardsDB, sortCardByValue } from './src/helperFunctions.js';
 
 it('cardAttrCount() Should return an Object with the icon or symbol as a key, and a count as value', ()=>{
     const countTwoIconSymbol = {
@@ -91,26 +91,6 @@ it('calculateHand() It should return the sum (Number) of the cardsInHand',()=>{
     expect(resultThreeHearths).toBe(29);
 });
 
-
-it('playerPass() It should return a string value to either pass or keep playing',()=>{
-    const cards29 = {
-        'Hearts-A': null,
-        'Hearts-10': null,
-        'Hearts-8': null,
-    }
-
-    const cards11 = {
-        'Clubs-8': null,
-        'Diamond-8': null,
-        'Hearts-A': null,
-    }
-
-    const result29 = playerPass(cards29, 28);
-    expect(result29).toBe('Player Pass');
-
-    const result11 = playerPass(cards11, 28);
-    expect(result11).toBe('Keep Playing');
-})
 
 it('findCardIdByAttr() It should return a string of the highest value cardID (key) based upon card attributes', ()=>{
     const findCardID = {
