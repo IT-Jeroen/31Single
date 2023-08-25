@@ -1,4 +1,4 @@
-import { cardsDB } from "./cardsDB.js";
+import { cardsDB, cardSymbols } from "./cardsDB.js";
 
 export function cardAttrCount(cardsInHand, attr){
     const cardAttr = Object.keys(cardsInHand).map((cardID)=> cardsDB[cardID][attr]);
@@ -17,21 +17,12 @@ export function cardAttrCount(cardsInHand, attr){
 }
 
 
-export function returnKeyFromCount(attrCount, minCount){
-    const countKeys = []
-
-    for (const [key, value] of Object.entries(attrCount)) {
-        if (value >= minCount){
-            countKeys.push(key)
-        }
-    }
-
-    return countKeys
-}
-
-
+// Does it need to return an array ??? //
+// Could return multiple values depending on the settings //
+// Not applicable in this setup, as long as paying attention to settings //
 export function returnKeysFromCount(attrCount, countValue, minMax){
-    const countKeys = []
+    const countKeys = [];
+
     if (minMax == 'min'){
         for (const [key, value] of Object.entries(attrCount)) {
             if (value >= countValue){
@@ -48,25 +39,38 @@ export function returnKeysFromCount(attrCount, countValue, minMax){
         }
     }
     
-
-    return countKeys
+    // return countKeys[0];
+    return countKeys.length > 0 ? countKeys[0] : 'None';
 }
 
 
-export function findCardIdByAttr(cardsInHand, attr, attrValue){
+export function findCardIdByAttr(cardsInHand, matchAttr, lowHigh){
     let cardFoundID = 'None';
+    let attr = 'icon';
+    let currentValue = 0;
+    let newValue = 0;
+    
+    if(cardSymbols.includes(matchAttr)){
+        attr = 'symbol';
+    }
 
     Object.keys(cardsInHand).forEach(cardID =>{
-        if (cardsDB[cardID][attr] == attrValue){
+        if (cardsDB[cardID][attr] == matchAttr){
             if (cardFoundID == 'None'){
                 cardFoundID = cardID;
             } else{
-                // Multiple matches for card symbols //
-                const currentValue = cardsDB[cardFoundID].value;
-                const newValue = cardsDB[cardID].value;
-                if (newValue > currentValue){
-                    cardFoundID = cardID;
+                currentValue = cardsDB[cardFoundID].value;
+                newValue = cardsDB[cardID].value;
+                if (lowHigh == 'high'){
+                    if (newValue > currentValue){
+                        cardFoundID = cardID;
+                    }
                 }
+                if (lowHigh == 'low'){
+                    if (newValue < currentValue){
+                        cardFoundID = cardID;
+                    }
+                }  
             } 
         }
     })
@@ -85,18 +89,17 @@ export function calculateHand(cardsInHand){
         return 30.5;
     }
     else{
-        let identicalSymbol = returnKeyFromCount(symbolCount, 1)[0]; /// ????
+        let identicalSymbol = returnKeysFromCount(symbolCount, 2, 'min');
         let sum = 0;
 
           Object.keys(cardsInHand).forEach(cardID =>{
-            // if identical symbols
             if (cardsDB[cardID].symbol == identicalSymbol){
                 sum += cardsDB[cardID].value;
-            }else{
-                // if no identical symbols //
+            }
+            if (identicalSymbol == 'None'){
                 if(cardsDB[cardID].value > sum){
                     sum = cardsDB[cardID].value;
-                }
+                    }
             }
         })
 

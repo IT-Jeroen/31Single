@@ -305,7 +305,7 @@ function createDeck(numDeck, orientation, postion){
 // Create Deck Card Values //
 function createDeckCards(numCards, minValue='2', maxValue='A'){
     const cardValues = ['2','3','4','5','6','7','8','9','10','J', 'Q', 'K', 'A'];
-    const cardSymbols = ['Clubs', 'Diamonds', 'Hearths', 'Spades'];
+    const cardSymbols = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
 
     const min = cardValues.indexOf(minValue);
     const max = cardValues.indexOf(maxValue)+1;

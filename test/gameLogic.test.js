@@ -4,8 +4,8 @@ import { findCardMatch, findCardMatch2, findCardMatch3, pickACard, playerPass } 
 describe('findCardMatch()  When the playerCardsInHand has no matching icons or symbols',()=>{
     it('It should return an Array with cardIDs where [0] is the pickBankCard and [1] is the dropHandCard', ()=>{
 
-        const playerCards = {'Clubs-8':null, 'Diamond-10':null, 'Hearts-A':null};
-        const bankCards = {'Clubs-9':null, 'Diamond-8':null, 'Hearts-10':null};
+        const playerCards = {'Clubs-8':null, 'Diamonds-10':null, 'Hearts-A':null};
+        const bankCards = {'Clubs-9':null, 'Diamonds-8':null, 'Hearts-10':null};
         const bankCardsNone = {'Spades-9':null, 'Spades-8':null, 'Spades-10':null};
 
         const resultSymbol = findCardMatch(playerCards, bankCards, 'symbol');
@@ -28,15 +28,15 @@ describe('findCardMatch()  When the playerCardsInHand has no matching icons or s
 describe('findCardMatch2()  When the playerCardsInHand has 2 matching icons or symbols',()=>{
     it('It should return an Array with cardIDs where [0] is the pickBankCard and [1] is the dropHandCard', ()=>{
 
-        const playerCardsSymbol = {'Hearts-8':null, 'Diamond-10':null, 'Hearts-A':null};
-        const playerCardsIcon = {'Hearts-8':null, 'Diamond-8':null, 'Hearts-A':null};
-        const bankCards = {'Clubs-8':null, 'Diamond-9':null, 'Hearts-10':null};
-        const bankCardsNone = {'Clubs-8':null, 'Diamond-9':null, 'Diamond-8':null};
+        const playerCardsSymbol = {'Hearts-8':null, 'Diamonds-10':null, 'Hearts-A':null};
+        const playerCardsIcon = {'Hearts-8':null, 'Diamonds-8':null, 'Hearts-A':null};
+        const bankCards = {'Clubs-8':null, 'Diamonds-9':null, 'Hearts-10':null};
+        const bankCardsNone = {'Clubs-8':null, 'Diamonds-9':null, 'Diamonds-8':null};
 
         const resultSymbol = findCardMatch2(playerCardsSymbol, bankCards, 'symbol');
-        expect(resultSymbol).toEqual(expect.arrayContaining(['Hearts-10', 'Diamond-10']));
+        expect(resultSymbol).toEqual(expect.arrayContaining(['Hearts-10', 'Diamonds-10']));
         expect(resultSymbol[0]).toBe('Hearts-10');
-        expect(resultSymbol[1]).toBe('Diamond-10');
+        expect(resultSymbol[1]).toBe('Diamonds-10');
 
         const resultIcon = findCardMatch2(playerCardsIcon, bankCards, 'icon');
         expect(resultIcon).toEqual(expect.arrayContaining(['Clubs-8', 'Hearts-A']));
@@ -55,8 +55,8 @@ describe('findCardMatch3()  When the playerCardsInHand has 3 matching icons or s
     it('It should return an Array with cardIDs where [0] is the pickBankCard and [1] is the dropHandCard', ()=>{
 
         const playerCards = {'Hearts-8':null, 'Hearts-10':null, 'Hearts-A':null};
-        const bankCards9 = {'Clubs-9':null, 'Diamond-8':null, 'Hearts-9':null};
-        const bankCardsNone = {'Clubs-9':null, 'Diamond-8':null, 'Diamond-9':null};
+        const bankCards9 = {'Clubs-9':null, 'Diamonds-8':null, 'Hearts-9':null};
+        const bankCardsNone = {'Clubs-9':null, 'Diamonds-8':null, 'Diamonds-9':null};
         
         const result9 = findCardMatch3(playerCards, bankCards9, 'symbol');
         expect(result9).toEqual(expect.arrayContaining(['Hearts-9', 'Hearts-8']));
@@ -79,7 +79,7 @@ it('playerPass() It should return a string value to either pass or keep playing'
 
     const cards11 = {
         'Clubs-8': null,
-        'Diamond-8': null,
+        'Diamonds-8': null,
         'Hearts-A': null,
     }
 
@@ -94,10 +94,10 @@ describe('pickACard() The main function that calls the findCardMatch functions',
 
     it('findCardMatch() It should return an Array with cardIDs where [0] is the pickBankCard and [1] is the dropHandCard', ()=>{
 
-        const playerCards = {'Clubs-8':null, 'Diamond-10':null, 'Hearts-K':null};
-        const bankCardsChaseSymbols = {'Clubs-9':null, 'Diamond-8':null, 'Hearts-10':null};
+        const playerCards = {'Clubs-8':null, 'Diamonds-10':null, 'Hearts-K':null};
+        const bankCardsChaseSymbols = {'Clubs-9':null, 'Diamonds-8':null, 'Hearts-10':null};
         const bankCardsChaseIcons = {'Spades-9':null, 'Spades-8':null, 'Spades-10':null};
-        const playerCardsChaseNone = {'Clubs-9':null, 'Diamond-J':null, 'Hearts-K':null};
+        const playerCardsChaseNone = {'Clubs-9':null, 'Diamonds-J':null, 'Hearts-K':null};
         const bankCardsChaseNone = {'Spades-7':null, 'Spades-8':null, 'Spades-10':null};
 
         // Match with Symbol (Preferred) //
@@ -119,16 +119,16 @@ describe('pickACard() The main function that calls the findCardMatch functions',
 
     it('findCardMatch2() It should return an Array with cardIDs where [0] is the pickBankCard and [1] is the dropHandCard', ()=>{
         
-        const playerCardsSymbol = {'Hearts-8':null, 'Diamond-10':null, 'Hearts-A':null};
-        const playerCardsIcon = {'Hearts-8':null, 'Diamond-8':null, 'Hearts-A':null};
-        const playerCardsSymbolIcon = {'Hearts-8':null, 'Diamond-8':null, 'Hearts-A':null};
-        const bankCards = {'Clubs-8':null, 'Diamond-9':null, 'Hearts-10':null};
-        const bankCardsNone = {'Clubs-8':null, 'Diamond-9':null, 'Diamond-8':null};
+        const playerCardsSymbol = {'Hearts-8':null, 'Diamonds-10':null, 'Hearts-A':null};
+        const playerCardsIcon = {'Hearts-8':null, 'Diamonds-8':null, 'Hearts-A':null};
+        const playerCardsSymbolIcon = {'Hearts-8':null, 'Diamonds-8':null, 'Hearts-A':null};
+        const bankCards = {'Clubs-8':null, 'Diamonds-9':null, 'Hearts-10':null};
+        const bankCardsNone = {'Clubs-8':null, 'Diamonds-9':null, 'Diamonds-8':null};
 
         const resultSymbol = pickACard(playerCardsSymbol, bankCards);
-        expect(resultSymbol).toEqual(expect.arrayContaining(['Hearts-10', 'Diamond-10']));
+        expect(resultSymbol).toEqual(expect.arrayContaining(['Hearts-10', 'Diamonds-10']));
         expect(resultSymbol[0]).toBe('Hearts-10');
-        expect(resultSymbol[1]).toBe('Diamond-10');
+        expect(resultSymbol[1]).toBe('Diamonds-10');
 
         const resultIcon = pickACard(playerCardsIcon, bankCards);
         expect(resultIcon).toEqual(expect.arrayContaining(['Clubs-8', 'Hearts-A']));
@@ -141,17 +141,17 @@ describe('pickACard() The main function that calls the findCardMatch functions',
         expect(resultSymbolIcon[1]).toBe('Hearts-A');
 
         const resultNone = pickACard(playerCardsSymbol, bankCardsNone);
-        expect(resultNone).toEqual(expect.arrayContaining(['Diamond-9', 'Diamond-10']));
-        expect(resultNone[0]).toBe('Diamond-9');
-        expect(resultNone[1]).toBe('Diamond-10');
+        expect(resultNone).toEqual(expect.arrayContaining(['Diamonds-9', 'Diamonds-10']));
+        expect(resultNone[0]).toBe('Diamonds-9');
+        expect(resultNone[1]).toBe('Diamonds-10');
     });
 
     it('findCardMatch3() It should return an Array with cardIDs where [0] is the pickBankCard and [1] is the dropHandCard Or pass with cardsInHand', ()=>{
         const playerCards = {'Hearts-8':null, 'Hearts-10':null, 'Hearts-A':null};
         const playerCardsPassSymbol = {'Hearts-K':null, 'Hearts-10':null, 'Hearts-A':null};
-        const playerCardsPassIcon = {'Clubs-8':null, 'Diamond-8':null, 'Hearts-8':null};
-        const bankCards9 = {'Clubs-9':null, 'Diamond-10':null, 'Hearts-9':null};
-        const bankCardsNone = {'Clubs-9':null, 'Diamond-8':null, 'Diamond-9':null};
+        const playerCardsPassIcon = {'Clubs-8':null, 'Diamonds-8':null, 'Hearts-8':null};
+        const bankCards9 = {'Clubs-9':null, 'Diamonds-10':null, 'Hearts-9':null};
+        const bankCardsNone = {'Clubs-9':null, 'Diamonds-8':null, 'Diamonds-9':null};
         
         const result9 = pickACard(playerCards, bankCards9);
         expect(result9).toEqual(expect.arrayContaining(['Hearts-9', 'Hearts-8']));
@@ -177,7 +177,7 @@ describe('pickACard() The main function that calls the findCardMatch functions',
     it('Should swap with bank if the score for bankCards is bigger than the score of handCards and a min score value (29)', ()=>{
         const playerCards = {'Hearts-8':null, 'Hearts-10':null, 'Hearts-A':null};
         const bankCards30 = {'Spades-10':null, 'Spades-J':null, 'Spades-Q':null};
-        const bankCardsIcons = {'Clubs-9':null, 'Hearts-9':null, 'Diamond-9':null};
+        const bankCardsIcons = {'Clubs-9':null, 'Hearts-9':null, 'Diamonds-9':null};
         const bankCardsNoSwap = {'Spades-7':null, 'Spades-8':null, 'Spades-9':null}
 
         const result30 = pickACard(playerCards, bankCards30);

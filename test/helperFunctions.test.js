@@ -45,21 +45,25 @@ it('returnKeysFromCount() Should return an Array of Key(s) based upon count valu
         'Clubs': 1,
     }
 
-    const resultAttrCountTest1 =  returnKeysFromCount(attrCountTest1, 1, 'min');
-    expect(resultAttrCountTest1).toEqual(expect.arrayContaining(['8','A','10']));
+    const resultAttrCountTest1a =  returnKeysFromCount(attrCountTest1, 1, 'min');
+    expect(resultAttrCountTest1a).toBe('8');
+
+    const resultAttrCountTest1b =  returnKeysFromCount(attrCountTest1, 2, 'min');
+    expect(resultAttrCountTest1b).toBe('None');
 
     const resultAttrCountTest2a = returnKeysFromCount(attrCountTest2, 2, 'min');
-    expect(resultAttrCountTest2a).toEqual(['8']);
+
+    expect(resultAttrCountTest2a).toBe('8');
     const resultAttrCountTest2b = returnKeysFromCount(attrCountTest2, 1, 'max');
-    expect(resultAttrCountTest2b).toEqual(['A']);
+    expect(resultAttrCountTest2b).toBe('A');
 
     const resultAttrCountTest3 =  returnKeysFromCount(attrCountTest3, 3, 'min');
-    expect(resultAttrCountTest3).toEqual(['8']);
+    expect(resultAttrCountTest3).toBe('8');
 
     const resultAttrCountTest4a = returnKeysFromCount(attrCountTest4, 2, 'min');
-    expect(resultAttrCountTest4a).toEqual(['Hearts']);
+    expect(resultAttrCountTest4a).toBe('Hearts');
     const resultAttrCountTest4b = returnKeysFromCount(attrCountTest4, 1, 'max');
-    expect(resultAttrCountTest4b).toEqual(['Clubs']);
+    expect(resultAttrCountTest4b).toBe('Clubs');
 });
 
 
@@ -73,19 +77,25 @@ it('calculateHand() It should return the sum (Number) of the cardsInHand',()=>{
     const cardsThree8 = {
         'Hearts-8': null,
         'Clubs-8': null,
-        'Diamond-8': null,
+        'Diamonds-8': null,
     }
     
     const cardsSingles = {
         'Clubs-8': null,
-        'Diamond-8': null,
         'Hearts-A': null,
+        'Diamonds-9': null,
     }
     
     const cardsThreeHearths = {
         'Hearts-A': null,
         'Hearts-10': null,
         'Hearts-8': null,
+    }
+
+    const cardsTrickTest = {
+        'Hearts-8': null,
+        'Spades-A': null,
+        'Hearts-10': null,
     }
     
     const resultTwoHearths = calculateHand(cardsTwoHearths);
@@ -99,23 +109,31 @@ it('calculateHand() It should return the sum (Number) of the cardsInHand',()=>{
 
     const resultThreeHearths = calculateHand(cardsThreeHearths);
     expect(resultThreeHearths).toBe(29);
+
+    const resultTrickTest = calculateHand(cardsTrickTest);
+    expect(resultTrickTest).toBe(18);
 });
 
 
 it('findCardIdByAttr() It should return a string of the highest value cardID (key) based upon card attributes', ()=>{
     const findCardID = {
-        'Hearts-A': null,
-        'Clubs-8': null,
         'Hearts-8': null,
-    }
+        'Clubs-8': null,
+        'Hearts-A': null,
+    };
     
-    const arr = ['Clubs-8', 'Hearts-8']
-    const resultIconAttr = findCardIdByAttr(findCardID, 'icon', '8');
-    expect(arr).toContain(resultIconAttr);
+    // const arr = ['Clubs-8', 'Hearts-8'];
+    // const resultIconAttr = findCardIdByAttr(findCardID, 'icon', '8');
+    // const resultIconAttr = findCardIdByAttr(findCardID, '8', 'low');
+    // // expect(arr).toContain(resultIconAttr);
+    // expect(resultIconAttr).toEqual(expect.arrayContaining(['Clubs-8', 'Hearts-8']));
 
-    const resultSymbolAttr = findCardIdByAttr(findCardID, 'symbol', 'Hearts');
-    expect(resultSymbolAttr).toBe('Hearts-A')
-})
+    const resultSymbolAttrHigh = findCardIdByAttr(findCardID, 'Hearts', 'high');
+    expect(resultSymbolAttrHigh).toBe('Hearts-A');
+    const resultSymbolAttrLow = findCardIdByAttr(findCardID, 'Hearts', 'low');
+    expect(resultSymbolAttrLow).toBe('Hearts-8');
+});
+
 
 it('filterCardsDB() It should return an Object holding a portion of the cardsDB based upon cardsInHand (keys) ', ()=>{
     const cardsInHand = {
@@ -138,15 +156,15 @@ it('sortCardByValue() It Should return a (Decending) sorted Array or sorted Obje
     const cardsSortValues = {
         'Hearts-A': null,
         'Clubs-8': null,
-        'Diamond-10': null,
+        'Diamonds-10': null,
     }
 
     const resultSortValueArray = sortCardByValue(cardsSortValues, true);
-    expect(resultSortValueArray).toEqual(expect.arrayContaining(['Hearts-A','Diamond-10', 'Clubs-8']));
+    expect(resultSortValueArray).toEqual(expect.arrayContaining(['Hearts-A','Diamonds-10', 'Clubs-8']));
 
     const resultSortValueObject = sortCardByValue(cardsSortValues);
     expect(resultSortValueObject).toBeTypeOf('object'); // Array and Object are the same
-    expect(Object.keys(resultSortValueObject)).toEqual(expect.arrayContaining(['Hearts-A','Diamond-10', 'Clubs-8']));
+    expect(Object.keys(resultSortValueObject)).toEqual(expect.arrayContaining(['Hearts-A','Diamonds-10', 'Clubs-8']));
     expect(resultSortValueObject['Hearts-A'].value).toBe(11);
 
 })
