@@ -1,10 +1,18 @@
-import { cardAttrCount, calculateHand, returnKeysFromCount, findCardIdByAttr, sortCardByValue } from './helperFunctions.js';
+import { cardAttrCount, calculateHand, returnAttrFromCount, findCardIdByAttr, sortCardByValue } from './helperFunctions.js';
 import { cardsDB } from "./cardsDB.js";
 
 
-function checkIfDropCardWithBankSum(){
-    // check if drop card is giving away high score in the bank //
+export function checkCardSwapSum(cardsInHand, cardIn, cardOut){
+    const cardIDs = Object.keys(cardsInHand);
+    cardIDs.push(cardIn);
+    const newcardIDs = cardIDs.filter(cardID => cardID != cardOut)
+    const newCardsSwap = Object.fromEntries(Object.entries(cardsInHand).filter(([k,v]) => newcardIDs.includes(k)));
+    newCardsSwap[cardIn] = null;
+    const sum = calculateHand(newCardsSwap);
+    return sum;
 }
+
+
 
 export function playerPass(cardsInHand,lowerSumPassLimit){
     const handValue = calculateHand(cardsInHand);
@@ -33,7 +41,6 @@ export function findCardMatch(cardsInHand, cardsInBank, attr){
                     keepHandCard = handID;
                     score = scoreValue;
                 }
-                
             }
         })
     })
@@ -55,11 +62,10 @@ export function findCardMatch2(cardsInHand, cardsInBank, attr){
     let score = 0;
 
     const attrCount = cardAttrCount(cardsInHand, attr);
-    const chaseAttr = returnKeysFromCount(attrCount, 2, 'min') 
-    const dropCardAttr = returnKeysFromCount(attrCount, 1, 'max');
+    const chaseAttr = returnAttrFromCount(attrCount, 2, 'min') 
+    const dropCardAttr = returnAttrFromCount(attrCount, 1, 'max');
 
     if (dropCardAttr != 'None'){
-        // dropCardAttrInHand = findCardIdByAttr(cardsInHand, attr, dropCardAttr);
         dropCardAttrInHand = findCardIdByAttr(cardsInHand, dropCardAttr, 'low');
     }
 
@@ -70,8 +76,7 @@ export function findCardMatch2(cardsInHand, cardsInBank, attr){
                 pickBankCard = bankID;
                 dropHandCard = dropCardAttrInHand;
                 score = scoreValue;
-            }
-            
+            } 
         }
     })
 
@@ -91,9 +96,7 @@ export function findCardMatch3(cardsInHand, cardsInBank, attr){
                     pickBankCard = bankID;
                     dropHandCard = handID;
                     score = cardsDB[bankID].value;
-
-                }
-                
+                } 
             }
         })
     })
@@ -178,11 +181,11 @@ export function pickACard(cardsInHand, cardsInBank){
             // Find which card to drop //
             let dropCardAttr = [];
             if (Object.keys(handSymbolsCount).length < Object.keys(handIconsCount).length){
-                dropCardAttr = returnKeysFromCount(handSymbolsCount, 1, 'max');
+                dropCardAttr = returnAttrFromCount(handSymbolsCount, 1, 'max');
                 // dropCardInHand = findCardIdByAttr(cardsInHand, 'symbol', dropCardAttr);
                 dropCardInHand = findCardIdByAttr(cardsInHand, dropCardAttr, 'low');
             }else{ // Favour Icons //
-                dropCardAttr = returnKeysFromCount(handIconsCount, 1, 'max');
+                dropCardAttr = returnAttrFromCount(handIconsCount, 1, 'max');
                 // dropCardInHand = findCardIdByAttr(cardsInHand, 'icon', dropCardAttr);
                 dropCardInHand = findCardIdByAttr(cardsInHand, dropCardAttr, 'low');
             }

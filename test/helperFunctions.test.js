@@ -1,5 +1,5 @@
 import { it, expect, describe } from 'vitest';
-import { cardAttrCount, returnKeysFromCount, calculateHand, findCardIdByAttr, filterCardsDB, sortCardByValue } from './src/helperFunctions.js';
+import { cardAttrCount, returnAttrFromCount, calculateHand, findCardIdByAttr, filterCardsDB, sortCardByValue } from './src/js/helperFunctions.js';
 
 it('cardAttrCount() Should return an Object with the icon or symbol as a key, and a count as value', ()=>{
     const countTwoIconSymbol = {
@@ -24,7 +24,7 @@ it('cardAttrCount() Should return an Object with the icon or symbol as a key, an
 });
 
 
-it('returnKeysFromCount() Should return an Array of Key(s) based upon count value', ()=>{
+it('returnAttrFromCount() Should return an Array of Key(s) based upon count value', ()=>{
     const attrCountTest1 = {
         '8': 1,
         'A': 1,
@@ -45,24 +45,24 @@ it('returnKeysFromCount() Should return an Array of Key(s) based upon count valu
         'Clubs': 1,
     }
 
-    const resultAttrCountTest1a =  returnKeysFromCount(attrCountTest1, 1, 'min');
+    const resultAttrCountTest1a =  returnAttrFromCount(attrCountTest1, 1, 'min');
     expect(resultAttrCountTest1a).toBe('8');
 
-    const resultAttrCountTest1b =  returnKeysFromCount(attrCountTest1, 2, 'min');
+    const resultAttrCountTest1b =  returnAttrFromCount(attrCountTest1, 2, 'min');
     expect(resultAttrCountTest1b).toBe('None');
 
-    const resultAttrCountTest2a = returnKeysFromCount(attrCountTest2, 2, 'min');
+    const resultAttrCountTest2a = returnAttrFromCount(attrCountTest2, 2, 'min');
 
     expect(resultAttrCountTest2a).toBe('8');
-    const resultAttrCountTest2b = returnKeysFromCount(attrCountTest2, 1, 'max');
+    const resultAttrCountTest2b = returnAttrFromCount(attrCountTest2, 1, 'max');
     expect(resultAttrCountTest2b).toBe('A');
 
-    const resultAttrCountTest3 =  returnKeysFromCount(attrCountTest3, 3, 'min');
+    const resultAttrCountTest3 =  returnAttrFromCount(attrCountTest3, 3, 'min');
     expect(resultAttrCountTest3).toBe('8');
 
-    const resultAttrCountTest4a = returnKeysFromCount(attrCountTest4, 2, 'min');
+    const resultAttrCountTest4a = returnAttrFromCount(attrCountTest4, 2, 'min');
     expect(resultAttrCountTest4a).toBe('Hearts');
-    const resultAttrCountTest4b = returnKeysFromCount(attrCountTest4, 1, 'max');
+    const resultAttrCountTest4b = returnAttrFromCount(attrCountTest4, 1, 'max');
     expect(resultAttrCountTest4b).toBe('Clubs');
 });
 
@@ -166,5 +166,9 @@ it('sortCardByValue() It Should return a (Decending) sorted Array or sorted Obje
     expect(resultSortValueObject).toBeTypeOf('object'); // Array and Object are the same
     expect(Object.keys(resultSortValueObject)).toEqual(expect.arrayContaining(['Hearts-A','Diamonds-10', 'Clubs-8']));
     expect(resultSortValueObject['Hearts-A'].value).toBe(11);
+
+});
+
+it ('filterPlayers() Should',()=>{
 
 })

@@ -18,11 +18,11 @@ let matrix270Flipped = [0,1,0,1,0,0,-1]; // 270 degree z axis
 // cardID = "Clubs-8": Object { elem: div.card, x: 425, y: 870 } //
 // Keep elem cards-in-hand as well for quicker search ??? (cards-in-hand.length vs cards-in cardsDB.length) //
 const players = {
-    '0': {"name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0},
-    '1': {"name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix90},
-    '2': {"name":'Dad', "location": 'north', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix180},
-    '3': {"name":'Mum', "location": 'east', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix270},
-    '4': {"name":'Bank', "location": 'center', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0},
+    0: {"name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0, 'pass': false, 'active':false, 'auto':false},
+    1: {"name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix90, 'pass': false, 'active':false, 'auto':true},
+    2: {"name":'Dad', "location": 'north', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix180, 'pass': false, 'active':false, 'auto':true},
+    3: {"name":'Mum', "location": 'east', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix270, 'pass': false, 'active':false, 'auto':true},
+    4: {"name":'Bank', "location": 'center', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0, 'pass': true, 'active':false, 'auto':false},
 }
 
 const charValues = {'A':11, 'K':10, 'Q':10, 'J': 10};
@@ -30,14 +30,14 @@ const charValues = {'A':11, 'K':10, 'Q':10, 'J': 10};
 const cardsDB = {}; // Generated in dealCards() with addToCardDB()
 
 
-const numPlayersCards = 5;
+const numPlayersCards = 3;
 const cardsInGame = (Object.keys(players).length) * numPlayersCards;
 
 const playFieldElem = document.querySelector('#playfield')
-const startGame = document.querySelector('#start')
+// const startGame = document.querySelector('#start')
 
 let fieldSize = 1000;
-let cardWidth = fieldSize / 10;
+let cardWidth = fieldSize / 8;
 let cardHeight = cardWidth * 1.3;
 let stackOffset = 25;
 let hoverOffsetX = 5;
@@ -52,11 +52,118 @@ const clickCardOffset = 5;
 const cardPickedBank = [];
 const cardPickPlayer = [];
 
+function loadGame(){
+    const playerName = document.getElementById('player-name').value;
+    const playerEntry = document.getElementById('player-entry');
+    
+    
 
-startGame.addEventListener('click', ()=> {
-    createDeck(cardsInGame, matrix0, deckPos);
-    dealCards(players);
-})
+    players[0].name = playerName;
+    players[0].auto = false;
+    // console.log(players[0]);
+
+    // remove element
+    setTimeout(()=>{
+        playerEntry.remove();
+    }, 500);
+    
+    // deal cards
+    setTimeout(()=>{
+        createDeck(cardsInGame, matrix0, deckPos);
+        dealCards(players);
+    }, 1000);
+
+    // only after cards are dealt should player be active
+    players[0].active = true;
+    
+}
+
+// function shiftArray(arr, index){
+//     const firstPart = arr.slice(index);
+//     const secondPart = arr.slice(0, index);
+//     const shiftedArray = firstPart.concat(secondPart);
+//     return shiftedArray;
+// }
+
+// first pass than activateDeactivate //
+function activateDeactivatePlayer(){
+    let activePlayer = null;
+    let nextActivePlayer = null;
+    
+    Object.entries(players).forEach(([k,v])=>{
+        if (v.active){
+            if (k == 3){
+                activePlayer = players[k];
+                nextActivePlayer = players[0];
+            }
+            if (k < 3){
+                activePlayer = players[k];
+                nextActivePlayer = players[Number(k)+1];
+            }
+        }
+    })
+    
+    activePlayer.active = false;
+    nextActivePlayer.active = true;
+    // console.log(activePlayer, nextActivePlayer);
+
+    // return [activePlayer, nextActivePlayer]
+}
+
+function gameContinues(){
+    const nonPassPlayers = filterPlayers('pass', [false], filterOut=false);
+
+    if(JSON.stringify(nonPassPlayers) === '{}'){
+        // stopGame()
+        return false;
+    }
+    return true;
+}
+
+
+function runAutoPlayer(){
+    const activePlayer = filterPlayers('active', [true], filterOut=false);
+    if (Object.values(activePlayer)[0].auto){
+        // Do automatic things //
+
+        setTimeout(()=>{
+            activateDeactivatePlayer();
+            if(gameContinues()){
+                runAutoPlayer();
+            }
+            
+        }, 3000);
+    }
+
+}
+
+function playCards(){
+    if (cardPickedBank.length == 1 && cardPickPlayer.length == 1){
+        swapCards(cardPickedBank[0], cardPickPlayer[0]);
+        enableDisablePlayCardsBtn('hidden');
+        activateDeactivatePlayer();
+        if (gameContinues()){
+            runAutoPlayer();
+        }
+        
+    }
+}
+
+function enableDisablePlayCardsBtn(trigger){
+    const playCardsBtn = document.getElementById('play-cards-btn');
+    const triggerCondition = playCardsBtn.getAttribute('class'); // 'hidden' 'visible'
+
+    if (triggerCondition != trigger){
+        if (trigger == 'hidden'){
+            removeClassFromElement(playCardsBtn, 'visible');
+            addClassToElement(playCardsBtn, 'hidden');
+        }
+        if (trigger == 'visible'){
+            removeClassFromElement(playCardsBtn, 'hidden');
+            addClassToElement(playCardsBtn, 'visible');
+        }
+    }  
+}
 
 function addToCardDB(cardID, cardElem){
     let splitID = cardID.split('-');
@@ -256,15 +363,18 @@ function cardClickEvent(elem){
 
     elem.addEventListener('click', (event)=>{
         const cardID = findCardID(event.target);
-        if (cardsDB[cardID].access){
+        // if (cardsDB[cardID].access){
+        if (cardsDB[cardID].access && players[0].active){
             pickCardEvent(event.target);
         }
 
-        // Needs a different trigger (in Game button ?)//
         if (cardPickedBank.length == 1 && cardPickPlayer.length == 1){
-            setTimeout(()=>{
-                swapCards(cardPickedBank[0], cardPickPlayer[0]);
-            },500);
+            enableDisablePlayCardsBtn('visible');
+            // setTimeout(()=>{
+            //     swapCards(cardPickedBank[0], cardPickPlayer[0]);
+            // },100);
+        }else{
+            enableDisablePlayCardsBtn('hidden');
         }
 
 

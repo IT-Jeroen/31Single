@@ -1,5 +1,40 @@
 import { it, expect, describe } from 'vitest';
-import { findCardMatch, findCardMatch2, findCardMatch3, pickACard, playerPass } from './src/gameLogic.js';
+import { findCardMatch, findCardMatch2, findCardMatch3, pickACard, playerPass, checkCardSwapSum } from './src/js/gameLogic.js';
+
+it('playerPass() It should return a string value to either pass or keep playing',()=>{
+    const cards29 = {
+        'Hearts-A': null,
+        'Hearts-10': null,
+        'Hearts-8': null,
+    }
+
+    const cards11 = {
+        'Clubs-8': null,
+        'Diamonds-8': null,
+        'Hearts-A': null,
+    }
+
+    const result29 = playerPass(cards29, 28);
+    expect(result29).toBe('Player Pass');
+
+    const result11 = playerPass(cards11, 28);
+    expect(result11).toBe('Keep Playing');
+});
+
+it('checkCardSwapSum() Should return the sum of the proposed card swap',()=>{
+    const cardsInHand = {
+        'Clubs-8': null,
+        'Diamonds-8': null,
+        'Hearts-A': null,
+    }
+
+    const cardToPick = 'Hearts-10';
+    const cardToDrop = 'Clubs-8';
+    // checkCardSwapSum(cardsInHand, cardIn, cardOut)
+    const bankResult = checkCardSwapSum(cardsInHand, cardToPick, cardToDrop);
+    expect(bankResult).toBe(21);
+})
+
 
 describe('findCardMatch()  When the playerCardsInHand has no matching icons or symbols',()=>{
     it('It should return an Array with cardIDs where [0] is the pickBankCard and [1] is the dropHandCard', ()=>{
@@ -70,25 +105,6 @@ describe('findCardMatch3()  When the playerCardsInHand has 3 matching icons or s
     });
 });
 
-it('playerPass() It should return a string value to either pass or keep playing',()=>{
-    const cards29 = {
-        'Hearts-A': null,
-        'Hearts-10': null,
-        'Hearts-8': null,
-    }
-
-    const cards11 = {
-        'Clubs-8': null,
-        'Diamonds-8': null,
-        'Hearts-A': null,
-    }
-
-    const result29 = playerPass(cards29, 28);
-    expect(result29).toBe('Player Pass');
-
-    const result11 = playerPass(cards11, 28);
-    expect(result11).toBe('Keep Playing');
-})
 
 describe('pickACard() The main function that calls the findCardMatch functions',()=>{
 

@@ -1,4 +1,5 @@
 import { cardsDB, cardSymbols } from "./cardsDB.js";
+import { players } from './players.js'
 
 export function cardAttrCount(cardsInHand, attr){
     const cardAttr = Object.keys(cardsInHand).map((cardID)=> cardsDB[cardID][attr]);
@@ -20,7 +21,7 @@ export function cardAttrCount(cardsInHand, attr){
 // Does it need to return an array ??? //
 // Could return multiple values depending on the settings //
 // Not applicable in this setup, as long as paying attention to settings //
-export function returnKeysFromCount(attrCount, countValue, minMax){
+export function returnAttrFromCount(attrCount, countValue, minMax){
     const countKeys = [];
 
     if (minMax == 'min'){
@@ -89,7 +90,7 @@ export function calculateHand(cardsInHand){
         return 30.5;
     }
     else{
-        let identicalSymbol = returnKeysFromCount(symbolCount, 2, 'min');
+        let identicalSymbol = returnAttrFromCount(symbolCount, 2, 'min');
         let sum = 0;
 
           Object.keys(cardsInHand).forEach(cardID =>{
@@ -129,4 +130,30 @@ export function sortCardByValue(cardsInHand, keyOnly=false){
     }
     
     return sortedCards;
+}
+
+export function filterPlayers(field, valuesArr, filterOut=true){
+    // Conversion to lower Case ??? //
+
+    if (field == 'key'){
+        if (filterOut){
+            return Object.fromEntries(Object.entries(players).filter(([k,v]) => !valuesArr.includes(k)));
+        }
+        else{
+            return Object.fromEntries(Object.entries(players).filter(([k,v]) => valuesArr.includes(k)));
+        }
+    }
+    
+    if (filterOut){
+        return Object.fromEntries(Object.entries(players).filter(([k,v]) => !valuesArr.includes(v[field])));
+    } else {
+        return Object.fromEntries(Object.entries(players).filter(([k,v]) => valuesArr.includes(v[field])));
+    }
+}
+
+export function shiftArray(arr, index){
+    const firstPart = arr.slice(index);
+    const secondPart = arr.slice(0, index);
+    const shiftedArray = firstPart.concat(secondPart);
+    return shiftedArray;
 }
