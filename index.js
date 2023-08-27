@@ -3,19 +3,19 @@
 
 
 // 0 DEGREE Y-AXIS //
-let matrix0 = [1,0,0,0,1,0,1]; // 0 degree z axis
-let matrix90 = [0,1,0,-1,0,0,1]; // 90 degree z axis
-let matrix180 = [-1,0,0,0,-1,0,1]; // 180 degree z axis
-let matrix270 = [0,-1,0,1,0,0,1]; // 270 degree z axis
+const matrix0 = [1,0,0,0,1,0,1]; // 0 degree z axis
+const matrix90 = [0,1,0,-1,0,0,1]; // 90 degree z axis
+const matrix180 = [-1,0,0,0,-1,0,1]; // 180 degree z axis
+const matrix270 = [0,-1,0,1,0,0,1]; // 270 degree z axis
 
 // 180 DEGREE Y-AXIS //
-let matrix0Flipped = [-1,0,0,0,1,0,-1]; // 0 degree z axis
-let matrix90Flipped = [0,-1,0,-1,0,0,1]; // 90 degree z axis
-let matrix180Flipped = [1,0,0,0,-1,0,-1]; // 180 degree z axis
-let matrix270Flipped = [0,1,0,1,0,0,-1]; // 270 degree z axis
+const matrix0Flipped = [-1,0,0,0,1,0,-1]; // 0 degree z axis
+const matrix90Flipped = [0,-1,0,-1,0,0,1]; // 90 degree z axis
+const matrix180Flipped = [1,0,0,0,-1,0,-1]; // 180 degree z axis
+const matrix270Flipped = [0,1,0,1,0,0,-1]; // 270 degree z axis
 
 
-// cardID = "Clubs-8": Object { elem: div.card, x: 425, y: 870 } //
+// Cards In Hand Object = "Clubs-8" :{ x: 425, y: 870 }} //
 // Keep elem cards-in-hand as well for quicker search ??? (cards-in-hand.length vs cards-in cardsDB.length) //
 const players = {
     0: {"name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0, 'pass': false, 'active':false, 'auto':false},
@@ -26,17 +26,15 @@ const players = {
 }
 
 const charValues = {'A':11, 'K':10, 'Q':10, 'J': 10};
-// cardID = "Clubs-8": Object { elem: div.card, picked:false, access:true, value:8, symbol:'Clubs', icon:'8'} //
+// Card in CardsDB = "Clubs-8": Object { elem: div.card, picked:false, access:true, value:8, symbol:'Clubs', icon:'8'} //
 const cardsDB = {}; // Generated in dealCards() with addToCardDB()
-
-
 const numPlayersCards = 3;
 const cardsInGame = (Object.keys(players).length) * numPlayersCards;
 
+const backgroundElem = document.getElementById('background');
 const playFieldElem = document.getElementById('playfield');
 const playCardsBtn = document.getElementById('play-cards-btn');
 const holdCardsBtn = document.getElementById('hold-cards-btn');
-// const startGame = document.querySelector('#start')
 
 let fieldSize = 1000;
 let cardWidth = fieldSize / 8;
@@ -54,23 +52,65 @@ const clickCardOffset = 5;
 const cardPickedBank = [];
 const cardPickPlayer = [];
 
-function loadGame(){
-    const playerName = document.getElementById('player-name').value;
-    const playerEntry = document.getElementById('player-entry');
+
+function displayPlayerEntry(){
+    const playerDisplay = createElem('div', ['player-display'], ['player-entry']);
     
-    players[0].name = playerName;
+    const playerLabel = createElem('div', ['player-label', 'full-width'], ['input-label']);
+    const playerLabelText = document.createTextNode('Enter Your Name');
+    addChildElement(playerLabel, playerLabelText);
+    
+    const playerName = createElem('input', ['player-name', 'full-width'], ['player-name']);
+    playerName.type = 'text';
+    playerName.placeholder = 'Player Name';
+
+    const startGameBtn = createElem('div', ['game-btn'], ['start-game-btn']);
+    startGameBtn.addEventListener('click', ()=>{
+        loadGame();
+        });
+
+    const startGameTextElem = createElem('div');
+    const startGameText = document.createTextNode('Start Game');
+    addChildElement(startGameTextElem, startGameText);
+    addChildElement(startGameBtn, startGameTextElem);
+
+    addChildElement(playerDisplay, playerLabel);
+    addChildElement(playerDisplay, playerName);
+    addChildElement(playerDisplay, startGameBtn);
+
+    addChildElement(backgroundElem, playerDisplay);
+}
+
+displayPlayerEntry();
+
+
+function loadGame(){
+    const playerName = document.getElementById('player-name');
+    const playerEntry = document.getElementById('player-entry');
+    const winnerDisplay = document.getElementById('winner-display');
+
+    
+    if (playerName){
+        players[0].name = playerName.value;
+    }
+   
     players[0].auto = false;
     // console.log(players[0]);
 
     // remove element
     setTimeout(()=>{
-        playerEntry.remove();
+        if (playerEntry){
+            playerEntry.remove();
+        }
+        if (winnerDisplay){
+            winnerDisplay.remove();
+        }
+        
     }, 500);
     
     // deal cards
     setTimeout(()=>{
         // setCursor('passive');
-        // createDeck(cardsInGame, matrix0, deckPos); // Create DOM Deck Elements // 
         dealCards(players);
     }, 1000);
 
@@ -82,12 +122,32 @@ function loadGame(){
     }, 6000);  
 }
 
+
+function resetGame(){
+    // Remove All Cards From Play Field //
+    document.querySelectorAll('.card').forEach(card => card.remove());
+    Object.entries(players).forEach(([k,v])=>{
+        
+        if (players[k].name == 'Bank'){
+            players[k].pass = true;
+            players[k].active = false;
+            players[k]['cards-in-hand'] = {};
+        }else{
+            players[k].pass = false;
+            players[k].active = false;
+            players[k]['cards-in-hand'] = {};
+        }
+    });
+
+    loadGame();
+
+}
+
 function setCursor(state){
 
 }
 
 
-// first pass than activateDeactivate //
 function activateDeactivatePlayer(){
     let activePlayer = null;
     let nextActivePlayer = null;
@@ -149,7 +209,7 @@ function nextPlayer(){
             nextPlayer();
         }else{
             console.log('END OF GAME');
-            stopGame();
+            stopGame('Daddy'); // TEMP WINNER //
         }
     }
     
@@ -161,15 +221,128 @@ function stopLoop(){
     })
 }
 
+
+function flipCards(){
+    Object.entries(players).forEach(([k,v])=>{
+        const location = players[k].location;
+        if (location != 'south' && location != 'center'){
+            // Probable need to reverse as cards are already flipped //
+            let matrixFlipped = []
+
+            if(location == 'west'){
+                matrixFlipped = matrix90Flipped;
+            }
+
+            if(location == 'north'){
+                matrixFlipped = matrix180Flipped;
+            }
+
+            if(location == 'east'){
+                matrixFlipped = matrix270Flipped;
+            }
+
+            const cardsInHand = players[k]['cards-in-hand']
+            const cardIDS = Object.keys(cardsInHand);
+            calcCardPositions(players[k], stacked=false);
+            
+            cardIDS.forEach(cardID => {
+                const cardElem = cardsDB[cardID].elem;
+                const postion = cardsInHand[cardID];
+
+                cardElem.style.transform = `matrix3d(
+                    ${matrixFlipped[0]},
+                    ${matrixFlipped[1]},
+                    ${matrixFlipped[2]},
+                    0,
+                    ${matrixFlipped[3]},
+                    ${matrixFlipped[4]},
+                    0,
+                    0,
+                    ${matrixFlipped[5]},
+                    0,
+                    ${matrixFlipped[6]},
+                    0,
+                    ${postion.x},
+                    ${postion.y},
+                    0,
+                    1
+                    )`;
+            })
+        }
+        if (location == 'south'){
+            calcCardPositions(players[k], stacked=false);
+            repositionCards([k]);
+        }
+    })
+}
+
+
+function stopGame(firstWinner='None'){
+    let topScore = 0;
+    let winner = 'None';
+
+    if (firstWinner == 'None'){
+        Object.entries(players).forEach(([k,v])=>{
+            if (players[k].name != 'Bank'){
+                const playerScore = calculateHand(players[k]['cards-in-hand']);
+                if (playerScore > topScore){
+                    topScore = playerScore;
+                    winner = players[k].name;
+                }
+            }
+
+        })
+    }else{
+        winner = firstWinner;
+        topScore = 31;
+    }
+
+
+    displayGameResults(winner, topScore);
+
+    // show all cards //
+    flipCards();
+
+}
+
+
+function displayGameResults(name, score){
+    const winnerDisplay = createElem('div', ['player-display'], ['winner-display']);
+    
+    const winnerLabel = createElem('div', ['player-label', 'full-width'], ['winner-label']);
+    const winnerLabelText = document.createTextNode('The Winner !');
+    addChildElement(winnerLabel, winnerLabelText);
+    
+    const winnerName = createElem('input', ['player-name', 'full-width'], ['winner-name']);
+    winnerName.type = 'text';
+    // winnerName.placeholder = `${name} with a score of: ${score}`;
+    winnerName.value = `${name} with a score of: ${score}`;
+    winnerName.readonly = 'true';
+
+    const restartGameBtn = createElem('div', ['game-btn'], ['re-start-game-btn']);
+    // restartGameBtn.onclick = 'loadGame()';
+    restartGameBtn.addEventListener('click', (event)=>{
+        resetGame();
+        });
+
+    const newGameTextElem = createElem('div');
+    const newGameText = document.createTextNode('New Game');
+    addChildElement(newGameTextElem, newGameText);
+    addChildElement(restartGameBtn, newGameTextElem);
+
+    addChildElement(winnerDisplay, winnerLabel);
+    addChildElement(winnerDisplay, winnerName);
+    addChildElement(winnerDisplay, restartGameBtn);
+
+    addChildElement(backgroundElem, winnerDisplay);
+}
+
+
 function playCards(){
     if (cardPickedBank.length == 1 && cardPickPlayer.length == 1){
         swapCards(cardPickedBank[0], cardPickPlayer[0]);
         enableDisablePlayHoldBtn(playCardsBtn, 'hidden');
-        nextPlayer();
-        // if (gameContinues()){
-        //     nextPlayer();
-        // }
-        
+        nextPlayer();    
     }
 }
 
@@ -188,21 +361,6 @@ function enableDisablePlayHoldBtn(elem, state){
     } 
 }
 
-// function enableDisablePlayCardsBtn(trigger){
-//     const playCardsBtn = document.getElementById('play-cards-btn');
-//     const triggerCondition = playCardsBtn.getAttribute('class'); // 'hidden' 'visible'
-
-//     if (triggerCondition != trigger){
-//         if (trigger == 'hidden'){
-//             removeClassFromElement(playCardsBtn, 'visible');
-//             addClassToElement(playCardsBtn, 'hidden');
-//         }
-//         if (trigger == 'visible'){
-//             removeClassFromElement(playCardsBtn, 'hidden');
-//             addClassToElement(playCardsBtn, 'visible');
-//         }
-//     }  
-// }
 
 function addToCardDB(cardID, cardElem){
     let splitID = cardID.split('-');
@@ -215,15 +373,13 @@ function addToCardDB(cardID, cardElem){
     }
     
     cardsDB[cardID] = {'elem': cardElem, 'picked':false, 'access':false, 'value':cardValue,'symbol':cardSymbol, 'icon':cardIcon, 'location':''};
-    // return {cardID:{'elem': elem, 'picked':false, 'access':false, 'value':cardValue,'symbol':cardSymbol, 'icon':cardIcon}};
 }
 
 
 function findCardID(cardElem){
-
-    return returnID = Object.keys(cardsDB).filter(cardID => cardsDB[cardID].elem == cardElem)[0]
-        
+    return returnID = Object.keys(cardsDB).filter(cardID => cardsDB[cardID].elem == cardElem)[0]       
 }
+
 
 function filterPlayers(field, valuesArr, filterOut=true){
     // Conversion to lower Case ??? //
@@ -309,17 +465,15 @@ function swapCards(bankCardID,playerCardID){
     const player = filterPlayers('location', playerLocation, filterOut=false);
     const playerID = Object.keys(player)[0];
 
-    
-
     // add bankCardID to Player
     players[playerID]['cards-in-hand'][bankCardID] = players[bankID]['cards-in-hand'][bankCardID];
-    // players[playerID]['cards-in-hand'][bankCardID] = {'x': 0, 'y': 0};
+    
     // reset location //
     cardsDB[bankCardID].location = playerLocation;
 
     // add playerCardID to Bank
     players[bankID]['cards-in-hand'][playerCardID] = players[playerID]['cards-in-hand'][playerCardID];
-    // players[bankID]['cards-in-hand'][playerCardID] = {'x': 0, 'y': 0};
+
     // reset location //
     cardsDB[playerCardID].location = bankLocation;
 
@@ -353,9 +507,8 @@ function pickCardEvent(pickedElem){
     const location = cardsDB[cardID].location;
 
     if (location == 'center'){
-        // Bank [4]
         if (cardPickedBank.length == 0){
-            cardPickedBank.push(cardID); // cardPickedBank.push(pickedElem);
+            cardPickedBank.push(cardID);
             cardsDB[cardID].picked = true;
         }else{
             if (cardID == cardPickedBank[0]){
@@ -364,17 +517,16 @@ function pickCardEvent(pickedElem){
             }else{
                 const unPickBankID = cardPickedBank.pop();
                 cardsDB[unPickBankID].picked = false;
-                cardPickedBank.push(cardID); // cardPickedBank.push(pickedElem);
+                cardPickedBank.push(cardID);
                 cardsDB[cardID].picked = true;
                 triggerLeaveEffect(cardsDB[unPickBankID].elem);
             }
-
         }
     }
+
     if (location == 'south'){
-        // Local Player [0]
         if (cardPickPlayer.length == 0){
-            cardPickPlayer.push(cardID); // cardPickPlayer.push(pickedElem);
+            cardPickPlayer.push(cardID);
             cardsDB[cardID].picked = true;
         }else{
             if (cardID == cardPickPlayer[0]){
@@ -383,14 +535,12 @@ function pickCardEvent(pickedElem){
             }else{
                 const unPickPlayerID = cardPickPlayer.pop();
                 cardsDB[unPickPlayerID].picked = false;
-                cardPickPlayer.push(cardID); // cardPickPlayer.push(pickedElem);
+                cardPickPlayer.push(cardID);
                 cardsDB[cardID].picked = true;
                 triggerLeaveEffect(cardsDB[unPickPlayerID].elem);
-            }
-            
+            }           
         }
     }
-    // console.log(cardsDB);
 }
 
 function triggerLeaveEffect(elem){
@@ -478,7 +628,6 @@ function createDeckCards(numCards, minValue='2', maxValue='A'){
         cardsInDeck.push(cardsInGame[pickIndex]);
         // Adjust length cardsInGame //
         cardsInGame.splice(pickIndex, 1);
-
     }
 
     return cardsInDeck;
@@ -488,8 +637,7 @@ function createDeckCards(numCards, minValue='2', maxValue='A'){
 // Deal Deck Cards //
 function dealCards(players){
     const allCards = createDeck(cardsInGame, matrix0, deckPos);
-    // Query all card elements
-    // const allCards = document.querySelectorAll('.card');
+
     // Create card values and id's
     const deckCardValues = createDeckCards(allCards.length, '7');
     let timing = 300;
@@ -502,7 +650,6 @@ function dealCards(players){
         // add card to DB //
         addToCardDB(cardId, cardElem);
         // add card to player hand //
-        // players[`${playerID}`]['cards-in-hand'][cardId] = {'elem': cardElem, 'x':0, 'y':0};
         players[`${playerID}`]['cards-in-hand'][cardId] = {'x':0, 'y':0};
         cardsDB[cardId].location = players[`${playerID}`].location;
         // add hover mouse event //
@@ -597,7 +744,6 @@ function dealingCards(players, timing){
         
         let player = players[`${playersID[playerIndex]}`];
         const cardIds = Object.keys(player['cards-in-hand']);
-        // cardID = "Clubs-8": Object {x: 425, y: 870 } // 
         const cardId = cardIds[cardIndex];
         const card = player['cards-in-hand'][cardId];
         const orientation = player.orientation;
@@ -606,6 +752,7 @@ function dealingCards(players, timing){
         const text = document.createTextNode(cardId);
         const cardElem = cardsDB[cardId].elem;
         addChildElement(cardElem, text);
+        //
 
         cardElem.style = `transform: matrix3d(
             ${orientation[0]},
@@ -640,7 +787,6 @@ function dealingCards(players, timing){
   
 
 function calcCardPositions(player, stacked=true){
-     // let playerCardObj = {cardId:{'x':cardX, 'y':cardY}};
     let cardsInHand = player['cards-in-hand'];
     let handWidth = 0;
     let cardOffSet = 0;
@@ -696,6 +842,19 @@ function calcCardPositions(player, stacked=true){
     }
 }
 
+
+function createElem(elemType, classNames=[], idNames=[]){
+    const elem = document.createElement(elemType);
+
+    for (let className of classNames){
+        addClassToElement(elem, className);
+    }
+    for (let idName of idNames){
+        addIdToElement(elem, idName);
+    }
+
+    return elem;
+}
 
 function createCard(classNames){
     const cardElem = createElement('div');

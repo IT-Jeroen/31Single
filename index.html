@@ -6,20 +6,14 @@
     <link rel="stylesheet" href="./style.css">
     <title>31Single</title>
 </head>
-<body class="background">
-    <div id="player-entry">
-        <div id="input-label" class="full-width">Enter Your Name</div>
-        <input id="player-name"class="full-width" type="text" placeholder="Player Name">
-        <div id="start-game-btn" onclick="loadGame()">
-            <div>Start Game</div>
-        </div>
-    </div>
-    
+<body id="background">
     <div id="playfield" class="playfield">
         <div id="play-cards-btn" class="hidden play-hold-btn" onclick="playCards()">Play Cards</div>
         <div id="hold-cards-btn" class="hidden play-hold-btn" onclick="playerHold()">Hold</div>
     </div>
     
 </body>
-<script src="./index.js"></script>
+<script src="./index.js">
+    // displayPlayerEntry();
+</script>
 </html>
