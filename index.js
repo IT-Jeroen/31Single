@@ -33,7 +33,9 @@ const cardsDB = {}; // Generated in dealCards() with addToCardDB()
 const numPlayersCards = 3;
 const cardsInGame = (Object.keys(players).length) * numPlayersCards;
 
-const playFieldElem = document.querySelector('#playfield')
+const playFieldElem = document.getElementById('playfield');
+const playCardsBtn = document.getElementById('play-cards-btn');
+const holdCardsBtn = document.getElementById('hold-cards-btn');
 // const startGame = document.querySelector('#start')
 
 let fieldSize = 1000;
@@ -56,8 +58,6 @@ function loadGame(){
     const playerName = document.getElementById('player-name').value;
     const playerEntry = document.getElementById('player-entry');
     
-    
-
     players[0].name = playerName;
     players[0].auto = false;
     // console.log(players[0]);
@@ -69,21 +69,23 @@ function loadGame(){
     
     // deal cards
     setTimeout(()=>{
-        createDeck(cardsInGame, matrix0, deckPos);
+        // setCursor('passive');
+        // createDeck(cardsInGame, matrix0, deckPos); // Create DOM Deck Elements // 
         dealCards(players);
     }, 1000);
 
-    // only after cards are dealt should player be active
-    players[0].active = true;
-    
+    // only after cards are dealt 
+    setTimeout(()=>{
+        players[0].active = true;
+        enableDisablePlayHoldBtn(holdCardsBtn, 'visible');
+        // setCursor('active');
+    }, 6000);  
 }
 
-// function shiftArray(arr, index){
-//     const firstPart = arr.slice(index);
-//     const secondPart = arr.slice(0, index);
-//     const shiftedArray = firstPart.concat(secondPart);
-//     return shiftedArray;
-// }
+function setCursor(state){
+
+}
+
 
 // first pass than activateDeactivate //
 function activateDeactivatePlayer(){
@@ -114,56 +116,93 @@ function gameContinues(){
     const nonPassPlayers = filterPlayers('pass', [false], filterOut=false);
 
     if(JSON.stringify(nonPassPlayers) === '{}'){
-        // stopGame()
         return false;
     }
     return true;
 }
 
-
-function runAutoPlayer(){
+function playerHold(){
     const activePlayer = filterPlayers('active', [true], filterOut=false);
-    if (Object.values(activePlayer)[0].auto){
-        // Do automatic things //
+    Object.values(activePlayer)[0].pass = true;
+    nextPlayer();
+    enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
+}
 
-        setTimeout(()=>{
-            activateDeactivatePlayer();
-            if(gameContinues()){
-                runAutoPlayer();
-            }
-            
-        }, 3000);
+
+function nextPlayer(){
+    activateDeactivatePlayer();
+    const activePlayer = filterPlayers('active', [true], filterOut=false);
+    if (!Object.values(activePlayer)[0].pass){
+        if (Object.values(activePlayer)[0].auto){
+            console.log('AUTOPLAYER !!!');
+            // Do automatic things //
+    
+            setTimeout(()=>{
+               nextPlayer();
+                
+            }, 3000);
+        } else{
+            enableDisablePlayHoldBtn(holdCardsBtn, 'visible');
+        }
+    }else{
+        if(gameContinues()){
+            nextPlayer();
+        }else{
+            console.log('END OF GAME');
+            stopGame();
+        }
     }
+    
+}
 
+function stopLoop(){
+    Object.entries(players).forEach(([k,v])=>{
+        players[k].pass = true;
+    })
 }
 
 function playCards(){
     if (cardPickedBank.length == 1 && cardPickPlayer.length == 1){
         swapCards(cardPickedBank[0], cardPickPlayer[0]);
-        enableDisablePlayCardsBtn('hidden');
-        activateDeactivatePlayer();
-        if (gameContinues()){
-            runAutoPlayer();
-        }
+        enableDisablePlayHoldBtn(playCardsBtn, 'hidden');
+        nextPlayer();
+        // if (gameContinues()){
+        //     nextPlayer();
+        // }
         
     }
 }
 
-function enableDisablePlayCardsBtn(trigger){
-    const playCardsBtn = document.getElementById('play-cards-btn');
-    const triggerCondition = playCardsBtn.getAttribute('class'); // 'hidden' 'visible'
+function enableDisablePlayHoldBtn(elem, state){
+    const triggerCondition = elem.getAttribute('class').split(' '); // 'hidden' 'visible'
 
-    if (triggerCondition != trigger){
-        if (trigger == 'hidden'){
-            removeClassFromElement(playCardsBtn, 'visible');
-            addClassToElement(playCardsBtn, 'hidden');
+    if (!triggerCondition.includes(state)){
+        if (state == 'hidden'){
+            removeClassFromElement(elem, 'visible');
+            addClassToElement(elem, 'hidden');
         }
-        if (trigger == 'visible'){
-            removeClassFromElement(playCardsBtn, 'hidden');
-            addClassToElement(playCardsBtn, 'visible');
+        if (state == 'visible'){
+            removeClassFromElement(elem, 'hidden');
+            addClassToElement(elem, 'visible');
         }
-    }  
+    } 
 }
+
+// function enableDisablePlayCardsBtn(trigger){
+//     const playCardsBtn = document.getElementById('play-cards-btn');
+//     const triggerCondition = playCardsBtn.getAttribute('class'); // 'hidden' 'visible'
+
+//     if (triggerCondition != trigger){
+//         if (trigger == 'hidden'){
+//             removeClassFromElement(playCardsBtn, 'visible');
+//             addClassToElement(playCardsBtn, 'hidden');
+//         }
+//         if (trigger == 'visible'){
+//             removeClassFromElement(playCardsBtn, 'hidden');
+//             addClassToElement(playCardsBtn, 'visible');
+//         }
+//     }  
+// }
 
 function addToCardDB(cardID, cardElem){
     let splitID = cardID.split('-');
@@ -360,31 +399,27 @@ function triggerLeaveEffect(elem){
 }
 
 function cardClickEvent(elem){
-
     elem.addEventListener('click', (event)=>{
         const cardID = findCardID(event.target);
-        // if (cardsDB[cardID].access){
+    
         if (cardsDB[cardID].access && players[0].active){
             pickCardEvent(event.target);
         }
 
         if (cardPickedBank.length == 1 && cardPickPlayer.length == 1){
-            enableDisablePlayCardsBtn('visible');
-            // setTimeout(()=>{
-            //     swapCards(cardPickedBank[0], cardPickPlayer[0]);
-            // },100);
+            enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
+            enableDisablePlayHoldBtn(playCardsBtn, 'visible');
         }else{
-            enableDisablePlayCardsBtn('hidden');
+            enableDisablePlayHoldBtn(playCardsBtn, 'hidden');
+            enableDisablePlayHoldBtn(holdCardsBtn, 'visible');
         }
-
-
     })
 }
 
 
-// Create Deck Elements //
+// Create DOM Deck Elements //
 function createDeck(numDeck, orientation, postion){
-
+    const deckElems = [];
     for (let i = 0; i < numDeck; i++){
         const cardElem = createCard(["card"]);
 
@@ -408,7 +443,9 @@ function createDeck(numDeck, orientation, postion){
             )`; 
 
         addChildElement(playFieldElem, cardElem);
+        deckElems.push(cardElem);
     }
+    return deckElems;
 }
 
 
@@ -439,6 +476,7 @@ function createDeckCards(numCards, minValue='2', maxValue='A'){
     for (let i= 0; i < numCards; i++){
         let pickIndex = Math.floor(Math.random() * (cardsInGame.length))
         cardsInDeck.push(cardsInGame[pickIndex]);
+        // Adjust length cardsInGame //
         cardsInGame.splice(pickIndex, 1);
 
     }
@@ -447,9 +485,11 @@ function createDeckCards(numCards, minValue='2', maxValue='A'){
 }
 
 
+// Deal Deck Cards //
 function dealCards(players){
+    const allCards = createDeck(cardsInGame, matrix0, deckPos);
     // Query all card elements
-    const allCards = document.querySelectorAll('.card');
+    // const allCards = document.querySelectorAll('.card');
     // Create card values and id's
     const deckCardValues = createDeckCards(allCards.length, '7');
     let timing = 300;

@@ -111,7 +111,7 @@ body {
     /* display: block; */
 }
 
-#play-cards-btn{
+.play-hold-btn{
     position: absolute;
     transform: translate(calc(var(--center-point) - 0.5 * (var(--card-width) + (2 * var(--card-offset)))), calc(var(--center-point) + var(--card-height)));
     /* transform: translate(calc(50vw - 0.5 * (var(--card-width) + 2 * var(--card-offset))), calc(var(--center-point) + var(--card-height))); */
@@ -126,11 +126,11 @@ body {
     z-index: 1;
 }
 
-#play-cards-btn:hover{
+.play-hold-btn:hover{
     background-color: lightcoral;
     border: 1px solid white;
     cursor: pointer;
 }
-#play-cards-btn:active{
+.play-hold-btn:active{
     background-color: red;
 }
