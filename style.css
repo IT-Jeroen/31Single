@@ -86,6 +86,26 @@ body {
     background-color: white;
     border: 1px solid black;
     transition: transform 0.3s ease-in-out;
+    transform-style: preserve-3d;
+}
+
+.front{
+    position: absolute;
+    width: var(--card-width);
+    height: var(--card-height);
+    background-color: white;
+    border: 1px solid black;
+    backface-visibility: hidden;
+}
+
+.back{
+    position: absolute;
+    width: var(--card-width);
+    height: var(--card-height);
+    background-color: blue;
+    border: 1px solid black;
+    transform: rotateY(180deg);
+    backface-visibility: hidden;
 }
 
 /* .card:hover{

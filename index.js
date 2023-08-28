@@ -10,18 +10,18 @@ const matrix270 = [0,-1,0,1,0,0,1]; // 270 degree z axis
 
 // 180 DEGREE Y-AXIS //
 const matrix0Flipped = [-1,0,0,0,1,0,-1]; // 0 degree z axis
-const matrix90Flipped = [0,-1,0,-1,0,0,1]; // 90 degree z axis
+const matrix90Flipped = [0,-1,0,1,0,0,-1]; // 90 degree z axis
 const matrix180Flipped = [1,0,0,0,-1,0,-1]; // 180 degree z axis
-const matrix270Flipped = [0,1,0,1,0,0,-1]; // 270 degree z axis
+const matrix270Flipped = [0,1,0,-1,0,0,-1]; // 270 degree z axis
 
 
 // Cards In Hand Object = "Clubs-8" :{ x: 425, y: 870 }} //
 // Keep elem cards-in-hand as well for quicker search ??? (cards-in-hand.length vs cards-in cardsDB.length) //
 const players = {
     0: {"name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0, 'pass': false, 'active':false, 'auto':false},
-    1: {"name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix90, 'pass': false, 'active':false, 'auto':true},
-    2: {"name":'Dad', "location": 'north', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix180, 'pass': false, 'active':false, 'auto':true},
-    3: {"name":'Mum', "location": 'east', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix270, 'pass': false, 'active':false, 'auto':true},
+    1: {"name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix90Flipped, 'pass': false, 'active':false, 'auto':true},
+    2: {"name":'Dad', "location": 'north', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix180Flipped, 'pass': false, 'active':false, 'auto':true},
+    3: {"name":'Mum', "location": 'east', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix270Flipped, 'pass': false, 'active':false, 'auto':true},
     4: {"name":'Bank', "location": 'center', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0, 'pass': true, 'active':false, 'auto':false},
 }
 
@@ -230,15 +230,15 @@ function flipCards(){
             let matrixFlipped = []
 
             if(location == 'west'){
-                matrixFlipped = matrix90Flipped;
+                matrixFlipped = matrix90;
             }
 
             if(location == 'north'){
-                matrixFlipped = matrix180Flipped;
+                matrixFlipped = matrix180;
             }
 
             if(location == 'east'){
-                matrixFlipped = matrix270Flipped;
+                matrixFlipped = matrix270;
             }
 
             const cardsInHand = players[k]['cards-in-hand']
@@ -247,7 +247,7 @@ function flipCards(){
             
             cardIDS.forEach(cardID => {
                 const cardElem = cardsDB[cardID].elem;
-                const postion = cardsInHand[cardID];
+                const position = cardsInHand[cardID];
 
                 cardElem.style.transform = `matrix3d(
                     ${matrixFlipped[0]},
@@ -262,8 +262,8 @@ function flipCards(){
                     0,
                     ${matrixFlipped[6]},
                     0,
-                    ${postion.x},
-                    ${postion.y},
+                    ${position.x},
+                    ${position.y},
                     0,
                     1
                     )`;
@@ -550,10 +550,12 @@ function triggerLeaveEffect(elem){
 
 function cardClickEvent(elem){
     elem.addEventListener('click', (event)=>{
-        const cardID = findCardID(event.target);
+        // const cardID = findCardID(event.target);
+        const cardID = findCardID(event.target.parentElement);
     
         if (cardsDB[cardID].access && players[0].active){
-            pickCardEvent(event.target);
+            // pickCardEvent(event.target);
+            pickCardEvent(event.target.parentElement);
         }
 
         if (cardPickedBank.length == 1 && cardPickPlayer.length == 1){
@@ -571,7 +573,8 @@ function cardClickEvent(elem){
 function createDeck(numDeck, orientation, postion){
     const deckElems = [];
     for (let i = 0; i < numDeck; i++){
-        const cardElem = createCard(["card"]);
+        // const cardElem = createCard(["card"]);
+        const cardElem = createCard();
 
         cardElem.style.transform = `matrix3d(
             ${orientation[0]},
@@ -636,7 +639,7 @@ function createDeckCards(numCards, minValue='2', maxValue='A'){
 
 // Deal Deck Cards //
 function dealCards(players){
-    const allCards = createDeck(cardsInGame, matrix0, deckPos);
+    const allCards = createDeck(cardsInGame, matrix0Flipped, deckPos);
 
     // Create card values and id's
     const deckCardValues = createDeckCards(allCards.length, '7');
@@ -751,7 +754,10 @@ function dealingCards(players, timing){
         // TEMP ELEMENT
         const text = document.createTextNode(cardId);
         const cardElem = cardsDB[cardId].elem;
-        addChildElement(cardElem, text);
+        const frontElem = cardElem.getElementsByClassName('front');
+        // console.log(backElem.length);
+        addChildElement(frontElem[0], text);
+        // addChildElement(cardElem, text);
         //
 
         cardElem.style = `transform: matrix3d(
@@ -856,12 +862,32 @@ function createElem(elemType, classNames=[], idNames=[]){
     return elem;
 }
 
-function createCard(classNames){
-    const cardElem = createElement('div');
+// function createCard(classNames){
+//     const cardElem = createElement('div');
 
-    for(let className of classNames){
-        addClassToElement(cardElem, className);
-    }
+//     for(let className of classNames){
+//         addClassToElement(cardElem, className);
+//     }
+
+//     return cardElem;
+// }
+
+function createCard(){
+    const cardElem = createElement('div');
+    addClassToElement(cardElem, 'card');
+
+    const frontElem = createElement('div');
+    addClassToElement(frontElem, 'front');
+
+    const backElem = createElement('div');
+    addClassToElement(backElem, 'back');
+    // const backImg = createElement('img');
+    // backImg.src = './src/images/card-back-Blue.png'
+    // addChildElement(backElem, backImg);
+    // Needs 180 transform //
+
+    addChildElement(cardElem, frontElem);
+    addChildElement(cardElem, backElem);
 
     return cardElem;
 }
