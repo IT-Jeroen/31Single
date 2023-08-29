@@ -1,7 +1,6 @@
 // https://ramlmn.github.io/visualizing-matrix3d/
 // https://meyerweb.com/eric/tools/matrix/
 
-
 // 0 DEGREE Y-AXIS //
 const matrix0 = [1,0,0,0,1,0,1]; // 0 degree z axis
 const matrix90 = [0,1,0,-1,0,0,1]; // 90 degree z axis
