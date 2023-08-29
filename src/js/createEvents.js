@@ -34,7 +34,7 @@ function cardClickEvent(elem){
             pickCardEffect(event.target.parentElement);
         }
 
-        if (cardPickedBank.length == 1 && cardPickPlayer.length == 1){
+        if (cardPickedBank.length == 1 && cardPickedPlayer.length == 1){
             enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
             enableDisablePlayHoldBtn(playCardsBtn, 'visible');
         }else{
@@ -43,7 +43,6 @@ function cardClickEvent(elem){
         }
     })
 }
-
 
 function playCardsEvent(elem){
     elem.addEventListener('click',()=> playCards());
@@ -60,46 +59,90 @@ function swapBankEvent(elem, pass){
 }
 
 
+// // DOESN'T WORK DON'T KNOW WHICH CARD TO UNPICK //
+// function pickCard(pickedElem){
+//     const cardID = findCardID(pickedElem);
+//     if (cardsDB[cardID].picked){
+//         cardsDB[cardID].picked = false;
+//         mouseLeaveEffect(pickedElem);
+//     }else{
+//         cardsDB[cardID].picked = true;
+//     }
+// }
+
+
 function pickCardEffect(pickedElem){
     const cardID = findCardID(pickedElem);
     const location = cardsDB[cardID].location;
+    let pickCardArray = [];
 
+    // cardPickedBank and cardPickedPlayer are global variable //
     if (location == 'center'){
-        if (cardPickedBank.length == 0){
-            cardPickedBank.push(cardID);
-            cardsDB[cardID].picked = true;
-        }else{
-            if (cardID == cardPickedBank[0]){
-                const unPickSameBankID = cardPickedBank.pop();
-                cardsDB[unPickSameBankID].picked = false;
-            }else{
-                const unPickBankID = cardPickedBank.pop();
-                cardsDB[unPickBankID].picked = false;
-                cardPickedBank.push(cardID);
-                cardsDB[cardID].picked = true;
-                mouseLeaveEffect(cardsDB[unPickBankID].elem);
-            }
-        }
+        pickCardArray =  cardPickedBank;
     }
 
     if (location == 'south'){
-        if (cardPickPlayer.length == 0){
-            cardPickPlayer.push(cardID);
-            cardsDB[cardID].picked = true;
-        }else{
-            if (cardID == cardPickPlayer[0]){
-                const unPickSamePlayerID = cardPickPlayer.pop();
-                cardsDB[unPickSamePlayerID].picked = false;
-            }else{
-                const unPickPlayerID = cardPickPlayer.pop();
-                cardsDB[unPickPlayerID].picked = false;
-                cardPickPlayer.push(cardID);
-                cardsDB[cardID].picked = true;
-                mouseLeaveEffect(cardsDB[unPickPlayerID].elem);
-            }           
-        }
+        pickCardArray = cardPickedPlayer;
     }
+
+    if (pickCardArray.length == 0){
+        pickCardArray.push(cardID);
+        cardsDB[cardID].picked = true;
+    }else{
+        if (cardID == pickCardArray[0]){
+            const unPickSameID = pickCardArray.pop();
+            cardsDB[unPickSameID].picked = false;
+        }else{
+            const unPickCardID = pickCardArray.pop();
+            cardsDB[unPickCardID].picked = false;
+            pickCardArray.push(cardID);
+            cardsDB[cardID].picked = true;
+            mouseLeaveEffect(cardsDB[unPickCardID].elem);
+        }
+    }             
 }
+
+
+// function pickCardEffect(pickedElem){
+//     const cardID = findCardID(pickedElem);
+//     const location = cardsDB[cardID].location;
+
+//     if (location == 'center'){
+//         if (cardPickedBank.length == 0){
+//             cardPickedBank.push(cardID);
+//             cardsDB[cardID].picked = true;
+//         }else{
+//             if (cardID == cardPickedBank[0]){
+//                 const unPickSameBankID = cardPickedBank.pop();
+//                 cardsDB[unPickSameBankID].picked = false;
+//             }else{
+//                 const unPickBankID = cardPickedBank.pop();
+//                 cardsDB[unPickBankID].picked = false;
+//                 cardPickedBank.push(cardID);
+//                 cardsDB[cardID].picked = true;
+//                 mouseLeaveEffect(cardsDB[unPickBankID].elem);
+//             }
+//         }
+//     }
+
+//     if (location == 'south'){
+//         if (cardPickPlayer.length == 0){
+//             cardPickPlayer.push(cardID);
+//             cardsDB[cardID].picked = true;
+//         }else{
+//             if (cardID == cardPickPlayer[0]){
+//                 const unPickSamePlayerID = cardPickPlayer.pop();
+//                 cardsDB[unPickSamePlayerID].picked = false;
+//             }else{
+//                 const unPickPlayerID = cardPickPlayer.pop();
+//                 cardsDB[unPickPlayerID].picked = false;
+//                 cardPickPlayer.push(cardID);
+//                 cardsDB[cardID].picked = true;
+//                 mouseLeaveEffect(cardsDB[unPickPlayerID].elem);
+//             }           
+//         }
+//     }
+// }
 
 
 function cardHoverEffect(hoverElem, reverse=false){
@@ -110,6 +153,7 @@ function cardHoverEffect(hoverElem, reverse=false){
     const matrix3D = targetStyle.slice(1, targetStyle.length-2);
     const zIndex = targetStyle.slice(targetStyle.length -2);
 
+    // hoverOffset is a global variable //
     let hoverX = hoverOffsetX;
     let hoverY = hoverOffsetY
 

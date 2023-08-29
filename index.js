@@ -51,7 +51,7 @@ let eastTop = fieldSize - cardHeight + ((cardHeight - cardWidth) /2);
 const deckPos = {'x': center - (cardWidth /2), 'y':center - (cardHeight /2)};
 const clickCardOffset = 5;
 const cardPickedBank = [];
-const cardPickPlayer = [];
+const cardPickedPlayer = [];
 
 /////////////////////////// GAME MECHANICS //////////////////////////////////
 
@@ -60,17 +60,11 @@ function loadGame(){
     const playerEntry = document.getElementById('player-entry');
     const winnerDisplay = document.getElementById('winner-display');
 
-    // players == Global Variable //
-    if (playerName){
-        players[0].name = playerName.value;
-    }
-   
-    players[0].auto = false;
-    // console.log(players[0]);
-
     // Display Elements //
     setTimeout(()=>{
         if (playerEntry){
+            players[0].name = playerName.value;
+            players[0].auto = false;
             playerEntry.remove();
         }
         if (winnerDisplay){
@@ -138,6 +132,7 @@ function playerHold(){
 function nextPlayer(winner=''){
     activateDeactivatePlayer();
     const activePlayer = filterPlayers('active', [true], false);
+    
     if (!Object.values(activePlayer)[0].pass){
         if (Object.values(activePlayer)[0].auto){
             console.log('AUTOPLAYER !!!');
@@ -153,7 +148,7 @@ function nextPlayer(winner=''){
         }
     }else{
         if(gameContinues()){
-            //
+            // All players get one last move if winner is declared //
             if (winner){
                 Object.values(activePlayer)[0].pass = true;
                 nextPlayer(winner);
@@ -206,8 +201,8 @@ function stopGame(winner=''){
 }
 
 function playCards(){
-    if (cardPickedBank.length == 1 && cardPickPlayer.length == 1){
-        swapCards(cardPickedBank[0], cardPickPlayer[0]);
+    if (cardPickedBank.length == 1 && cardPickedPlayer.length == 1){
+        swapCards(cardPickedBank[0], cardPickedPlayer[0]);
         enableDisablePlayHoldBtn(playCardsBtn, 'hidden');
         enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
         nextPlayer();    
@@ -217,8 +212,8 @@ function playCards(){
 
 // Swap Hand with Bank //
 function swapBank(hold=true){
-    const bank = Object.values(filterPlayers('name', ['Bank'], filterOut=false))[0];
-    const player = Object.values(filterPlayers('active', [true], filterOut=false))[0];
+    const bank = Object.values(filterPlayers('name', ['Bank'], false))[0];
+    const player = Object.values(filterPlayers('active', [true], false))[0];
     const playerHand = Object.keys(player['cards-in-hand']);
     const bankHand = Object.keys(bank['cards-in-hand']);
     
@@ -236,49 +231,42 @@ function swapBank(hold=true){
     
 }
 
-// Sould Bank be Global Variable ??? //
-// NEED TO SET CARD ACCESS //
+
 function swapCards(bankCardID,playerCardID){
     const timingRepos = 700;
     const timingCalc = 500;
-    const bankLocation = cardsDB[bankCardID].location;
-    const bank = filterPlayers('location', bankLocation, filterOut=false);
-    const bankID = Object.keys(bank)[0];
+
     const playerLocation = cardsDB[playerCardID].location;
     const player = filterPlayers('location', playerLocation, filterOut=false);
     const playerID = Object.keys(player)[0];
 
-    // add bankCardID to Player
-    players[playerID]['cards-in-hand'][bankCardID] = players[bankID]['cards-in-hand'][bankCardID];
-    
-    // reset location //
-    cardsDB[bankCardID].location = playerLocation;
+    // const bankID = 4; //
+    const bankLocation = cardsDB[bankCardID].location;
+    const bank = filterPlayers('location', bankLocation, filterOut=false);
+    const bankID = Object.keys(bank)[0];
 
-    // add playerCardID to Bank
+    // ADD CARD//
+    players[playerID]['cards-in-hand'][bankCardID] = players[bankID]['cards-in-hand'][bankCardID];
     players[bankID]['cards-in-hand'][playerCardID] = players[playerID]['cards-in-hand'][playerCardID];
 
-    // reset location //
-    cardsDB[playerCardID].location = bankLocation;
-
-    // remove bankCardID from Bank
-    delete players[bankID]['cards-in-hand'][bankCardID];
-    // reset pick //
-    cardsDB[playerCardID].picked = false;
-
-    // remove playerCardID from Player
+    // REMOVE CARD //
     delete players[playerID]['cards-in-hand'][playerCardID]
-    // reset pick //
+    delete players[bankID]['cards-in-hand'][bankCardID];
+
+    // RESET //
+    cardsDB[bankCardID].location = playerLocation;
+    cardsDB[playerCardID].location = bankLocation;
+    cardsDB[playerCardID].picked = false;
     cardsDB[bankCardID].picked = false;
+    cardPickedBank.pop();
+    cardPickedPlayer.pop();
 
     setTimeout(()=>{
         calcCardPositions(players[playerID]);
         calcCardPositions(players[bankID], stacked=false);
     },timingCalc);
 
-    cardPickedBank.pop();
-    cardPickPlayer.pop();
-
-
+    
     setTimeout(()=>{
         repositionCards([playerID, bankID]);
     },timingRepos);
@@ -286,11 +274,6 @@ function swapCards(bankCardID,playerCardID){
 }
 
 
-
-// Animate Handing out cards //
-// Create Interval for animated effect //
-// Read Players Cards in Hand //
-// Add Transform to cardElem from cardsDB //
 function handOutDeckCards(players, timing){
     let i = 0;
     const playersID = Object.keys(players)
@@ -354,16 +337,6 @@ function handOutDeckCards(players, timing){
 }
 
 
-// addDeckCardsToPlayers //
-// Generate deckCard Elements //
-// Generate Random deckCard Values //
-// Add deckCard to Cards DB //
-// Assign deckCard to Player //
-
-// Add eventListeners on All cards in Game //
-// Set Card Access true/false in Cards DB to Player (mouseClick mouseOver Event) //
-// Calculate card position //
-
 function addDeckCardsToPlayers(){
     // players = Global Variable //
     // cardsInGame = Global Variable //
@@ -386,52 +359,17 @@ function addDeckCardsToPlayers(){
         // add card to player hand //
         players[`${playerID}`]['cards-in-hand'][cardId] = {'x':0, 'y':0};
         cardsDB[cardId].location = players[`${playerID}`].location;
-
-        
-        // MOVED TO CREATE DECK ELEMENTS //
-        // // Add eventListeners on All cards in Game //
-        // // add hover mouse event //
-        // mouseOverEvent(cardElem);
-        // // add click card event //
-        // cardClickEvent(cardElem);
-
         
         if (players[`${playerID}`].name == 'Bank' || players[`${playerID}`].location == 'south'){
             cardsDB[cardId].access = true;
         }
-
-        // MOVED TO DEAL DECK CARDS //
-        // if (players[`${playerID}`].name == 'Bank'){
-        //     calcCardPositions(players[`${playerID}`], stacked=false);
-        //     // give player acces to card //
-        //     cardsDB[cardId].access = true;
-        // }else{
-        //     if (players[`${playerID}`].location == 'south'){
-        //          // give player acces to card //
-        //         cardsDB[cardId].access = true;
-        //     }
-        //     // calc cardPosition //
-        //     calcCardPositions(players[`${playerID}`]);
-        // }
         
         playerID += 1;
 
         if (playerID == Number(playersID[playersID.length-1])+1){
             playerID = 0;
         }
-
-    })
-
-    // MOVED TO DEAL DECK CARDS //
-    // // position cards
-    // const bank = filterPlayers('name', ['Bank'], false);
-    // const nonBankPlayers = filterPlayers('name', ['Bank']);
-
-    // dealingCards(nonBankPlayers, timing);
-    // setTimeout(()=>{
-    //     dealingCards(bank, timing);
-    // },(allCardElems.length + 1)*timing);
-    
+    })  
 }
 
 function dealDeckCards(timing){
@@ -459,7 +397,6 @@ function dealDeckCards(timing){
 }
 
 
-
 ////////////////////////// GAME SUPPORT //////////////////////////////////
 
 function activateDeactivatePlayer(){
@@ -481,16 +418,13 @@ function activateDeactivatePlayer(){
     
     activePlayer.active = false;
     nextActivePlayer.active = true;
-    // console.log(activePlayer, nextActivePlayer);
-
-    // return [activePlayer, nextActivePlayer]
 }
 
 function flipAllCards(){
     Object.entries(players).forEach(([k,v])=>{
         const location = players[k].location;
         if (location != 'south' && location != 'center'){
-            // Probable need to reverse as cards are already flipped //
+        
             let matrixFlipped = []
 
             if(location == 'west'){
@@ -556,12 +490,14 @@ function enableDisablePlayHoldBtn(elem, state){
 }
 
 
+// Function only used in addDeckCardsToPlayers() //
 function addCardToCardDB(cardID, cardElem){
     let splitID = cardID.split('-');
     let cardSymbol = splitID[0];
     let cardIcon = splitID[1];
     let cardValue = Number(cardIcon);
 
+    // charValues is a Global Variable //
     if (!cardValue){
         cardValue = charValues[cardIcon];
     }
@@ -751,6 +687,7 @@ function displayPlayerEntry(){
     addChildElement(backgroundElem, playerDisplay);
 }
 
+
 function displayGameResults(name, score){
     const winnerDisplay = createElem('div', ['player-display'], 'winner-display');
     
@@ -760,12 +697,12 @@ function displayGameResults(name, score){
     
     const winnerName = createElem('input', ['player-name', 'full-width'], 'winner-name');
     winnerName.type = 'text';
-    // winnerName.placeholder = `${name} with a score of: ${score}`;
+    
     winnerName.value = `${name} with a score of: ${score}`;
     winnerName.readonly = 'true';
 
     const restartGameBtn = createElem('div', ['game-btn'], 're-start-game-btn');
-    // restartGameBtn.onclick = 'loadGame()';
+    
     restartGameBtn.addEventListener('click', ()=>{
         resetGame();
         });
@@ -782,18 +719,13 @@ function displayGameResults(name, score){
     addChildElement(backgroundElem, winnerDisplay);
 }
 
+
 function createHoldCardsBtn(){
     const btnElem = createElem('div', ['hidden', 'play-hold-swap-btn'], 'hold-cards-btn')
     const btnText = document.createTextNode('Hold');
     addChildElement(btnElem, btnText);
     addChildElement(playFieldElem, btnElem);
     playerHoldEvent(btnElem);
-
-    // addChildElement(backgroundElem, btnElem);
-
-    // btnElem.addEventListener('click',()=>{
-    //     playerHold();
-    // })
 
     return btnElem;
 }
@@ -805,12 +737,6 @@ function createPlayCardsBtn(){
     addChildElement(btnElem, btnText);
     addChildElement(playFieldElem, btnElem);
     playCardsEvent(btnElem);
-    
-    // addChildElement(backgroundElem, btnElem);
-    
-    // btnElem.addEventListener('click',()=>{
-    //     playCards();
-    // })
 
     return btnElem;
 }
@@ -823,14 +749,9 @@ function createSwapBankBtn(){
     addChildElement(playFieldElem, btnElem);
     swapBankEvent(btnElem, true);
     
-    // addChildElement(backgroundElem, btnElem);
-    
-    // btnElem.addEventListener('click',()=>{
-    //     swapBank();
-    // })
-
     return btnElem;
 }
+
 
 function introSwapBankBtn(){
     const btnElem = createElem('div', ['hidden', 'play-hold-swap-btn'], 'swap-bank-btn')
@@ -839,12 +760,6 @@ function introSwapBankBtn(){
     addChildElement(playFieldElem, btnElem);
     swapBankEvent(btnElem, false);
     
-    // addChildElement(backgroundElem, btnElem);
-    
-    // btnElem.addEventListener('click',()=>{
-    //     swapBank();
-    // })
-
     return btnElem;
 }
 
@@ -860,48 +775,6 @@ function createElem(elemType, classNames=[], idName){
 
     return elem;
 }
-
-
-
-// // cardsInGame = Global Variable //
-// // matrix0Flipped = Global Variable //
-// // deckPos = Global Variable //
-// // createDeckElements(cardsInGame, matrix0Flipped, deckPos); //
-// function createDeckElements(numDeck, orientation, postion){
-//     const deckElems = [];
-//     for (let i = 0; i < numDeck; i++){
-//         const cardElem = createCard();
-
-//         cardElem.style.transform = `matrix3d(
-//             ${orientation[0]},
-//             ${orientation[1]},
-//             ${orientation[2]},
-//             0,
-//             ${orientation[3]},
-//             ${orientation[4]},
-//             0,
-//             0,
-//             ${orientation[5]},
-//             0,
-//             ${orientation[6]},
-//             0,
-//             ${postion.x},
-//             ${postion.y},
-//             0,
-//             1
-//             )`; 
-        
-//         // add hover mouse event //
-//         mouseOverEvent(cardElem);
-//         // add click card event //
-//         cardClickEvent(cardElem);
-
-//         // playFieldElem = Global Variable
-//         addChildElement(playFieldElem, cardElem);
-//         deckElems.push(cardElem);
-//     }
-//     return deckElems;
-// }
 
 
 function createDeckElements(){
@@ -948,7 +821,6 @@ function createCard(){
     const frontElem = createElement('div');
     addClassToElement(frontElem, 'front');
 
-    // Sould get a rotation matrix instead of rotateY(180Deg) with the back class //
     const backElem = createElement('div');
     addClassToElement(backElem, 'back');
 
@@ -1022,7 +894,7 @@ function cardClickEvent(elem){
             pickCardEffect(event.target.parentElement);
         }
 
-        if (cardPickedBank.length == 1 && cardPickPlayer.length == 1){
+        if (cardPickedBank.length == 1 && cardPickedPlayer.length == 1){
             enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
             enableDisablePlayHoldBtn(playCardsBtn, 'visible');
         }else{
@@ -1031,7 +903,6 @@ function cardClickEvent(elem){
         }
     })
 }
-
 
 function playCardsEvent(elem){
     elem.addEventListener('click',()=> playCards());
@@ -1051,42 +922,32 @@ function swapBankEvent(elem, pass){
 function pickCardEffect(pickedElem){
     const cardID = findCardID(pickedElem);
     const location = cardsDB[cardID].location;
+    let pickCardArray = [];
 
+    // cardPickedBank and cardPickedPlayer are global variable //
     if (location == 'center'){
-        if (cardPickedBank.length == 0){
-            cardPickedBank.push(cardID);
-            cardsDB[cardID].picked = true;
-        }else{
-            if (cardID == cardPickedBank[0]){
-                const unPickSameBankID = cardPickedBank.pop();
-                cardsDB[unPickSameBankID].picked = false;
-            }else{
-                const unPickBankID = cardPickedBank.pop();
-                cardsDB[unPickBankID].picked = false;
-                cardPickedBank.push(cardID);
-                cardsDB[cardID].picked = true;
-                mouseLeaveEffect(cardsDB[unPickBankID].elem);
-            }
-        }
+        pickCardArray =  cardPickedBank;
     }
 
     if (location == 'south'){
-        if (cardPickPlayer.length == 0){
-            cardPickPlayer.push(cardID);
-            cardsDB[cardID].picked = true;
-        }else{
-            if (cardID == cardPickPlayer[0]){
-                const unPickSamePlayerID = cardPickPlayer.pop();
-                cardsDB[unPickSamePlayerID].picked = false;
-            }else{
-                const unPickPlayerID = cardPickPlayer.pop();
-                cardsDB[unPickPlayerID].picked = false;
-                cardPickPlayer.push(cardID);
-                cardsDB[cardID].picked = true;
-                mouseLeaveEffect(cardsDB[unPickPlayerID].elem);
-            }           
-        }
+        pickCardArray = cardPickedPlayer;
     }
+
+    if (pickCardArray.length == 0){
+        pickCardArray.push(cardID);
+        cardsDB[cardID].picked = true;
+    }else{
+        if (cardID == pickCardArray[0]){
+            const unPickSameID = pickCardArray.pop();
+            cardsDB[unPickSameID].picked = false;
+        }else{
+            const unPickCardID = pickCardArray.pop();
+            cardsDB[unPickCardID].picked = false;
+            pickCardArray.push(cardID);
+            cardsDB[cardID].picked = true;
+            mouseLeaveEffect(cardsDB[unPickCardID].elem);
+        }
+    }             
 }
 
 
@@ -1098,6 +959,7 @@ function cardHoverEffect(hoverElem, reverse=false){
     const matrix3D = targetStyle.slice(1, targetStyle.length-2);
     const zIndex = targetStyle.slice(targetStyle.length -2);
 
+    // hoverOffset is a global variable //
     let hoverX = hoverOffsetX;
     let hoverY = hoverOffsetY
 
@@ -1119,6 +981,7 @@ function mouseLeaveEffect(elem){
     const hoverDown = new Event("mouseleave");
     elem.dispatchEvent(hoverDown);
 }
+
 
 ///////////////////////// CREATE START POINT ////////////////////////////////
 displayPlayerEntry();

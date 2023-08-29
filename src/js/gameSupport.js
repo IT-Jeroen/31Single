@@ -92,12 +92,14 @@ function enableDisablePlayHoldBtn(elem, state){
 }
 
 
+// Function only used in addDeckCardsToPlayers() //
 function addCardToCardDB(cardID, cardElem){
     let splitID = cardID.split('-');
     let cardSymbol = splitID[0];
     let cardIcon = splitID[1];
     let cardValue = Number(cardIcon);
 
+    // charValues is a Global Variable //
     if (!cardValue){
         cardValue = charValues[cardIcon];
     }

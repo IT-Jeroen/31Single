@@ -3,17 +3,19 @@ function loadGame(){
     const playerEntry = document.getElementById('player-entry');
     const winnerDisplay = document.getElementById('winner-display');
 
-    // players == Global Variable //
-    if (playerName){
-        players[0].name = playerName.value;
-    }
+    // // players == Global Variable //
+    // if (playerName){
+    //     players[0].name = playerName.value;
+    // }
    
-    players[0].auto = false;
-    // console.log(players[0]);
+    // players[0].auto = false;
+    // // console.log(players[0]);
 
     // Display Elements //
     setTimeout(()=>{
         if (playerEntry){
+            players[0].name = playerName.value;
+            players[0].auto = false;
             playerEntry.remove();
         }
         if (winnerDisplay){
@@ -81,6 +83,7 @@ function playerHold(){
 function nextPlayer(winner=''){
     activateDeactivatePlayer();
     const activePlayer = filterPlayers('active', [true], false);
+    
     if (!Object.values(activePlayer)[0].pass){
         if (Object.values(activePlayer)[0].auto){
             console.log('AUTOPLAYER !!!');
@@ -96,7 +99,7 @@ function nextPlayer(winner=''){
         }
     }else{
         if(gameContinues()){
-            //
+            // All players get one last move if winner is declared //
             if (winner){
                 Object.values(activePlayer)[0].pass = true;
                 nextPlayer(winner);
@@ -149,8 +152,8 @@ function stopGame(winner=''){
 }
 
 function playCards(){
-    if (cardPickedBank.length == 1 && cardPickPlayer.length == 1){
-        swapCards(cardPickedBank[0], cardPickPlayer[0]);
+    if (cardPickedBank.length == 1 && cardPickedPlayer.length == 1){
+        swapCards(cardPickedBank[0], cardPickedPlayer[0]);
         enableDisablePlayHoldBtn(playCardsBtn, 'hidden');
         enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
         nextPlayer();    
@@ -160,8 +163,8 @@ function playCards(){
 
 // Swap Hand with Bank //
 function swapBank(hold=true){
-    const bank = Object.values(filterPlayers('name', ['Bank'], filterOut=false))[0];
-    const player = Object.values(filterPlayers('active', [true], filterOut=false))[0];
+    const bank = Object.values(filterPlayers('name', ['Bank'], false))[0];
+    const player = Object.values(filterPlayers('active', [true], false))[0];
     const playerHand = Object.keys(player['cards-in-hand']);
     const bankHand = Object.keys(bank['cards-in-hand']);
     
@@ -179,49 +182,42 @@ function swapBank(hold=true){
     
 }
 
-// Sould Bank be Global Variable ??? //
-// NEED TO SET CARD ACCESS //
+
 function swapCards(bankCardID,playerCardID){
     const timingRepos = 700;
     const timingCalc = 500;
-    const bankLocation = cardsDB[bankCardID].location;
-    const bank = filterPlayers('location', bankLocation, filterOut=false);
-    const bankID = Object.keys(bank)[0];
+
     const playerLocation = cardsDB[playerCardID].location;
     const player = filterPlayers('location', playerLocation, filterOut=false);
     const playerID = Object.keys(player)[0];
 
-    // add bankCardID to Player
-    players[playerID]['cards-in-hand'][bankCardID] = players[bankID]['cards-in-hand'][bankCardID];
-    
-    // reset location //
-    cardsDB[bankCardID].location = playerLocation;
+    // const bankID = 4; //
+    const bankLocation = cardsDB[bankCardID].location;
+    const bank = filterPlayers('location', bankLocation, filterOut=false);
+    const bankID = Object.keys(bank)[0];
 
-    // add playerCardID to Bank
+    // ADD CARD//
+    players[playerID]['cards-in-hand'][bankCardID] = players[bankID]['cards-in-hand'][bankCardID];
     players[bankID]['cards-in-hand'][playerCardID] = players[playerID]['cards-in-hand'][playerCardID];
 
-    // reset location //
-    cardsDB[playerCardID].location = bankLocation;
-
-    // remove bankCardID from Bank
-    delete players[bankID]['cards-in-hand'][bankCardID];
-    // reset pick //
-    cardsDB[playerCardID].picked = false;
-
-    // remove playerCardID from Player
+    // REMOVE CARD //
     delete players[playerID]['cards-in-hand'][playerCardID]
-    // reset pick //
+    delete players[bankID]['cards-in-hand'][bankCardID];
+
+    // RESET //
+    cardsDB[bankCardID].location = playerLocation;
+    cardsDB[playerCardID].location = bankLocation;
+    cardsDB[playerCardID].picked = false;
     cardsDB[bankCardID].picked = false;
+    cardPickedBank.pop();
+    cardPickedPlayer.pop();
 
     setTimeout(()=>{
         calcCardPositions(players[playerID]);
         calcCardPositions(players[bankID], stacked=false);
     },timingCalc);
 
-    cardPickedBank.pop();
-    cardPickPlayer.pop();
-
-
+    
     setTimeout(()=>{
         repositionCards([playerID, bankID]);
     },timingRepos);
