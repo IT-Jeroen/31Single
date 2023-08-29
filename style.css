@@ -83,8 +83,8 @@ body {
     position: absolute;
     width: var(--card-width);
     height: var(--card-height);
-    background-color: white;
-    border: 1px solid black;
+    /* background-color: white;
+    border: 1px solid black; */
     transition: transform 0.3s ease-in-out;
     transform-style: preserve-3d;
 }
@@ -122,9 +122,24 @@ body {
     /* display: block; */
 }
 
-.play-hold-btn{
+#swap-bank-btn{
+    position: absolute;
+    transform: translate(calc(var(--center-point) + 0.5 * (var(--card-width) + (2 * var(--card-offset)))), calc(var(--center-point) + var(--card-height)));
+}
+
+#hold-cards-btn{
     position: absolute;
     transform: translate(calc(var(--center-point) - 0.5 * (var(--card-width) + (2 * var(--card-offset)))), calc(var(--center-point) + var(--card-height)));
+}
+
+#play-cards-btn{
+    position: absolute;
+    transform: translate(calc(var(--center-point) - 0.5 * (var(--card-width) + (2 * var(--card-offset)))), calc(var(--center-point) + var(--card-height)));
+}
+
+.play-hold-swap-btn{
+    /* position: absolute; */
+    /* transform: translate(calc(var(--center-point) - 0.5 * (var(--card-width) + (2 * var(--card-offset)))), calc(var(--center-point) + var(--card-height))); */
     background-color: red;
     font: 1.5em sans-serif;
     color: white;
@@ -136,11 +151,11 @@ body {
     z-index: 1;
 }
 
-.play-hold-btn:hover{
+.play-hold-swap-btn:hover{
     background-color: lightcoral;
     border: 1px solid white;
     cursor: pointer;
 }
-.play-hold-btn:active{
+.play-hold-swap-btn:active{
     background-color: red;
 }
