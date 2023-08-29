@@ -14,7 +14,6 @@ const matrix90Flipped = [0,-1,0,1,0,0,-1]; // 90 degree z axis
 const matrix180Flipped = [1,0,0,0,-1,0,-1]; // 180 degree z axis
 const matrix270Flipped = [0,1,0,-1,0,0,-1]; // 270 degree z axis
 
-
 // Cards In Hand Object = "Clubs-8" :{ x: 425, y: 870 }} //
 // Keep elem cards-in-hand as well for quicker search ??? (cards-in-hand.length vs cards-in cardsDB.length) //
 const players = {
