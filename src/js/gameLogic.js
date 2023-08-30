@@ -1,4 +1,4 @@
-import { cardAttrCount, calculateHand, returnAttrFromCount, findCardIdByAttr, sortCardByValue } from './helperFunctions.js';
+import { cardAttrCount, calculateHand, returnAttrFromCount, findCardIdByAttr, sortCardByValue } from './logicHelperFunctions.js';
 import { cardsDB } from "./cardsDB.js";
 
 
@@ -104,18 +104,19 @@ export function findCardMatch3(cardsInHand, cardsInBank, attr){
     return [pickBankCard, dropHandCard];
 }
 
-export function pickACard(cardsInHand, cardsInBank){
+
+export function autoPickACard(cardsInHand, cardsInBank){
     const handIconsCount = cardAttrCount(cardsInHand, 'icon');
     const handSymbolsCount = cardAttrCount(cardsInHand, 'symbol');
     const sortedCardInHandIDs = sortCardByValue(cardsInHand, true) // true returns array of cardIDs only
     const sortedCardInBankIDs = sortCardByValue(cardsInBank, true) // true returns array of cardIDs only
     
-    const minBankScore = 28;
+    // const minBankScore = 28;
     const cardsInHandScore = calculateHand(cardsInHand);
     const cardsInBankScore = calculateHand(cardsInBank);
     
     if (cardsInBankScore > cardsInHandScore && cardsInBankScore > minBankScore){
-        return ['Take Bank', cardsInBank]
+        return ['Take Bank', cardsInBank];
     }
 
     // 3 unique symbols and 3 unique icons (chase symbols first);

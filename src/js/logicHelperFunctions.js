@@ -50,6 +50,7 @@ export function findCardIdByAttr(cardsInHand, matchAttr, lowHigh){
     let attr = 'icon';
     let currentValue = 0;
     let newValue = 0;
+    cardSymbols = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
     
     if(cardSymbols.includes(matchAttr)){
         attr = 'symbol';

@@ -204,6 +204,14 @@ function swapCards(bankCardID,playerCardID){
     delete players[playerID]['cards-in-hand'][playerCardID]
     delete players[bankID]['cards-in-hand'][bankCardID];
 
+    // SET CARD ACCESS //
+    cardsDB[playerCardID].access = true;
+    cardsDB[bankCardID].access = false;
+
+    if(playerLocation == 'south'){
+        cardsDB[bankCardID].access = true;
+    }
+
     // RESET //
     cardsDB[bankCardID].location = playerLocation;
     cardsDB[playerCardID].location = bankLocation;
