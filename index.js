@@ -18,11 +18,11 @@ const matrix270Flipped = [0,1,0,-1,0,0,-1]; // 270 degree z axis
 // Cards In Hand Object = "Clubs-8" :{ x: 425, y: 870 }} //
 // Keep elem cards-in-hand as well for quicker search ??? (cards-in-hand.length vs cards-in cardsDB.length) //
 const players = {
-    0: {"name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0, 'pass': false, 'active':false, 'auto':false},
-    1: {"name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix90Flipped, 'pass': false, 'active':false, 'auto':true},
-    2: {"name":'Dad', "location": 'north', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix180Flipped, 'pass': false, 'active':false, 'auto':true},
-    3: {"name":'Mum', "location": 'east', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix270Flipped, 'pass': false, 'active':false, 'auto':true},
-    4: {"name":'Bank', "location": 'center', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0, 'pass': true, 'active':false, 'auto':false},
+    0: {"name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix0, 'pass': false, 'active':false, 'auto':false},
+    1: {"name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix90Flipped, 'pass': false, 'active':false, 'auto':true},
+    2: {"name":'Dad', "location": 'north', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix180Flipped, 'pass': false, 'active':false, 'auto':true},
+    3: {"name":'Mum', "location": 'east', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix270Flipped, 'pass': false, 'active':false, 'auto':true},
+    4: {"name":'Bank', "location": 'center', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix0, 'pass': true, 'active':false, 'auto':false},
 }
 
 const charValues = {'A':11, 'K':10, 'Q':10, 'J': 10};
@@ -53,6 +53,8 @@ const clickCardOffset = 5;
 const cardPickedBank = [];
 const cardPickedPlayer = [];
 const minBankScore = 28;
+const winner = {'name':'None'};
+let intro = true;
 
 /////////////////////////// GAME MECHANICS //////////////////////////////////
 
@@ -91,6 +93,13 @@ function loadGame(){
 
 
 function resetGame(){
+    // Reset Winner //
+    winner.name = 'None';
+    // Reset Intro //
+    intro = true;
+    // Clear pickedCards Save fail//
+    cardPickedBank.pop();
+    cardPickedPlayer.pop();
     // Remove All Cards From Play Field //
     document.querySelectorAll('.card').forEach(card => card.remove());
     // Reset PLayer Settings to default //
@@ -123,22 +132,31 @@ function gameContinues(){
 
 
 let autoCount = 1;
-// NEED CHECK FOR WINNER (After playing cards) //
-// calculate hand after playing cards //
-function nextPlayer(winner=''){
+
+function nextPlayer(){
+    // Reset player.pass = true as default with swapBank() //
+    if (intro){
+        intro = false;
+    }
+    // Set all previous players to pass when a winner is found //
+    if(winner.name != 'None'){
+        const previousPlayer = Object.values(filterPlayers('active', [true], false))[0];
+        previousPlayer.pass = true;
+    }
+
     activateDeactivatePlayer();
     const activePlayer = filterPlayers('active', [true], false);
     
     if (!Object.values(activePlayer)[0].pass){
         if (Object.values(activePlayer)[0].auto){
             const bank = filterPlayers('name', ['Bank'], false);
-            // Do automatic things //
+            
             console.log('AUTOPLAYER !!!:', Object.values(activePlayer)[0].name, Object.values(activePlayer)[0].location, autoCount);
             autoCount += 1;
-            // players instead of cards in hand ??? //
+
             const autoPlayerCardsInHand = Object.values(activePlayer)[0]['cards-in-hand'];
             const cardsInBank = Object.values(bank)[0]['cards-in-hand'];
-            const autoPickedCards = autoPickACard(autoPlayerCardsInHand, cardsInBank); // return [pickBankCard, dropHandCard]
+            const autoPickedCards = autoPickACard(autoPlayerCardsInHand, cardsInBank);
             const autoPickedBankCard = autoPickedCards[0];
             const autoPickedPlayerCard = autoPickedCards[1];
 
@@ -154,7 +172,6 @@ function nextPlayer(winner=''){
                 if (autoPickedBankCard == 'Take Bank'){
                     console.log('Take Bank')
                     swapBank();
-                    // swapBank() will execute nextPlayer // No
                     setTimeout(()=>{
                         nextPlayer();
                          
@@ -163,7 +180,6 @@ function nextPlayer(winner=''){
                 if (autoPickedBankCard == 'Player Pass'){
                     console.log('Player Pass')
                     playerHold();
-                    // playerHold will execute nextPlayer // No
                     setTimeout(()=>{
                         nextPlayer();
                          
@@ -176,21 +192,13 @@ function nextPlayer(winner=''){
             enableDisablePlayHoldBtn(holdCardsBtn, 'visible');
             enableDisablePlayHoldBtn(swapBankBtn, 'visible');
         }
+
+    // IF PLAYER PASS //   
     }else{
         if(gameContinues()){
-            // All players get one last move if winner is declared //
-            if (winner){
-                Object.values(activePlayer)[0].pass = true;
-                nextPlayer(winner);
-            }else{
-                nextPlayer();
-            }
+            nextPlayer();
         }else{
-            // All Player Hold or Game has a Winner//
-            // stopGame(winner);
-            
-            // TEMP WINNER //
-            stopGame('Daddy');
+            stopGame();
         }
     }
     
@@ -205,34 +213,53 @@ function stopLoop(){
 }
 
 
-function stopGame(winner=''){
+function winnersAndLosers(){
     let topScore = 0;
+    let lowestScore = 30.5;
+    let loserNames = [];
+    let winnerNames = [];
 
-    if (!winner){
-        Object.entries(players).forEach(([k,v])=>{
-            if (players[k].name != 'Bank'){
-                const playerScore = calculateHand(players[k]['cards-in-hand']);
-                if (playerScore > topScore){
-                    topScore = playerScore;
-                    winner = players[k].name;
-                }
+    Object.entries(players).forEach(([k,v])=>{
+        if (players[k].name != 'Bank'){
+            const playerScore = calculateHand(players[k]['cards-in-hand']);
+            console.log(players[k].name, playerScore);
+            if (playerScore == topScore){
+                winnerNames.push(players[k].name);
             }
-        })
-    }else{
-        topScore = 31;
+            if (playerScore > topScore){
+                winnerNames = [players[k].name]
+                topScore = playerScore;
+                
+            }
+            if (playerScore == lowestScore){
+                loserNames.push(players[k].name);
+            }
+            if(playerScore < lowestScore){
+                loserNames = [players[k].name];
+                lowestScore = playerScore;
+            }
+        }
+    })
+
+    if (winner.name != 'None'){
+        winnerNames = [winner.name]
+        topScore = 31
     }
 
+    return {'winners': winnerNames, 'top-score': topScore, 'losers': loserNames, 'lowest-score': lowestScore}
+}
 
-    displayGameResults(winner, topScore);
-
+function stopGame(){
+    const gameResult = winnersAndLosers();
+    displayGameResults(gameResult.winners, gameResult["top-score"]);
     // show all cards //
     flipAllCards();
-
 }
 
 
 function playerAction(action){
     let timing = 0;
+
     if (action == 'playCards'){
         playCards();
         timing = 2000;
@@ -242,21 +269,21 @@ function playerAction(action){
         timing = 250;
     }
     if (action == 'swapBank'){
-        swapBank(false);
+        swapBank();
         timing = 2000;
     }
     setTimeout(()=>{
-        // calculateHand // if 31 => nextPlayer(winner)
-        nextPlayer();
+            nextPlayer(); 
     },timing); 
 }
+
 
 function playCards(){
     if (cardPickedBank.length == 1 && cardPickedPlayer.length == 1){
         console.log('LOCAL PLAYER Picked Bank:',cardPickedBank[0], 'Picked Hand:', cardPickedPlayer[0])
         swapCards(cardPickedBank[0], cardPickedPlayer[0]);
         enableDisablePlayHoldBtn(playCardsBtn, 'hidden');
-        enableDisablePlayHoldBtn(swapBankBtn, 'hidden');  
+        enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
     }
 }
 
@@ -274,19 +301,21 @@ function playerHold(){
 }
 
 
+
 // Swap Hand with Bank //
-function swapBank(hold=true){
+function swapBank(){
     const bank = Object.values(filterPlayers('name', ['Bank'], false))[0];
     const player = Object.values(filterPlayers('active', [true], false))[0];
     const playerHand = Object.keys(player['cards-in-hand']);
     const bankHand = Object.keys(bank['cards-in-hand']);
+
     console.log('SWAP BANK:', player.name);
 
     playerHand.forEach((cardID, index)=>{
         swapCards(bankHand[index], cardID);
     })
 
-    if (hold){
+    if (!intro){
         player.pass = true;
     }
 
@@ -332,16 +361,23 @@ function swapCards(bankCardID,playerCardID){
     cardPickedBank.pop();
     cardPickedPlayer.pop();
 
+    // Calculate Winner //
+    const score = calculateHand(players[playerID]['cards-in-hand']);
+    if (score == 31){
+        if (winner.name == 'None'){
+            winner.name = players[playerID].name;
+        }
+    }
+    console.log(players[playerID].name, score);
+
     setTimeout(()=>{
         calcCardPositions(players[playerID]);
         calcCardPositions(players[bankID], stacked=false);
     },timingCalc);
 
-    
     setTimeout(()=>{
         repositionCards([playerID, bankID]);
     },timingRepos);
-    
 }
 
 
@@ -353,7 +389,6 @@ function handOutDeckCards(players, timing){
     let cardIndex = 0;
     let numCardsToDeal = 0;
     
-
     playersID.forEach(id => {
         numCardsToDeal += Object.keys(players[id]['cards-in-hand']).length;
     })
@@ -409,10 +444,6 @@ function handOutDeckCards(players, timing){
 
 
 function addDeckCardsToPlayers(){
-    // players = Global Variable //
-    // cardsInGame = Global Variable //
-    // matrix0Flipped = Global Variable //
-    // deckPos = Global Variable //
     const allCardElems = createDeckElements(cardsInGame, matrix0Flipped, deckPos);
 
     // Create card values and id's
@@ -444,8 +475,6 @@ function addDeckCardsToPlayers(){
 }
 
 function dealDeckCards(timing){
-    // players = Global Variable //
-    // cardsInGame = Global Variable //
     const bankPlayer = filterPlayers('name', ['Bank'], false);
     const nonBankPlayers = filterPlayers('name', ['Bank']);
     
@@ -571,9 +600,7 @@ function findCardMatch3(cardsInHand, cardsInBank, attr){
     return [pickBankCard, dropHandCard];
 }
 
-// NEEDS A SWAP BANK OUTPUT //
-// NEEDS A HOLD OUTPUT //
-// NEEDS A NEXT PLAYER EXECUTION ??? ///
+
 function autoPickACard(cardsInHand, cardsInBank){
     const handIconsCount = cardAttrCount(cardsInHand, 'icon');
     const handSymbolsCount = cardAttrCount(cardsInHand, 'symbol');
@@ -607,7 +634,7 @@ function autoPickACard(cardsInHand, cardsInBank){
             dropCardInHand = sortedCardInHandIDs[2];
         }
 
-        return [cardPicked, dropCardInHand] // [dropHandCard, cardsPicked[0]] [0,1]
+        return [cardPicked, dropCardInHand]
     }
 
     // 1 unique symbol (score 24 - 31) (1 unique icon == 30.5)
@@ -617,17 +644,15 @@ function autoPickACard(cardsInHand, cardsInBank){
             return ['Player Pass', cardsInHand]
         }
         const cardsPicked = findCardMatch3(cardsInHand, cardsInBank, 'symbol');
-        // could be removed //
         const cardPicked  = cardsPicked[0];
         const dropCardInHand = cardsPicked[1];
 
         // if playerScore > X => take a Gamble ? //
         if (cardPicked  == 'None'){
-            //playerPass(cardsInHand,lowerSumPassLimit) // returns playerPass
             return ['Player Pass', cardsInHand]
         }
 
-        return [cardPicked , dropCardInHand] //pickedCards; [dropCard, pickCard] [0,1]
+        return [cardPicked , dropCardInHand]
     }
 
     // 2 unique symbols or 2 unique icons (chase icons first)
@@ -651,16 +676,14 @@ function autoPickACard(cardsInHand, cardsInBank){
             let dropCardAttr = [];
             if (Object.keys(handSymbolsCount).length < Object.keys(handIconsCount).length){
                 dropCardAttr = returnAttrFromCount(handSymbolsCount, 1, 'max');
-                // dropCardInHand = findCardIdByAttr(cardsInHand, 'symbol', dropCardAttr);
                 dropCardInHand = findCardIdByAttr(cardsInHand, dropCardAttr, 'low');
             }else{ // Favour Icons //
                 dropCardAttr = returnAttrFromCount(handIconsCount, 1, 'max');
-                // dropCardInHand = findCardIdByAttr(cardsInHand, 'icon', dropCardAttr);
                 dropCardInHand = findCardIdByAttr(cardsInHand, dropCardAttr, 'low');
             }
         }
 
-        return [cardPicked, dropCardInHand] //[dropCardInHand, cardPicked] [0, 1]
+        return [cardPicked, dropCardInHand];
     }
         
 }
@@ -1118,18 +1141,24 @@ function displayPlayerEntry(){
 }
 
 
-function displayGameResults(name, score){
+function displayGameResults(names, score){
     const winnerDisplay = createElem('div', ['player-display'], 'winner-display');
     
     const winnerLabel = createElem('div', ['player-label', 'full-width'], 'winner-label');
     const winnerLabelText = document.createTextNode('The Winner !');
     addChildElement(winnerLabel, winnerLabelText);
+    addChildElement(winnerDisplay, winnerLabel);
     
-    const winnerName = createElem('input', ['player-name', 'full-width'], 'winner-name');
-    winnerName.type = 'text';
+    names.forEach((name, index)=>{
+        const winnerName = createElem('input', ['player-name', 'full-width'], `winner-name-${index}`);
+        winnerName.type = 'text';
+        
+        winnerName.value = `${name} with a score of: ${score}`;
+        winnerName.readonly = 'true';
+
+        addChildElement(winnerDisplay, winnerName);
+        })
     
-    winnerName.value = `${name} with a score of: ${score}`;
-    winnerName.readonly = 'true';
 
     const restartGameBtn = createElem('div', ['game-btn'], 're-start-game-btn');
     
@@ -1138,14 +1167,11 @@ function displayGameResults(name, score){
         });
 
     const newGameTextElem = createElem('div');
+    addChildElement(restartGameBtn, newGameTextElem);
     const newGameText = document.createTextNode('New Game');
     addChildElement(newGameTextElem, newGameText);
-    addChildElement(restartGameBtn, newGameTextElem);
-
-    addChildElement(winnerDisplay, winnerLabel);
-    addChildElement(winnerDisplay, winnerName);
+    
     addChildElement(winnerDisplay, restartGameBtn);
-
     addChildElement(backgroundElem, winnerDisplay);
 }
 
