@@ -71,28 +71,57 @@ function gameContinues(){
     return true;
 }
 
-function playerHold(){
-    const activePlayer = filterPlayers('active', [true], false);
-    Object.values(activePlayer)[0].pass = true;
-    nextPlayer();
-    enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
-    enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
-}
 
-
+let autoCount = 1;
+// NEED CHECK FOR WINNER (After playing cards) //
+// calculate hand after playing cards //
 function nextPlayer(winner=''){
     activateDeactivatePlayer();
     const activePlayer = filterPlayers('active', [true], false);
     
     if (!Object.values(activePlayer)[0].pass){
         if (Object.values(activePlayer)[0].auto){
-            console.log('AUTOPLAYER !!!');
+            const bank = filterPlayers('name', ['Bank'], false);
             // Do automatic things //
-    
-            setTimeout(()=>{
-               nextPlayer();
-                
-            }, 3000);
+            console.log('AUTOPLAYER !!!:', Object.values(activePlayer)[0].name, Object.values(activePlayer)[0].location, autoCount);
+            autoCount += 1;
+            // players instead of cards in hand ??? //
+            const autoPlayerCardsInHand = Object.values(activePlayer)[0]['cards-in-hand'];
+            const cardsInBank = Object.values(bank)[0]['cards-in-hand'];
+            const autoPickedCards = autoPickACard(autoPlayerCardsInHand, cardsInBank); // return [pickBankCard, dropHandCard]
+            const autoPickedBankCard = autoPickedCards[0];
+            const autoPickedPlayerCard = autoPickedCards[1];
+
+            console.log('AUTOPLAYER !!!: PickedBank:',autoPickedBankCard, 'PickedHand:', autoPickedPlayerCard);
+
+            if (autoPickedBankCard != 'Take Bank' && autoPickedBankCard != 'Player Pass'){
+                swapCards(autoPickedBankCard,autoPickedPlayerCard);
+                setTimeout(()=>{
+                    nextPlayer();
+                     
+                 }, 2000);
+            }else{
+                if (autoPickedBankCard == 'Take Bank'){
+                    console.log('Take Bank')
+                    swapBank();
+                    // swapBank() will execute nextPlayer // No
+                    setTimeout(()=>{
+                        nextPlayer();
+                         
+                     }, 2000);
+                }
+                if (autoPickedBankCard == 'Player Pass'){
+                    console.log('Player Pass')
+                    playerHold();
+                    // playerHold will execute nextPlayer // No
+                    setTimeout(()=>{
+                        nextPlayer();
+                         
+                     }, 500);
+                }
+            }
+
+
         } else{
             enableDisablePlayHoldBtn(holdCardsBtn, 'visible');
             enableDisablePlayHoldBtn(swapBankBtn, 'visible');
@@ -151,13 +180,47 @@ function stopGame(winner=''){
 
 }
 
+
+function playerAction(action){
+    let timing = 0;
+    if (action == 'playCards'){
+        playCards();
+        timing = 2000;
+    }
+    if (action == 'playerHold'){
+        playerHold();
+        timing = 250;
+    }
+    if (action == 'swapBank'){
+        swapBank(false);
+        timing = 2000;
+    }
+    setTimeout(()=>{
+        // calculateHand // if 31 => nextPlayer(winner)
+        nextPlayer();
+    },timing); 
+}
+
 function playCards(){
     if (cardPickedBank.length == 1 && cardPickedPlayer.length == 1){
+        console.log('LOCAL PLAYER Picked Bank:',cardPickedBank[0], 'Picked Hand:', cardPickedPlayer[0])
         swapCards(cardPickedBank[0], cardPickedPlayer[0]);
         enableDisablePlayHoldBtn(playCardsBtn, 'hidden');
-        enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
-        nextPlayer();    
+        enableDisablePlayHoldBtn(swapBankBtn, 'hidden');  
     }
+}
+
+
+function playerHold(){
+    const activePlayer = filterPlayers('active', [true], false);
+    Object.values(activePlayer)[0].pass = true;
+    console.log('PLAYER PASS:', Object.values(activePlayer)[0].name);
+
+    if (!Object.values(activePlayer)[0].auto){
+        enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
+        enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
+    }
+    
 }
 
 
@@ -167,7 +230,8 @@ function swapBank(hold=true){
     const player = Object.values(filterPlayers('active', [true], false))[0];
     const playerHand = Object.keys(player['cards-in-hand']);
     const bankHand = Object.keys(bank['cards-in-hand']);
-    
+    console.log('SWAP BANK:', player.name);
+
     playerHand.forEach((cardID, index)=>{
         swapCards(bankHand[index], cardID);
     })
@@ -178,8 +242,6 @@ function swapBank(hold=true){
 
     enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
     enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
-    nextPlayer();
-    
 }
 
 

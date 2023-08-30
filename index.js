@@ -144,7 +144,7 @@ function nextPlayer(winner=''){
 
             console.log('AUTOPLAYER !!!: PickedBank:',autoPickedBankCard, 'PickedHand:', autoPickedPlayerCard);
 
-            if (autoPickedBankCard != 'Take Bank' || autoPickedBankCard != 'Player Pass'){
+            if (autoPickedBankCard != 'Take Bank' && autoPickedBankCard != 'Player Pass'){
                 swapCards(autoPickedBankCard,autoPickedPlayerCard);
                 setTimeout(()=>{
                     nextPlayer();
@@ -171,11 +171,6 @@ function nextPlayer(winner=''){
                 }
             }
 
-            // Time Out for Execution of Animation //
-            // setTimeout(()=>{
-            //    nextPlayer();
-                
-            // }, 3000);
 
         } else{
             enableDisablePlayHoldBtn(holdCardsBtn, 'visible');
@@ -261,10 +256,7 @@ function playCards(){
         console.log('LOCAL PLAYER Picked Bank:',cardPickedBank[0], 'Picked Hand:', cardPickedPlayer[0])
         swapCards(cardPickedBank[0], cardPickedPlayer[0]);
         enableDisablePlayHoldBtn(playCardsBtn, 'hidden');
-        enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
-        // setTimeout(()=>{
-        //     nextPlayer();
-        // },2000);   
+        enableDisablePlayHoldBtn(swapBankBtn, 'hidden');  
     }
 }
 
@@ -273,10 +265,7 @@ function playerHold(){
     const activePlayer = filterPlayers('active', [true], false);
     Object.values(activePlayer)[0].pass = true;
     console.log('PLAYER PASS:', Object.values(activePlayer)[0].name);
-    // // setTimeout(()=>{
-    // //     nextPlayer();
-    // // },500);
-    // nextPlayer();
+
     if (!Object.values(activePlayer)[0].auto){
         enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
         enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
@@ -303,8 +292,6 @@ function swapBank(hold=true){
 
     enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
     enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
-    // nextPlayer();
-    
 }
 
 
@@ -1350,13 +1337,7 @@ function cardClickEvent(elem){
 function playCardsEvent(elem){
     elem.addEventListener('click',()=> {
         // playCards();
-
         playerAction('playCards');
-
-        // setTimeout(()=>{
-        //     nextPlayer();
-        // },500);
-        // nextPlayer();
     });
 }
 
@@ -1364,13 +1345,7 @@ function playCardsEvent(elem){
 function playerHoldEvent(elem){
     elem.addEventListener('click',()=> {
         // playerHold();
-
         playerAction('playerHold');
-
-        // setTimeout(()=>{
-        //     nextPlayer();
-        // },500);
-        // nextPlayer();
     });
 }
 
@@ -1378,13 +1353,7 @@ function playerHoldEvent(elem){
 function swapBankEvent(elem, pass){
     elem.addEventListener('click',()=> {
         // swapBank(pass);
-
         playerAction('swapBank');
-
-        // setTimeout(()=>{
-        //     nextPlayer();
-        // },500);
-        // nextPlayer();
     });
 }
 

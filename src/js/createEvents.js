@@ -45,17 +45,26 @@ function cardClickEvent(elem){
 }
 
 function playCardsEvent(elem){
-    elem.addEventListener('click',()=> playCards());
+    elem.addEventListener('click',()=> {
+        // playCards();
+        playerAction('playCards');
+    });
 }
 
 
 function playerHoldEvent(elem){
-    elem.addEventListener('click',()=> playerHold());
+    elem.addEventListener('click',()=> {
+        // playerHold();
+        playerAction('playerHold');
+    });
 }
 
 
 function swapBankEvent(elem, pass){
-    elem.addEventListener('click',()=> swapBank(pass));
+    elem.addEventListener('click',()=> {
+        // swapBank(pass);
+        playerAction('swapBank');
+    });
 }
 
 
