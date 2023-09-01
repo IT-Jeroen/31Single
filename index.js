@@ -113,8 +113,8 @@ function calculateVariables(){
     viewPortScale.scale = 1;
     viewPortDimension.width = window.innerWidth;
     viewPortDimension.height = window.innerHeight;
-    console.log('Calc Var ViewPort [0]', viewPortDimension);
-    console.log('Calc Var Scale [0]', viewPortScale);
+    // console.log('Calc Var ViewPort [0]', viewPortDimension);
+    // console.log('Calc Var Scale [0]', viewPortScale);
     
     const widthScale  = viewPortDimension.width / minViewPortDimensions.width;
     const heightScale = viewPortDimension.height / minViewPortDimensions.height;
@@ -163,20 +163,20 @@ function calculateVariables(){
 
 
 function loadGame(){
-    console.log('ID:',players[0].name)
-    console.log('Load Game ViewPort', viewPortDimension);
-    console.log('Load Game Scale', viewPortScale);
-    console.log('Zones[0]', zonesPos);
-    console.log('Center Pos [0]', centerPos);
+    // console.log('ID:',players[0].name)
+    // console.log('Load Game ViewPort', viewPortDimension);
+    // console.log('Load Game Scale', viewPortScale);
+    // console.log('Zones[0]', zonesPos);
+    // console.log('Center Pos [0]', centerPos);
     
     calculateVariables();
 
-    setTimeout(()=>{
-        console.log('Calc Var ViewPort [1]', viewPortDimension);
-        console.log('Calc Var Scale [1]', viewPortScale);
-        console.log('Zones[1]', zonesPos);
-        console.log('Center Pos [1]', centerPos);
-    },500);
+    // setTimeout(()=>{
+    //     console.log('Calc Var ViewPort [1]', viewPortDimension);
+    //     console.log('Calc Var Scale [1]', viewPortScale);
+    //     console.log('Zones[1]', zonesPos);
+    //     console.log('Center Pos [1]', centerPos);
+    // },500);
 
     
 
@@ -263,13 +263,38 @@ function playerHold(){
 }
 
 
+function activeVisual(cardsInHand, active){
+    console.log('cardsInHand', cardsInHand)
+    Object.keys(cardsInHand).forEach((cardID)=>{
+        const cardElem = cardsDB[cardID].elem
+        if (active){
+            
+            addClassToElement(cardElem, 'active');
+        }
+        if (!active){
+            removeClassFromElement(cardElem, 'active');
+        }
+    });
+}
+
+
 function nextPlayer(winner=''){
+
+    const deActivePlayer = filterPlayers('active', [true], false);
+    activeVisual(Object.values(deActivePlayer)[0]['cards-in-hand'], false);
+    console.log('deActivePlayer', deActivePlayer)
+
     activateDeactivatePlayer();
     const activePlayer = filterPlayers('active', [true], false);
+    console.log('activePlayer', activePlayer)
     
     if (!Object.values(activePlayer)[0].pass){
         if (Object.values(activePlayer)[0].auto){
             console.log('AUTOPLAYER !!!');
+            // Set Active Visual //
+            
+            activeVisual(Object.values(activePlayer)[0]['cards-in-hand'], true);
+
             // Do automatic things //
     
             setTimeout(()=>{
@@ -339,7 +364,11 @@ function playCards(){
         swapCards(cardPickedBank[0], cardPickedPlayer[0]);
         enableDisablePlayHoldBtn(playCardsBtn, 'hidden');
         enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
-        nextPlayer();    
+        // nextPlayer();  
+        // Set Delay To Align Visual Effects // 
+        setTimeout(()=>{
+            nextPlayer();
+        },2000);
     }
 }
 

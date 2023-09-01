@@ -77,6 +77,11 @@ body {
     background-color: red;
 }
 
+.active {
+    border: 4px solid hsl(34, 98%, 64%);
+    border-radius: 10px;
+}
+
 .playfield{
     /* width: var(--field-size);
     height: var(--field-size); */
