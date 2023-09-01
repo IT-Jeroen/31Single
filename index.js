@@ -1,6 +1,8 @@
 // https://ramlmn.github.io/visualizing-matrix3d/
 // https://meyerweb.com/eric/tools/matrix/
 
+/////////////////////////////////////// VARIABLES ///////////////////////////////////////////////
+
 // 0 DEGREE Y-AXIS //
 const matrix0 = [1,0,0,0,1,0,1]; // 0 degree z axis
 const matrix90 = [0,1,0,-1,0,0,1]; // 90 degree z axis
@@ -16,11 +18,11 @@ const matrix270Flipped = [0,1,0,-1,0,0,-1]; // 270 degree z axis
 // Cards In Hand Object = "Clubs-8" :{ x: 425, y: 870 }} //
 // Keep elem cards-in-hand as well for quicker search ??? (cards-in-hand.length vs cards-in cardsDB.length) //
 const players = {
-    0: {"name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0, 'pass': false, 'active':false, 'auto':false},
-    1: {"name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix90Flipped, 'pass': false, 'active':false, 'auto':true},
-    2: {"name":'Dad', "location": 'north', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix180Flipped, 'pass': false, 'active':false, 'auto':true},
-    3: {"name":'Mum', "location": 'east', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix270Flipped, 'pass': false, 'active':false, 'auto':true},
-    4: {"name":'Bank', "location": 'center', 'cards-in-hand':{}, 'wins': 0, 'orientation': matrix0, 'pass': true, 'active':false, 'auto':false},
+    0: {"name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix0, 'pass': false, 'active':false, 'auto':false},
+    1: {"name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix90Flipped, 'pass': false, 'active':false, 'auto':true},
+    2: {"name":'Dad', "location": 'north', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix180Flipped, 'pass': false, 'active':false, 'auto':true},
+    3: {"name":'Mum', "location": 'east', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix270Flipped, 'pass': false, 'active':false, 'auto':true},
+    4: {"name":'Bank', "location": 'center', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix0, 'pass': true, 'active':false, 'auto':false},
 }
 
 // const charValues = {'A':11, 'K':10, 'Q':10, 'J': 10};
@@ -60,6 +62,9 @@ const zonesPos = {
 
 const cardPickedBank = [];
 const cardPickedPlayer = [];
+const minBankScore = 28;
+const winner = {'name':'None'};
+let intro = true;
 
 
 // SCALE DISTORTED TRANSLATE //
@@ -154,6 +159,13 @@ function loadGame(){
 
 
 function resetGame(){
+    // Reset Winner //
+    winner.name = 'None';
+    // Reset Intro //
+    intro = true;
+    // Clear pickedCards Save fail//
+    cardPickedBank.pop();
+    cardPickedPlayer.pop();
     // Remove All Cards From Play Field //
     document.querySelectorAll('.card').forEach(card => card.remove());
     // Reset PLayer Settings to default //
@@ -209,12 +221,23 @@ function activeVisual(cardsInHand, active){
     });
 }
 
+let autoCount = 1;
 
-function nextPlayer(winner=''){
+function nextPlayer(){
+    // Reset player.pass = true as default with swapBank() //
+    if (intro){
+        intro = false;
+    }
+    // Set all previous players to pass when a winner is found //
+    if(winner.name != 'None'){
 
     const deActivePlayer = filterPlayers('active', [true], false);
     activeVisual(Object.values(deActivePlayer)[0]['cards-in-hand'], false);
     console.log('deActivePlayer', deActivePlayer)
+
+        const previousPlayer = Object.values(filterPlayers('active', [true], false))[0];
+        previousPlayer.pass = true;
+    }
 
     activateDeactivatePlayer();
     const activePlayer = filterPlayers('active', [true], false);
@@ -222,36 +245,60 @@ function nextPlayer(winner=''){
     
     if (!Object.values(activePlayer)[0].pass){
         if (Object.values(activePlayer)[0].auto){
-            console.log('AUTOPLAYER !!!');
+            const bank = filterPlayers('name', ['Bank'], false);
             // Set Active Visual //
             
             activeVisual(Object.values(activePlayer)[0]['cards-in-hand'], true);
 
-            // Do automatic things //
-    
-            setTimeout(()=>{
-               nextPlayer();
-                
-            }, 3000);
+            
+            console.log('AUTOPLAYER !!!:', Object.values(activePlayer)[0].name, Object.values(activePlayer)[0].location, autoCount);
+            autoCount += 1;
+
+            const autoPlayerCardsInHand = Object.values(activePlayer)[0]['cards-in-hand'];
+            const cardsInBank = Object.values(bank)[0]['cards-in-hand'];
+            const autoPickedCards = autoPickACard(autoPlayerCardsInHand, cardsInBank);
+            const autoPickedBankCard = autoPickedCards[0];
+            const autoPickedPlayerCard = autoPickedCards[1];
+
+            console.log('AUTOPLAYER !!!: PickedBank:',autoPickedBankCard, 'PickedHand:', autoPickedPlayerCard);
+
+            if (autoPickedBankCard != 'Take Bank' && autoPickedBankCard != 'Player Pass'){
+                swapCards(autoPickedBankCard,autoPickedPlayerCard);
+                setTimeout(()=>{
+                    nextPlayer();
+                     
+                 }, 2000);
+            }else{
+                if (autoPickedBankCard == 'Take Bank'){
+                    console.log('Take Bank')
+                    swapBank();
+                    setTimeout(()=>{
+                        nextPlayer();
+                         
+                     }, 2000);
+                }
+                if (autoPickedBankCard == 'Player Pass'){
+                    console.log('Player Pass')
+                    playerHold();
+                    setTimeout(()=>{
+                        nextPlayer();
+                         
+                     }, 500);
+                }
+            }
+
+
         } else{
             enableDisablePlayHoldBtn(holdCardsBtn, 'visible');
             enableDisablePlayHoldBtn(swapBankBtn, 'visible');
         }
+
+    // IF PLAYER PASS //   
     }else{
         if(gameContinues()){
-            // All players get one last move if winner is declared //
-            if (winner){
-                Object.values(activePlayer)[0].pass = true;
-                nextPlayer(winner);
-            }else{
-                nextPlayer();
-            }
+            nextPlayer();
         }else{
-            // All Player Hold or Game has a Winner//
-            // stopGame(winner);
-            
-            // TEMP WINNER //
-            stopGame('Daddy');
+            stopGame();
         }
     }
     
@@ -266,33 +313,74 @@ function stopLoop(){
 }
 
 
-function stopGame(winner=''){
+function winnersAndLosers(){
     let topScore = 0;
+    let lowestScore = 30.5;
+    let loserNames = [];
+    let winnerNames = [];
 
-    if (!winner){
-        Object.entries(players).forEach(([k,v])=>{
-            if (players[k].name != 'Bank'){
-                const playerScore = calculateHand(players[k]['cards-in-hand']);
-                if (playerScore > topScore){
-                    topScore = playerScore;
-                    winner = players[k].name;
-                }
+    Object.entries(players).forEach(([k,v])=>{
+        if (players[k].name != 'Bank'){
+            const playerScore = calculateHand(players[k]['cards-in-hand']);
+            console.log(players[k].name, playerScore);
+            if (playerScore == topScore){
+                winnerNames.push(players[k].name);
             }
-        })
-    }else{
-        topScore = 31;
+            if (playerScore > topScore){
+                winnerNames = [players[k].name]
+                topScore = playerScore;
+                
+            }
+            if (playerScore == lowestScore){
+                loserNames.push(players[k].name);
+            }
+            if(playerScore < lowestScore){
+                loserNames = [players[k].name];
+                lowestScore = playerScore;
+            }
+        }
+    })
+
+    if (winner.name != 'None'){
+        winnerNames = [winner.name]
+        topScore = 31
     }
 
+    return {'winners': winnerNames, 'top-score': topScore, 'losers': loserNames, 'lowest-score': lowestScore}
+}
 
-    displayGameResults(winner, topScore);
-
+function stopGame(){
+    const gameResult = winnersAndLosers();
+    displayGameResults(gameResult.winners, gameResult["top-score"]);
     // show all cards //
     flipAllCards();
-
 }
+
+
+function playerAction(action){
+    let timing = 0;
+
+    if (action == 'playCards'){
+        playCards();
+        timing = 2000;
+    }
+    if (action == 'playerHold'){
+        playerHold();
+        timing = 250;
+    }
+    if (action == 'swapBank'){
+        swapBank();
+        timing = 2000;
+    }
+    setTimeout(()=>{
+            nextPlayer(); 
+    },timing); 
+}
+
 
 function playCards(){
     if (cardPickedBank.length == 1 && cardPickedPlayer.length == 1){
+        console.log('LOCAL PLAYER Picked Bank:',cardPickedBank[0], 'Picked Hand:', cardPickedPlayer[0])
         swapCards(cardPickedBank[0], cardPickedPlayer[0]);
         enableDisablePlayHoldBtn(playCardsBtn, 'hidden');
         enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
@@ -305,18 +393,34 @@ function playCards(){
 }
 
 
+function playerHold(){
+    const activePlayer = filterPlayers('active', [true], false);
+    Object.values(activePlayer)[0].pass = true;
+    console.log('PLAYER PASS:', Object.values(activePlayer)[0].name);
+
+    if (!Object.values(activePlayer)[0].auto){
+        enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
+        enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
+    }
+    
+}
+
+
+
 // Swap Hand with Bank //
-function swapBank(hold=true){
+function swapBank(){
     const bank = Object.values(filterPlayers('name', ['Bank'], false))[0];
     const player = Object.values(filterPlayers('active', [true], false))[0];
     const playerHand = Object.keys(player['cards-in-hand']);
     const bankHand = Object.keys(bank['cards-in-hand']);
-    
+
+    console.log('SWAP BANK:', player.name);
+
     playerHand.forEach((cardID, index)=>{
         swapCards(bankHand[index], cardID);
     })
 
-    if (hold){
+    if (!intro){
         player.pass = true;
     }
 
@@ -352,6 +456,14 @@ function swapCards(bankCardID,playerCardID){
     delete players[playerID]['cards-in-hand'][playerCardID]
     delete players[bankID]['cards-in-hand'][bankCardID];
 
+    // SET CARD ACCESS //
+    cardsDB[playerCardID].access = true;
+    cardsDB[bankCardID].access = false;
+
+    if(playerLocation == 'south'){
+        cardsDB[bankCardID].access = true;
+    }
+
     // RESET //
     cardsDB[bankCardID].location = playerLocation;
     cardsDB[playerCardID].location = bankLocation;
@@ -360,16 +472,23 @@ function swapCards(bankCardID,playerCardID){
     cardPickedBank.pop();
     cardPickedPlayer.pop();
 
+    // Calculate Winner //
+    const score = calculateHand(players[playerID]['cards-in-hand']);
+    if (score == 31){
+        if (winner.name == 'None'){
+            winner.name = players[playerID].name;
+        }
+    }
+    console.log(players[playerID].name, score);
+
     setTimeout(()=>{
         calcCardPositions(players[playerID]);
         calcCardPositions(players[bankID], stacked=false);
     },timingCalc);
 
-    
     setTimeout(()=>{
         repositionCards([playerID, bankID]);
     },timingRepos);
-    
 }
 
 
@@ -381,7 +500,6 @@ function handOutDeckCards(players, timing){
     let cardIndex = 0;
     let numCardsToDeal = 0;
     
-
     playersID.forEach(id => {
         numCardsToDeal += Object.keys(players[id]['cards-in-hand']).length;
     })
@@ -433,6 +551,10 @@ function handOutDeckCards(players, timing){
 
 
 function addDeckCardsToPlayers(){
+    // players = Global Variable //
+    // cardsInGame = Global Variable //
+    // matrix0Flipped = Global Variable //
+    // deckPos = Global Variable //
     const allCardElems = createDeckElements(cardsInGame, matrix0Flipped, deckPos);
 
     // Create card values and id's
@@ -472,6 +594,8 @@ function addDeckCardsToPlayers(){
 }
 
 function dealDeckCards(timing){
+    // players = Global Variable //
+    // cardsInGame = Global Variable //
     const bankPlayer = filterPlayers('name', ['Bank'], false);
     const nonBankPlayers = filterPlayers('name', ['Bank']);
     
@@ -493,8 +617,199 @@ function dealDeckCards(timing){
     },(cardsInGame + 1) * timing);
 }
 
+//////////////////////////// GAME LOGIC /////////////////////////////////
 
-////////////////////////// GAME SUPPORT //////////////////////////////////
+function checkCardSwapSum(cardsInHand, cardIn, cardOut){
+    const cardIDs = Object.keys(cardsInHand);
+    cardIDs.push(cardIn);
+    const newcardIDs = cardIDs.filter(cardID => cardID != cardOut)
+    const newCardsSwap = Object.fromEntries(Object.entries(cardsInHand).filter(([k,v]) => newcardIDs.includes(k)));
+    newCardsSwap[cardIn] = null;
+    const sum = calculateHand(newCardsSwap);
+    return sum;
+}
+
+
+
+function playerPass(cardsInHand,lowerSumPassLimit){
+    const handValue = calculateHand(cardsInHand);
+    if (handValue > lowerSumPassLimit){
+        return 'Player Pass';
+    }
+    return 'Keep Playing';
+}
+
+
+// When cardsInHand has no matching icons or symbols //
+// Find the combination of playerCard and bankCard with the highest score //
+function findCardMatch(cardsInHand, cardsInBank, attr){
+    const sortedCardInHandIDs = sortCardByValue(cardsInHand, true) // true returns array of cardIDs only
+    let pickBankCard = 'None';
+    let keepHandCard = 'None';
+    let dropHandCard = 'None';
+    let score = 0;
+
+    Object.keys(cardsInHand).forEach(handID =>{
+        Object.keys(cardsInBank).forEach(bankID=>{
+            if (cardsDB[handID][attr] == cardsDB[bankID][attr]){
+                let scoreValue = cardsDB[handID].value + cardsDB[bankID].value;
+                if (scoreValue > score){
+                    pickBankCard = bankID;
+                    keepHandCard = handID;
+                    score = scoreValue;
+                }
+            }
+        })
+    })
+
+    if (pickBankCard != 'None'){
+        dropHandCard = sortedCardInHandIDs[2];
+        if (keepHandCard == dropHandCard){
+            dropHandCard = sortedCardInHandIDs[1];
+        }
+    }
+
+    return [pickBankCard, dropHandCard];
+}
+
+function findCardMatch2(cardsInHand, cardsInBank, attr){
+    let dropHandCard = 'None';
+    let pickBankCard = 'None';
+    let dropCardAttrInHand = 'None';
+    let score = 0;
+
+    const attrCount = cardAttrCount(cardsInHand, attr);
+    const chaseAttr = returnAttrFromCount(attrCount, 2, 'min') 
+    const dropCardAttr = returnAttrFromCount(attrCount, 1, 'max');
+
+    if (dropCardAttr != 'None'){
+        dropCardAttrInHand = findCardIdByAttr(cardsInHand, dropCardAttr, 'low');
+    }
+
+    Object.keys(cardsInBank).forEach(bankID =>{
+        if (cardsDB[bankID][attr] == chaseAttr){
+            let scoreValue = cardsDB[bankID].value;
+            if (scoreValue > score){
+                pickBankCard = bankID;
+                dropHandCard = dropCardAttrInHand;
+                score = scoreValue;
+            } 
+        }
+    })
+
+    return [pickBankCard, dropHandCard];
+}
+
+
+function findCardMatch3(cardsInHand, cardsInBank, attr){
+    let pickBankCard = 'None';
+    let dropHandCard = 'None';
+    let score = 0;
+
+    Object.keys(cardsInHand).forEach(handID =>{
+        Object.keys(cardsInBank).forEach(bankID=>{
+            if (cardsDB[handID][attr] == cardsDB[bankID][attr]){
+                if (cardsDB[bankID].value > cardsDB[handID].value && cardsDB[bankID].value > score){
+                    pickBankCard = bankID;
+                    dropHandCard = handID;
+                    score = cardsDB[bankID].value;
+                } 
+            }
+        })
+    })
+
+    return [pickBankCard, dropHandCard];
+}
+
+
+function autoPickACard(cardsInHand, cardsInBank){
+    const handIconsCount = cardAttrCount(cardsInHand, 'icon');
+    const handSymbolsCount = cardAttrCount(cardsInHand, 'symbol');
+    const sortedCardInHandIDs = sortCardByValue(cardsInHand, true) // true returns array of cardIDs only
+    const sortedCardInBankIDs = sortCardByValue(cardsInBank, true) // true returns array of cardIDs only
+    
+    const cardsInHandScore = calculateHand(cardsInHand);
+    const cardsInBankScore = calculateHand(cardsInBank);
+    
+    if (cardsInBankScore > cardsInHandScore && cardsInBankScore > minBankScore){
+        return ['Take Bank', cardsInBank]
+    }
+
+    // 3 unique symbols and 3 unique icons (chase symbols first);
+    if (Object.keys(handIconsCount).length == 3 && Object.keys(handSymbolsCount).length == 3){
+        // Loop through cards in hand and loop through cards in bank to find the highst score combination by symbol
+        let cardsPicked = findCardMatch(cardsInHand, cardsInBank, 'symbol');
+        let cardPicked = cardsPicked[0];
+        let dropCardInHand = cardsPicked[1];
+
+        // If no matching symbol in bank chase (any) icon
+        if (cardPicked == 'None'){
+            cardsPicked = findCardMatch(cardsInHand, cardsInBank, 'icon');
+            cardPicked = cardsPicked[0];
+            dropCardInHand = cardsPicked[1];
+        }
+
+        // If no matching icon in bank either chase highest bank card
+        if (cardPicked == 'None'){
+            cardPicked = sortedCardInBankIDs[0];
+            dropCardInHand = sortedCardInHandIDs[2];
+        }
+
+        return [cardPicked, dropCardInHand]
+    }
+
+    // 1 unique symbol (score 24 - 31) (1 unique icon == 30.5)
+    if (Object.keys(handIconsCount).length == 1 || Object.keys(handSymbolsCount).length == 1){
+        
+        if (cardsInHandScore == 30.5){
+            return ['Player Pass', cardsInHand]
+        }
+        const cardsPicked = findCardMatch3(cardsInHand, cardsInBank, 'symbol');
+        const cardPicked  = cardsPicked[0];
+        const dropCardInHand = cardsPicked[1];
+
+        // if playerScore > X => take a Gamble ? //
+        if (cardPicked  == 'None'){
+            return ['Player Pass', cardsInHand]
+        }
+
+        return [cardPicked , dropCardInHand]
+    }
+
+    // 2 unique symbols or 2 unique icons (chase icons first)
+    if (Object.keys(handIconsCount).length == 2 || Object.keys(handSymbolsCount).length == 2){
+        // Chase Icons first
+        let cardsPicked = findCardMatch2(cardsInHand, cardsInBank, 'icon');
+        let cardPicked = cardsPicked[0];
+        let dropCardInHand = cardsPicked[1];
+        
+        // If no matching icon in bank chase symbol
+        if (cardPicked == 'None'){
+            cardsPicked = findCardMatch2(cardsInHand, cardsInBank, 'symbol');
+            cardPicked = cardsPicked[0];
+            dropCardInHand = cardsPicked[1];
+        }
+
+        // If no matching icon in bank either, chase highest bank card
+        if (cardPicked == 'None'){
+            cardPicked = sortedCardInBankIDs[0];
+            // Find which card to drop //
+            let dropCardAttr = [];
+            if (Object.keys(handSymbolsCount).length < Object.keys(handIconsCount).length){
+                dropCardAttr = returnAttrFromCount(handSymbolsCount, 1, 'max');
+                dropCardInHand = findCardIdByAttr(cardsInHand, dropCardAttr, 'low');
+            }else{ // Favour Icons //
+                dropCardAttr = returnAttrFromCount(handIconsCount, 1, 'max');
+                dropCardInHand = findCardIdByAttr(cardsInHand, dropCardAttr, 'low');
+            }
+        }
+
+        return [cardPicked, dropCardInHand];
+    }
+        
+}
+
+////////////////////////// GAME MECHANICS HELPER FUNCTIONS /////////////////////////////////
 
 function activateDeactivatePlayer(){
     let activePlayer = null;
@@ -756,7 +1071,169 @@ function calcCardPositions(player, stacked=true){
 }
 
 
-/////////////////////////////// ELEMENTS /////////////////////////////////
+
+////////////////////////////// LOGIC HELPER FUNCTIONS /////////////////////////////////////
+
+function cardAttrCount(cardsInHand, attr){
+    const cardAttr = Object.keys(cardsInHand).map((cardID)=> cardsDB[cardID][attr]);
+    const attrCount = {};
+
+    cardAttr.forEach(item => {
+        if (Object.hasOwn(attrCount, item)){
+            attrCount[item] += 1;
+        } else{
+            attrCount[item] = 1;
+        }
+
+    })
+
+    return attrCount;
+}
+
+
+// Does it need to return an array ??? //
+// Could return multiple values depending on the settings //
+// Not applicable in this setup, as long as paying attention to settings //
+function returnAttrFromCount(attrCount, countValue, minMax){
+    const countKeys = [];
+
+    if (minMax == 'min'){
+        for (const [key, value] of Object.entries(attrCount)) {
+            if (value >= countValue){
+                countKeys.push(key)
+            }
+        }
+    }
+
+    if (minMax == 'max'){
+        for (const [key, value] of Object.entries(attrCount)) {
+            if (value <= countValue){
+                countKeys.push(key)
+            }
+        }
+    }
+    
+    // return countKeys[0];
+    return countKeys.length > 0 ? countKeys[0] : 'None';
+}
+
+
+function findCardIdByAttr(cardsInHand, matchAttr, lowHigh){
+    let cardFoundID = 'None';
+    let attr = 'icon';
+    let currentValue = 0;
+    let newValue = 0;
+    const cardSymbols = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
+
+    if(cardSymbols.includes(matchAttr)){
+        attr = 'symbol';
+    }
+
+    Object.keys(cardsInHand).forEach(cardID =>{
+        if (cardsDB[cardID][attr] == matchAttr){
+            if (cardFoundID == 'None'){
+                cardFoundID = cardID;
+            } else{
+                currentValue = cardsDB[cardFoundID].value;
+                newValue = cardsDB[cardID].value;
+                if (lowHigh == 'high'){
+                    if (newValue > currentValue){
+                        cardFoundID = cardID;
+                    }
+                }
+                if (lowHigh == 'low'){
+                    if (newValue < currentValue){
+                        cardFoundID = cardID;
+                    }
+                }  
+            } 
+        }
+    })
+
+    return cardFoundID;
+}
+
+
+function calculateHand(cardsInHand){
+
+    const iconCount = cardAttrCount(cardsInHand, 'icon');
+    const symbolCount = cardAttrCount(cardsInHand, 'symbol');
+    
+    if (Object.keys(iconCount).length == 1){
+        // If 3 identical icons //
+        return 30.5;
+    }
+    else{
+        let identicalSymbol = returnAttrFromCount(symbolCount, 2, 'min');
+        let sum = 0;
+
+          Object.keys(cardsInHand).forEach(cardID =>{
+            if (cardsDB[cardID].symbol == identicalSymbol){
+                sum += cardsDB[cardID].value;
+            }
+            if (identicalSymbol == 'None'){
+                if(cardsDB[cardID].value > sum){
+                    sum = cardsDB[cardID].value;
+                    }
+            }
+        })
+
+        return sum
+    }
+
+}
+
+
+function filterCardsDB(cardsInHand, filterOut=false){
+    const cardIdArr = Object.keys(cardsInHand)
+    if (filterOut){
+        return Object.fromEntries(Object.entries(cardsDB).filter(([k,v]) => !cardIdArr.includes(k)));
+    }
+    else{
+        return Object.fromEntries(Object.entries(cardsDB).filter(([k,v]) => cardIdArr.includes(k)));
+    }
+}
+
+
+function sortCardByValue(cardsInHand, keyOnly=false){
+    const cardIDs = filterCardsDB(cardsInHand)
+    const sortedCards = Object.fromEntries(Object.entries(cardIDs).sort(([,a],[,b]) => b.value-a.value));
+    
+    if (keyOnly){
+        return Object.keys(sortedCards);
+    }
+    
+    return sortedCards;
+}
+
+function filterPlayers(field, valuesArr, filterOut=true){
+    // Conversion to lower Case ??? //
+
+    if (field == 'key'){
+        if (filterOut){
+            return Object.fromEntries(Object.entries(players).filter(([k,v]) => !valuesArr.includes(k)));
+        }
+        else{
+            return Object.fromEntries(Object.entries(players).filter(([k,v]) => valuesArr.includes(k)));
+        }
+    }
+    
+    if (filterOut){
+        return Object.fromEntries(Object.entries(players).filter(([k,v]) => !valuesArr.includes(v[field])));
+    } else {
+        return Object.fromEntries(Object.entries(players).filter(([k,v]) => valuesArr.includes(v[field])));
+    }
+}
+
+function shiftArray(arr, index){
+    const firstPart = arr.slice(index);
+    const secondPart = arr.slice(0, index);
+    const shiftedArray = firstPart.concat(secondPart);
+    return shiftedArray;
+}
+
+
+/////////////////////////////// CREATE ELEMENTS /////////////////////////////////
 
 function displayPlayerEntry(){
     const playerDisplay = createElem('div', ['player-display'], 'player-entry');
@@ -787,18 +1264,24 @@ function displayPlayerEntry(){
 }
 
 
-function displayGameResults(name, score){
+function displayGameResults(names, score){
     const winnerDisplay = createElem('div', ['player-display'], 'winner-display');
     
     const winnerLabel = createElem('div', ['player-label', 'full-width'], 'winner-label');
     const winnerLabelText = document.createTextNode('The Winner !');
     addChildElement(winnerLabel, winnerLabelText);
+    addChildElement(winnerDisplay, winnerLabel);
     
-    const winnerName = createElem('input', ['player-name', 'full-width'], 'winner-name');
-    winnerName.type = 'text';
+    names.forEach((name, index)=>{
+        const winnerName = createElem('input', ['player-name', 'full-width'], `winner-name-${index}`);
+        winnerName.type = 'text';
+        
+        winnerName.value = `${name} with a score of: ${score}`;
+        winnerName.readonly = 'true';
+
+        addChildElement(winnerDisplay, winnerName);
+        })
     
-    winnerName.value = `${name} with a score of: ${score}`;
-    winnerName.readonly = 'true';
 
     const restartGameBtn = createElem('div', ['game-btn'], 're-start-game-btn');
     
@@ -807,14 +1290,11 @@ function displayGameResults(name, score){
         });
 
     const newGameTextElem = createElem('div');
+    addChildElement(restartGameBtn, newGameTextElem);
     const newGameText = document.createTextNode('New Game');
     addChildElement(newGameTextElem, newGameText);
-    addChildElement(restartGameBtn, newGameTextElem);
-
-    addChildElement(winnerDisplay, winnerLabel);
-    addChildElement(winnerDisplay, winnerName);
+    
     addChildElement(winnerDisplay, restartGameBtn);
-
     addChildElement(backgroundElem, winnerDisplay);
 }
 
@@ -952,7 +1432,7 @@ function addChildElement(parentElem, childElem){
     parentElem.appendChild(childElem);
 }
 
-//////////////////////////// EVENTS //////////////////////////////////
+//////////////////////////// CREATE EVENTS //////////////////////////////////
 
 function mouseOverEvent(elem){
 
@@ -1001,17 +1481,26 @@ function cardClickEvent(elem){
 }
 
 function playCardsEvent(elem){
-    elem.addEventListener('click',()=> playCards());
+    elem.addEventListener('click',()=> {
+        // playCards();
+        playerAction('playCards');
+    });
 }
 
 
 function playerHoldEvent(elem){
-    elem.addEventListener('click',()=> playerHold());
+    elem.addEventListener('click',()=> {
+        // playerHold();
+        playerAction('playerHold');
+    });
 }
 
 
 function swapBankEvent(elem, pass){
-    elem.addEventListener('click',()=> swapBank(pass));
+    elem.addEventListener('click',()=> {
+        // swapBank(pass);
+        playerAction('swapBank');
+    });
 }
 
 
