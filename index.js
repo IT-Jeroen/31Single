@@ -40,8 +40,8 @@ let swapBankBtn = document.getElementById('swap-bank-btn');
 
 const viewPortDimension = {'width': window.innerWidth, 'height': window.innerHeight};
 const viewPortScale = {'scale': 1, 'x': 1, 'y': 1};
-console.log('Load File ViewPort', viewPortDimension);
-console.log('Load File Scale', viewPortScale);
+// console.log('Load File ViewPort', viewPortDimension);
+// console.log('Load File Scale', viewPortScale);
 
 const imageDimensions = {'width': 169, 'height': 244};
 const cssViewPort = {'width': 0.98, 'height': 0.98};
@@ -121,6 +121,7 @@ function loadGame(){
     // Recalculated variables when newgame() //
     calculateVariables();
 
+    intro = true;
     const playerName = document.getElementById('player-name');
     const playerEntry = document.getElementById('player-entry');
     const winnerDisplay = document.getElementById('winner-display');
@@ -223,33 +224,35 @@ function activeVisual(cardsInHand, active){
 
 let autoCount = 1;
 
+
 function nextPlayer(){
+    ///
+    const deActivePlayer = filterPlayers('active', [true], false);
+    activeVisual(Object.values(deActivePlayer)[0]['cards-in-hand'], false);
+    console.log('deActivePlayer', deActivePlayer)
+    ///
+
     // Reset player.pass = true as default with swapBank() //
     if (intro){
         intro = false;
     }
     // Set all previous players to pass when a winner is found //
     if(winner.name != 'None'){
-
-    const deActivePlayer = filterPlayers('active', [true], false);
-    activeVisual(Object.values(deActivePlayer)[0]['cards-in-hand'], false);
-    console.log('deActivePlayer', deActivePlayer)
-
         const previousPlayer = Object.values(filterPlayers('active', [true], false))[0];
         previousPlayer.pass = true;
     }
 
     activateDeactivatePlayer();
     const activePlayer = filterPlayers('active', [true], false);
-    console.log('activePlayer', activePlayer)
     
     if (!Object.values(activePlayer)[0].pass){
         if (Object.values(activePlayer)[0].auto){
-            const bank = filterPlayers('name', ['Bank'], false);
-            // Set Active Visual //
             
+            ///
             activeVisual(Object.values(activePlayer)[0]['cards-in-hand'], true);
+            ///
 
+            const bank = filterPlayers('name', ['Bank'], false);
             
             console.log('AUTOPLAYER !!!:', Object.values(activePlayer)[0].name, Object.values(activePlayer)[0].location, autoCount);
             autoCount += 1;
@@ -260,7 +263,7 @@ function nextPlayer(){
             const autoPickedBankCard = autoPickedCards[0];
             const autoPickedPlayerCard = autoPickedCards[1];
 
-            console.log('AUTOPLAYER !!!: PickedBank:',autoPickedBankCard, 'PickedHand:', autoPickedPlayerCard);
+            // console.log('AUTOPLAYER !!!: PickedBank:',autoPickedBankCard, 'PickedHand:', autoPickedPlayerCard);
 
             if (autoPickedBankCard != 'Take Bank' && autoPickedBankCard != 'Player Pass'){
                 swapCards(autoPickedBankCard,autoPickedPlayerCard);
@@ -322,7 +325,7 @@ function winnersAndLosers(){
     Object.entries(players).forEach(([k,v])=>{
         if (players[k].name != 'Bank'){
             const playerScore = calculateHand(players[k]['cards-in-hand']);
-            console.log(players[k].name, playerScore);
+            // console.log(players[k].name, playerScore);
             if (playerScore == topScore){
                 winnerNames.push(players[k].name);
             }
@@ -384,11 +387,6 @@ function playCards(){
         swapCards(cardPickedBank[0], cardPickedPlayer[0]);
         enableDisablePlayHoldBtn(playCardsBtn, 'hidden');
         enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
-        // nextPlayer();  
-        // Set Delay To Align Visual Effects // 
-        setTimeout(()=>{
-            nextPlayer();
-        },2000);
     }
 }
 
@@ -426,12 +424,6 @@ function swapBank(){
 
     enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
     enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
-    // nextPlayer();  
-    // Set Delay To Align Visual Effects // 
-    setTimeout(()=>{
-        nextPlayer();
-    },2000);
-    
 }
 
 
@@ -479,7 +471,7 @@ function swapCards(bankCardID,playerCardID){
             winner.name = players[playerID].name;
         }
     }
-    console.log(players[playerID].name, score);
+    // console.log(players[playerID].name, score);
 
     setTimeout(()=>{
         calcCardPositions(players[playerID]);
@@ -488,6 +480,12 @@ function swapCards(bankCardID,playerCardID){
 
     setTimeout(()=>{
         repositionCards([playerID, bankID]);
+        // RESET ACTIVE VISUAL EFFECT //
+        if (players[playerID].auto){
+            activeVisual(players[playerID]['cards-in-hand'], true);
+        }
+        
+        activeVisual(players[bankID]['cards-in-hand'], false);
     },timingRepos);
 }
 
@@ -643,6 +641,7 @@ function playerPass(cardsInHand,lowerSumPassLimit){
 // When cardsInHand has no matching icons or symbols //
 // Find the combination of playerCard and bankCard with the highest score //
 function findCardMatch(cardsInHand, cardsInBank, attr){
+    // console.log('findCardMatch')
     const sortedCardInHandIDs = sortCardByValue(cardsInHand, true) // true returns array of cardIDs only
     let pickBankCard = 'None';
     let keepHandCard = 'None';
@@ -673,6 +672,7 @@ function findCardMatch(cardsInHand, cardsInBank, attr){
 }
 
 function findCardMatch2(cardsInHand, cardsInBank, attr){
+    // console.log('findCardMatch2')
     let dropHandCard = 'None';
     let pickBankCard = 'None';
     let dropCardAttrInHand = 'None';
@@ -696,12 +696,13 @@ function findCardMatch2(cardsInHand, cardsInBank, attr){
             } 
         }
     })
-
+    // console.log('Return', 'Picked', pickBankCard, 'Drop', dropHandCard);
     return [pickBankCard, dropHandCard];
 }
 
 
 function findCardMatch3(cardsInHand, cardsInBank, attr){
+    // console.log('findCardMatch3')
     let pickBankCard = 'None';
     let dropHandCard = 'None';
     let score = 0;
@@ -1123,7 +1124,7 @@ function findCardIdByAttr(cardsInHand, matchAttr, lowHigh){
     let attr = 'icon';
     let currentValue = 0;
     let newValue = 0;
-    const cardSymbols = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
+    const cardSymbols = ['club', 'diamond', 'heart', 'spade'];
 
     if(cardSymbols.includes(matchAttr)){
         attr = 'symbol';
