@@ -83,26 +83,14 @@ body {
 }
 
 .playfield{
-    /* width: var(--field-size);
-    height: var(--field-size); */
     width: var(--field-width);
     height: var(--field-height);
-    /* background-color: green; */
     background-image: url("./src/img/wood-texture.jpg");
-    /* transform: translate(calc(50vw - var(--center-point)), calc(50vh - var(--center-point))); */
-    /* transform: translate(calc(50vw - var(--center-point)), calc(50vh - var(--center-point) + (var(--top-margin)))); */
     transform: translate(calc((100vw - var(--field-width)) / 2), calc((100vh - var(--field-height)) / 2));
 }
 
 .card{
     position: absolute;
-    /* width: var(--img-width); */
-    /* height: var(--img-height); */
-    /* width: var(--card-width);
-    height: var(--card-height); */
-    /* background-color: white; */
-    /* border: 1px solid black; */
-    /* background-image: url("./scr/img/back-blue.png"); */
     transition: transform 0.3s ease-in-out;
     transform-style: preserve-3d;
     box-shadow: 1px 1px 10px 3px rgba(0,0,0,.2);
@@ -115,60 +103,41 @@ body {
 
 .front{
     position: absolute;
-    /* width: var(--card-width);
-    height: var(--card-height); */
-    /* background-color: white; */
-    /* border: 1px solid black; */
     backface-visibility: hidden;
 }
 
 .back{
     position: absolute;
-    /* width: var(--card-width);
-    height: var(--card-height); */
-    /* background-color: blue; */
-    /* border: 1px solid black; */
     transform: rotateY(180deg);
     backface-visibility: hidden;
 }
 
-/* .card:hover{
-    background-color: blueviolet;
-} */
 
 .hidden{
     visibility: hidden;
-    /* display: none; */
 }
 
 .visible{
     visibility: visible;
-    /* display: block; */
 }
 
 #swap-bank-btn{
     position: absolute;
-    /* transform: translate(calc(var(--center-point) + 0.5 * (var(--card-width) + (2 * var(--card-offset)))), calc(var(--center-point) + var(--card-height))); */
 }
 
 #hold-cards-btn{
     position: absolute;
-    /* transform: translate(calc(var(--center-point) - 0.5 * (var(--card-width) + (2 * var(--card-offset)))), calc(var(--center-point) + var(--card-height))); */
 }
 
 #play-cards-btn{
     position: absolute;
-    /* transform: translate(calc(var(--center-point) - 0.5 * (var(--card-width) + (2 * var(--card-offset)))), calc(var(--center-point) + var(--card-height))); */
 }
 
 .play-hold-swap-btn{
-    /* position: absolute; */
-    /* transform: translate(calc(var(--center-point) - 0.5 * (var(--card-width) + (2 * var(--card-offset)))), calc(var(--center-point) + var(--card-height))); */
     background-color: red;
     font: 1.5em sans-serif;
     color: white;
     text-align: center;
-    /* width: calc(var(--card-width) + (2 * var(--card-offset))); */
     height: 2em;
     border-radius: 10px;
     padding-top: 15px;

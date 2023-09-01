@@ -50,6 +50,7 @@ const handWidth = {'stacked': (cardDimensions.width + ((numPlayersCards -1) * of
 const btnDimensions = {'width': handWidth.stacked, 'height': null};
 const centerPos = {'x': (cssViewPort.width * viewPortDimension.width) / 2,'y': (cssViewPort.height * viewPortDimension.height) / 2};
 const deckPos = {'x': centerPos.x - (cardDimensions.width / 2), 'y': centerPos.y - (cardDimensions.height /2)};
+const minViewPortDimensions = {'width': ((numPlayersCards -1) * cardDimensions.height) + (numPlayersCards * cardDimensions.width) + 80, 'height': (3 * cardDimensions.height) + 80};
 const zonesPos = {
     'south': (cssViewPort.height * viewPortDimension.height) - cardDimensions.height,
     'west': (cardDimensions.height - cardDimensions.width) /2,
@@ -57,53 +58,6 @@ const zonesPos = {
     'east': (cssViewPort.height * viewPortDimension.width - cardDimensions.height + ((cardDimensions.height - cardDimensions.width) /2))
 }
 
-
-
-// Added width and height to cardElem, Now different (irregular different) outcomes //
-// const deckPos = {'x': centerPos.x + (cardDimensions.width / 2), 'y': centerPos.y - (cardDimensions.height /2)};
-// const zonesPos = {
-//     'south': (cssViewPort.height * viewPortDimension.height) - cardDimensions.height,
-//     'west': 0,
-//     'north': cardDimensions.height,
-//     'east': (cssViewPort.height * viewPortDimension.width)
-// }
-
-const minViewPortDimensions = {'width': ((numPlayersCards -1) * cardDimensions.height) + (numPlayersCards * cardDimensions.width) + 80, 'height': (3 * cardDimensions.height) + 80};
-
-// // let fieldSize = 1000;
-// // let cardWidth = fieldSize / 8;
-// // let cardHeight = cardWidth * 1.3;
-// const cssViewHeight = 0.98;
-// const cssViewWidth = 0.98;
-// const cardWidth = cardDimensions.width * viewPortScale.scale;
-// const cardHeight = cardDimensions.height * viewPortScale.scale;
-// const imageWidht = cardDimensions.width * viewPortScale.scale;
-// const imageHeight = cardDimensions.height * viewPortScale.scale;
-// const stackOffset = 40 * viewPortScale.scale;
-// const hoverOffsetX = 5;
-// const hoverOffsetY = 40 * viewPortScale.scale;
-// const stackedHandWidth = (cardWidth + ((numPlayersCards -1) * stackOffset)) * viewPortScale.scale; 
-// const btnHeight = 0;
-// const btnWidth = stackedHandWidth;
-// const minViewPortDimensions = {'width': ((numPlayersCards -1) * cardHeight) + (numPlayersCards * cardWidth) + 80, 'height': (3 * cardHeight) + 80};
-// // const minViewPortWidth = (2 * cardHeight) + (3 * cardWidth) + 80;
-// // const minViewPortHeight = (3 * cardHeight) + 80;
-// // let center = fieldSize / 2;
-// // let southTop = fieldSize - cardHeight;
-// // let westTop = (cardHeight - cardWidth) /2;
-// // let northTop = 0;
-// // let eastTop = fieldSize - cardHeight + ((cardHeight - cardWidth) /2);
-// // const deckPos = {'x': center - (cardWidth /2), 'y':center - (cardHeight /2)};
-// const centerHeight = (cssViewHeight * viewPortDimension.height) / 2;
-// const centerWidth = (cssViewWidth * viewPortDimension.width) / 2;
-// const southTop = (cssViewHeight * viewPortDimension.height) - cardHeight;
-// const westTop = (cardHeight - cardWidth) /2;
-// const northTop = (cardDimensions.height * viewPortScale.scale) - cardDimensions.height;
-// const eastTop = (cssViewWidth * viewPortDimension.width - cardHeight + ((cardHeight - cardWidth) /2));
-// // const deckPos = {'x': centerWidth - (cardWidth /2), 'y':centerHeight - (cardHeight /2)};
-// const deckPos = {'x': centerWidth - (cardWidth / 2), 'y': centerHeight - (cardHeight /2)};
-
-// const clickCardOffset = 5;
 const cardPickedBank = [];
 const cardPickedPlayer = [];
 
@@ -113,8 +67,6 @@ function calculateVariables(){
     viewPortScale.scale = 1;
     viewPortDimension.width = window.innerWidth;
     viewPortDimension.height = window.innerHeight;
-    // console.log('Calc Var ViewPort [0]', viewPortDimension);
-    // console.log('Calc Var Scale [0]', viewPortScale);
     
     const widthScale  = viewPortDimension.width / minViewPortDimensions.width;
     const heightScale = viewPortDimension.height / minViewPortDimensions.height;
@@ -127,12 +79,10 @@ function calculateVariables(){
             viewPortScale.scale = heightScale;
             viewPortScale.x = widthScale;
             viewPortScale.y = heightScale;
-            // console.log(viewPortScale);
         }else{
             viewPortScale.scale = widthScale;
             viewPortScale.x = widthScale;
             viewPortScale.y = heightScale;
-            // console.log(viewPortScale);
         }
     }
 
@@ -163,22 +113,8 @@ function calculateVariables(){
 
 
 function loadGame(){
-    // console.log('ID:',players[0].name)
-    // console.log('Load Game ViewPort', viewPortDimension);
-    // console.log('Load Game Scale', viewPortScale);
-    // console.log('Zones[0]', zonesPos);
-    // console.log('Center Pos [0]', centerPos);
-    
+    // Recalculated variables when newgame() //
     calculateVariables();
-
-    // setTimeout(()=>{
-    //     console.log('Calc Var ViewPort [1]', viewPortDimension);
-    //     console.log('Calc Var Scale [1]', viewPortScale);
-    //     console.log('Zones[1]', zonesPos);
-    //     console.log('Center Pos [1]', centerPos);
-    // },500);
-
-    
 
     const playerName = document.getElementById('player-name');
     const playerEntry = document.getElementById('player-entry');
@@ -196,10 +132,6 @@ function loadGame(){
         }
         
     }, 500);
-
-    // playCardsBtn = createPlayCardsBtn(((cssViewWidth * viewPortDimension.width) / 2 - (stackedHandWidth * 2)), southTop + 0.5 * cardHeight);
-    // holdCardsBtn = createHoldCardsBtn(((cssViewWidth * viewPortDimension.width) / 2 - (stackedHandWidth * 2)), southTop + 0.5 * cardHeight);
-    // swapBankBtn = createSwapBankBtn(((cssViewWidth * viewPortDimension.width) / 2 + stackedHandWidth), southTop + 0.5 * cardHeight);
 
     playCardsBtn = createPlayCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
     holdCardsBtn = createHoldCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
@@ -390,7 +322,11 @@ function swapBank(hold=true){
 
     enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
     enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
-    nextPlayer();
+    // nextPlayer();  
+    // Set Delay To Align Visual Effects // 
+    setTimeout(()=>{
+        nextPlayer();
+    },2000);
     
 }
 
@@ -462,33 +398,8 @@ function handOutDeckCards(players, timing){
         const orientation = player.orientation;
 
         const cardElem = cardsDB[cardId].elem;
-        // const frontElem = cardElem.getElementsByClassName('front');
-        // const frontImg = frontElem[0].children[0];
-        // frontImg.src = `./src/img/${cardId}.png`;
-        // const backElem = cardElem.getElementsByClassName('back');
-        // const backImg = backElem[0].children[0];
-        // backImg.src = './src/img/back-blue.png';
 
-        // cardElem.style = `transform: matrix3d(
-        //     ${orientation[0]},
-        //     ${orientation[1]},
-        //     ${orientation[2]},
-        //     0,
-        //     ${orientation[3]},
-        //     ${orientation[4]},
-        //     0,
-        //     0,
-        //     ${orientation[5]},
-        //     0,
-        //     ${orientation[6]},
-        //     0,
-        //     ${card.x},
-        //     ${card.y},
-        //     0,
-        //     1
-        //     ); z-index: ${zIndex};`;
-
-        // Scaling to keep images crisp //
+        // Scaling 1.001 to keep images crisp //
         cardElem.style = `transform: matrix3d(
             ${orientation[0]},
             ${orientation[1]},
@@ -522,10 +433,6 @@ function handOutDeckCards(players, timing){
 
 
 function addDeckCardsToPlayers(){
-    // players = Global Variable //
-    // cardsInGame = Global Variable //
-    // matrix0Flipped = Global Variable //
-    // deckPos = Global Variable //
     const allCardElems = createDeckElements(cardsInGame, matrix0Flipped, deckPos);
 
     // Create card values and id's
@@ -538,7 +445,6 @@ function addDeckCardsToPlayers(){
         let cardId = deckCardValues[index];
 
         // Add Correct Card Images to image Elements //
-        // const cardElem = cardsDB[cardId].elem;
         const frontElem = cardElem.getElementsByClassName('front');
         const frontImg = frontElem[0].children[0];
         frontImg.src = `./src/img/${cardId}.png`;
@@ -566,8 +472,6 @@ function addDeckCardsToPlayers(){
 }
 
 function dealDeckCards(timing){
-    // players = Global Variable //
-    // cardsInGame = Global Variable //
     const bankPlayer = filterPlayers('name', ['Bank'], false);
     const nonBankPlayers = filterPlayers('name', ['Bank']);
     
@@ -640,26 +544,7 @@ function flipAllCards(){
                 const cardElem = cardsDB[cardID].elem;
                 const position = cardsInHand[cardID];
 
-                // cardElem.style.transform = `matrix3d(
-                //     ${matrixFlipped[0]},
-                //     ${matrixFlipped[1]},
-                //     ${matrixFlipped[2]},
-                //     0,
-                //     ${matrixFlipped[3]},
-                //     ${matrixFlipped[4]},
-                //     0,
-                //     0,
-                //     ${matrixFlipped[5]},
-                //     0,
-                //     ${matrixFlipped[6]},
-                //     0,
-                //     ${position.x},
-                //     ${position.y},
-                //     0,
-                //     1
-                //     )`;
-
-                // Scaling to keep imgaes crisp //
+                // Scaling 1.001 to keep imgaes crisp //
                 cardElem.style = `transform: matrix3d(
                     ${matrixFlipped[0]},
                     ${matrixFlipped[1]},
@@ -705,7 +590,6 @@ function enableDisablePlayHoldBtn(elem, state){
 
 // Function only used in addDeckCardsToPlayers() //
 function addCardToCardDB(cardID, cardElem){
-    // let splitID = cardID.split('-');
     let splitID = cardID.split('_');
     let cardSymbol = splitID[0];
     let cardIcon = splitID[1];
@@ -746,9 +630,6 @@ function filterPlayers(field, valuesArr, filterOut=true){
 }
 
 function createRandomDeckValues(numCards, minValue='2', maxValue='ace'){
-// function createRandomDeckValues(numCards, minValue='2', maxValue='A'){
-    // const cardValues = ['2','3','4','5','6','7','8','9','10','J', 'Q', 'K', 'A'];
-    // const cardSymbols = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
     const cardValues = ['2','3','4','5','6','7','8','9','10','jack', 'queen', 'king', 'ace'];
     const cardSymbols = ['club', 'diamond', 'heart', 'spade'];
 
@@ -766,7 +647,6 @@ function createRandomDeckValues(numCards, minValue='2', maxValue='ace'){
 
     cardRange.forEach(value => {
         cardSymbols.forEach(symbol => {
-            // cardsInGame.push(`${symbol}-${value}`);
             cardsInGame.push(`${symbol}_${value}`);
         })
     })
@@ -793,26 +673,8 @@ function repositionCards(playersID){
         cardsID.forEach(cardID =>{
             const cardElem = cardsDB[cardID].elem;
             const cardPos = players[id]['cards-in-hand'][cardID];
-            // cardElem.style = `transform: matrix3d(
-            //     ${orientation[0]},
-            //     ${orientation[1]},
-            //     ${orientation[2]},
-            //     0,
-            //     ${orientation[3]},
-            //     ${orientation[4]},
-            //     0,
-            //     0,
-            //     ${orientation[5]},
-            //     0,
-            //     ${orientation[6]},
-            //     0,
-            //     ${cardPos.x},
-            //     ${cardPos.y},
-            //     0,
-            //     1
-            //     ); z-index: ${zIndex};`;
 
-            // Scaling to keep images crisp //
+            // Scaling 1.001 to keep images crisp //
             cardElem.style = `transform: matrix3d(
                 ${orientation[0]},
                 ${orientation[1]},
@@ -843,25 +705,16 @@ function calcCardPositions(player, stacked=true){
     let cardOffSet = 0;
 
     if (stacked){
-        // handWidth = cardWidth + ((Object.keys(cardsInHand).length -1) * stackOffset);
-        // cardOffSet = stackOffset;
-
-        // widthHand = cardDimensions.width + ((Object.keys(cardsInHand).length -1) * offset.stacked);
         widthHand = handWidth.stacked;
         cardOffSet = offset.stacked;
     }
     else{
-        // widthHand = cardWidth * Object.keys(cardsInHand).length;
         widthHand = handWidth.unstacked;
         cardOffSet = cardDimensions.width;
     }
     
-    // let emptySpace = (fieldSize - handWidth) / 2;
     let emptySpaceX = ((cssViewPort.width * viewPortDimension.width) - widthHand) / 2;
     let emptySpaceY = ((cssViewPort.height * viewPortDimension.height) - widthHand) / 2 - offset.stacked;
-    
-    // Added width and height to cardElem, requires new calculations (Ireeregular behaviour)//
-    // let emptySpaceY = ((cssViewPort.height * viewPortDimension.height) - widthHand) / 2;
 
     if (player.location == 'south'){
         Object.keys(cardsInHand).forEach((cardId, index) => {
@@ -874,8 +727,6 @@ function calcCardPositions(player, stacked=true){
         Object.keys(cardsInHand).forEach((cardId, index) => {
             player['cards-in-hand'][cardId].x = zonesPos.west;
             player['cards-in-hand'][cardId].y = emptySpaceY + (index * cardOffSet);
-            // Added width and height to cardElem, requires new calculations (irregular behaviour)//
-            // player['cards-in-hand'][cardId].y = emptySpaceY + (index * cardOffSet) + cardDimensions.width;
         })
 
     }
@@ -904,65 +755,6 @@ function calcCardPositions(player, stacked=true){
     }
 }
 
-// function calcCardPositions(player, stacked=true){
-//     let cardsInHand = player['cards-in-hand'];
-//     let handWidth = 0;
-//     let cardOffSet = 0;
-
-//     if (stacked){
-//         // handWidth = cardWidth + ((Object.keys(cardsInHand).length -1) * stackOffset);
-//         // cardOffSet = stackOffset;
-
-//         // handWidth = cardDimensions.width + ((Object.keys(cardsInHand).length -1) * offset.stacked);
-//         cardOffSet = offset.stacked;
-//     }
-//     else{
-//         handWidth = cardWidth * Object.keys(cardsInHand).length;
-//         cardOffSet = cardWidth;
-//     }
-    
-//     // let emptySpace = (fieldSize - handWidth) / 2;
-//     let emptySpaceX = ((cssViewWidth * viewPortDimension.width) - handWidth) / 2;
-//     let emptySpaceY = ((cssViewHeight * viewPortDimension.height) - handWidth) / 2 - stackOffset;
-
-//     if (player.location == 'south'){
-//         Object.keys(cardsInHand).forEach((cardId, index) => {
-//             player['cards-in-hand'][cardId].y = southTop;
-//             player['cards-in-hand'][cardId].x = emptySpaceX + (index * cardOffSet);
-//         })
-//     }
-
-//     if (player.location == 'west'){
-//         Object.keys(cardsInHand).forEach((cardId, index) => {
-//             player['cards-in-hand'][cardId].x = westTop;
-//             player['cards-in-hand'][cardId].y = emptySpaceY + (index * cardOffSet);
-//         })
-
-//     }
-
-//     if (player.location == 'north'){
-//         Object.keys(cardsInHand).forEach((cardId, index) => {
-//             player['cards-in-hand'][cardId].y = northTop;
-//             player['cards-in-hand'][cardId].x = emptySpaceX + (index * cardOffSet);
-//         })
-
-//     }
-//     if (player.location == 'east'){
-//         Object.keys(cardsInHand).forEach((cardId, index) => {
-//             player['cards-in-hand'][cardId].x = eastTop;
-//             player['cards-in-hand'][cardId].y = emptySpaceY + (index * cardOffSet);
-//         })
-
-//     }
-
-//     if (player.location == 'center'){
-//         Object.keys(cardsInHand).forEach((cardId, index) => {
-//             player['cards-in-hand'][cardId].x = emptySpaceX + (index * cardOffSet);
-//             player['cards-in-hand'][cardId].y = deckPos.y;
-//         })
-
-//     }
-// }
 
 /////////////////////////////// ELEMENTS /////////////////////////////////
 
@@ -1029,7 +821,6 @@ function displayGameResults(name, score){
 
 function createHoldCardsBtn(x,y){
     const btnElem = createElem('div', ['hidden', 'play-hold-swap-btn'], 'hold-cards-btn');
-    // btnElem.style = `width: ${btnWidth}px; transform: translate(${x}px,${y}px);`;
     btnElem.style = `width: ${btnDimensions.width}px; transform: translate(${x}px,${y}px);`;
     const btnText = document.createTextNode('Hold');
     addChildElement(btnElem, btnText);
@@ -1042,7 +833,6 @@ function createHoldCardsBtn(x,y){
 
 function createPlayCardsBtn(x,y){
     const btnElem = createElem('div', ['hidden', 'play-hold-swap-btn'], 'play-cards-btn');
-    // btnElem.style = `width: ${btnWidth}px; transform: translate(${x}px,${y}px);`;
     btnElem.style = `width: ${btnDimensions.width}px; transform: translate(${x}px,${y}px);`;
     const btnText = document.createTextNode('Play Cards');
     addChildElement(btnElem, btnText);
@@ -1055,7 +845,6 @@ function createPlayCardsBtn(x,y){
 
 function createSwapBankBtn(x,y){
     const btnElem = createElem('div', ['hidden', 'play-hold-swap-btn'], 'swap-bank-btn');
-    // btnElem.style = `width: ${btnWidth}px; transform: translate(${x}px,${y}px);`;
     btnElem.style = `width: ${btnDimensions.width}px; transform: translate(${x}px,${y}px);`;
     const btnText = document.createTextNode('Swap Bank');
     addChildElement(btnElem, btnText);
@@ -1064,17 +853,6 @@ function createSwapBankBtn(x,y){
     
     return btnElem;
 }
-
-
-// function introSwapBankBtn(){
-//     const btnElem = createElem('div', ['hidden', 'play-hold-swap-btn'], 'swap-bank-btn')
-//     const btnText = document.createTextNode('Swap Bank');
-//     addChildElement(btnElem, btnText);
-//     addChildElement(playFieldElem, btnElem);
-//     swapBankEvent(btnElem, false);
-    
-//     return btnElem;
-// }
 
 
 function createElem(elemType, classNames=[], idName){
@@ -1095,26 +873,7 @@ function createDeckElements(){
     for (let i = 0; i < cardsInGame; i++){
         const cardElem = createCard();
 
-        // cardElem.style.transform = `matrix3d(
-        //     ${matrix0Flipped[0]},
-        //     ${matrix0Flipped[1]},
-        //     ${matrix0Flipped[2]},
-        //     0,
-        //     ${matrix0Flipped[3]},
-        //     ${matrix0Flipped[4]},
-        //     0,
-        //     0,
-        //     ${matrix0Flipped[5]},
-        //     0,
-        //     ${matrix0Flipped[6]},
-        //     0,
-        //     ${deckPos.x},
-        //     ${deckPos.y},
-        //     0,
-        //     1
-        //     )`; 
-
-        // Scaling to keep images crisp //
+        // Scaling 1.001 to keep images crisp //
         cardElem.style = `transform: matrix3d(
             ${matrix0Flipped[0]},
             ${matrix0Flipped[1]},
@@ -1225,11 +984,9 @@ function mouseOverEvent(elem){
 
 function cardClickEvent(elem){
     elem.addEventListener('click', (event)=>{
-        // const cardID = findCardID(event.target.parentElement);
         const cardID = findCardID(event.target.parentElement.parentElement);
     
         if (cardsDB[cardID].access && players[0].active){
-            // pickCardEffect(event.target.parentElement);
             pickCardEffect(event.target.parentElement.parentElement);
         }
 
@@ -1263,7 +1020,6 @@ function pickCardEffect(pickedElem){
     const location = cardsDB[cardID].location;
     let pickCardArray = [];
 
-    // cardPickedBank and cardPickedPlayer are global variable //
     if (location == 'center'){
         pickCardArray =  cardPickedBank;
     }
@@ -1295,14 +1051,8 @@ function cardHoverEffect(hoverElem, reverse=false){
     let targetStyle = hoverElem.getAttribute('style').split(/\s/);
     targetStyle = targetStyle.map(item => item.replace(',',''));
     const transform = targetStyle[0];
-    // const matrix3D = targetStyle.slice(1, targetStyle.length-2);
     const matrix3D = targetStyle.slice(1, targetStyle.length-6);
-    // const zIndex = targetStyle.slice(targetStyle.length -2);
     const trailing = targetStyle.slice(targetStyle.length -6);
-    // console.log(targetStyle);
-    // hoverOffset is a global variable //
-    // let hoverX = hoverOffsetX;
-    // let hoverY = hoverOffsetY;
 
     let hoverX = offset.hoverx;
     let hoverY = offset.hovery;
@@ -1315,10 +1065,7 @@ function cardHoverEffect(hoverElem, reverse=false){
     matrix3D[12] = Number(matrix3D[12]) - hoverX;
     matrix3D[13] = Number(matrix3D[13]) - hoverY;
 
-    // matrixStr = `${transform} ${matrix3D.toString()} ${zIndex.toString().replace(',', '')}}`;
     matrixStr = `${transform} ${matrix3D.toString()} ${trailing.toString().replace(/,/g, ' ')}}`;
-    // console.log(trailing.toString().replace(/,/g, ' '));
-    // console.log(matrixStr);
     
     return matrixStr;
 }
