@@ -37,7 +37,10 @@ let holdCardsBtn = document.getElementById('hold-cards-btn');
 let swapBankBtn = document.getElementById('swap-bank-btn');
 
 const viewPortDimension = {'width': window.innerWidth, 'height': window.innerHeight};
-const viewPortScale = {'scale': 0.998, 'x': 0.998, 'y': 0.998};
+const viewPortScale = {'scale': 1, 'x': 1, 'y': 1};
+console.log('Load File ViewPort', viewPortDimension);
+console.log('Load File Scale', viewPortScale);
+
 const imageDimensions = {'width': 169, 'height': 244};
 const cssViewPort = {'width': 0.98, 'height': 0.98};
 
@@ -50,9 +53,21 @@ const deckPos = {'x': centerPos.x - (cardDimensions.width / 2), 'y': centerPos.y
 const zonesPos = {
     'south': (cssViewPort.height * viewPortDimension.height) - cardDimensions.height,
     'west': (cardDimensions.height - cardDimensions.width) /2,
-    'north': (cardDimensions.height - imageDimensions.height),
+    'north': 0,
     'east': (cssViewPort.height * viewPortDimension.width - cardDimensions.height + ((cardDimensions.height - cardDimensions.width) /2))
 }
+
+
+
+// Added width and height to cardElem, Now different (irregular different) outcomes //
+// const deckPos = {'x': centerPos.x + (cardDimensions.width / 2), 'y': centerPos.y - (cardDimensions.height /2)};
+// const zonesPos = {
+//     'south': (cssViewPort.height * viewPortDimension.height) - cardDimensions.height,
+//     'west': 0,
+//     'north': cardDimensions.height,
+//     'east': (cssViewPort.height * viewPortDimension.width)
+// }
+
 const minViewPortDimensions = {'width': ((numPlayersCards -1) * cardDimensions.height) + (numPlayersCards * cardDimensions.width) + 80, 'height': (3 * cardDimensions.height) + 80};
 
 // // let fieldSize = 1000;
@@ -95,9 +110,11 @@ const cardPickedPlayer = [];
 
 // SCALE DISTORTED TRANSLATE //
 function calculateVariables(){
-    viewPortScale.scale = 0.998;
+    viewPortScale.scale = 1;
     viewPortDimension.width = window.innerWidth;
     viewPortDimension.height = window.innerHeight;
+    console.log('Calc Var ViewPort [0]', viewPortDimension);
+    console.log('Calc Var Scale [0]', viewPortScale);
     
     const widthScale  = viewPortDimension.width / minViewPortDimensions.width;
     const heightScale = viewPortDimension.height / minViewPortDimensions.height;
@@ -105,15 +122,20 @@ function calculateVariables(){
     viewPortScale.x = widthScale;
     viewPortScale.y = heightScale;
  
-    if (heightScale < 0.998 || widthScale < 0.998){
+    if (heightScale < 1 || widthScale < 1){
         if (heightScale < widthScale){
             viewPortScale.scale = heightScale;
-            console.log(viewPortScale);
+            viewPortScale.x = widthScale;
+            viewPortScale.y = heightScale;
+            // console.log(viewPortScale);
         }else{
             viewPortScale.scale = widthScale;
-            console.log(viewPortScale);
+            viewPortScale.x = widthScale;
+            viewPortScale.y = heightScale;
+            // console.log(viewPortScale);
         }
     }
+
 
     cardDimensions.width = imageDimensions.width * viewPortScale.scale;
     cardDimensions.height = imageDimensions.height * viewPortScale.scale
@@ -126,8 +148,14 @@ function calculateVariables(){
 
     zonesPos.south = (cssViewPort.height * viewPortDimension.height) - cardDimensions.height;
     zonesPos.west = (cardDimensions.height - cardDimensions.width) /2;
-    zonesPos.north = (cardDimensions.height - (imageDimensions.height * viewPortScale.y));
+    // zonesPos.north = (cardDimensions.height - imageDimensions.height);
     zonesPos.east = (cssViewPort.height * viewPortDimension.width - cardDimensions.height + ((cardDimensions.height - cardDimensions.width) /2));
+
+    centerPos.x = (cssViewPort.width * viewPortDimension.width) / 2;
+    centerPos.y = (cssViewPort.height * viewPortDimension.height) / 2;
+
+    deckPos.x = centerPos.x - (cardDimensions.width / 2);
+    deckPos.y = centerPos.y - (cardDimensions.height / 2);
 }
 
 
@@ -135,7 +163,22 @@ function calculateVariables(){
 
 
 function loadGame(){
-    // calculateVariables();
+    console.log('ID:',players[0].name)
+    console.log('Load Game ViewPort', viewPortDimension);
+    console.log('Load Game Scale', viewPortScale);
+    console.log('Zones[0]', zonesPos);
+    console.log('Center Pos [0]', centerPos);
+    
+    calculateVariables();
+
+    setTimeout(()=>{
+        console.log('Calc Var ViewPort [1]', viewPortDimension);
+        console.log('Calc Var Scale [1]', viewPortScale);
+        console.log('Zones[1]', zonesPos);
+        console.log('Center Pos [1]', centerPos);
+    },500);
+
+    
 
     const playerName = document.getElementById('player-name');
     const playerEntry = document.getElementById('player-entry');
@@ -433,8 +476,8 @@ function handOutDeckCards(players, timing){
             ${card.x},
             ${card.y},
             0,
-            ${1/viewPortScale.scale}
-            ); z-index: ${zIndex};`;
+            1.001
+            ); width: ${cardDimensions.width}px; height: ${cardDimensions.height}px; z-index: ${zIndex};`;
         
         zIndex += 1;
         playerIndex += 1;
@@ -588,7 +631,7 @@ function flipAllCards(){
                 //     )`;
 
                 // Scaling to keep imgaes crisp //
-                cardElem.style.transform = `matrix3d(
+                cardElem.style = `transform: matrix3d(
                     ${matrixFlipped[0]},
                     ${matrixFlipped[1]},
                     ${matrixFlipped[2]},
@@ -604,8 +647,8 @@ function flipAllCards(){
                     ${position.x},
                     ${position.y},
                     0,
-                    ${1/viewPortScale.scale}
-                    )`;
+                    1.001
+                    ); width: ${cardDimensions.width}px; height: ${cardDimensions.height}px;`;
             })
         }
         if (location == 'south'){
@@ -757,8 +800,8 @@ function repositionCards(playersID){
                 ${cardPos.x},
                 ${cardPos.y},
                 0,
-                ${1/viewPortScale.scale}
-                ); z-index: ${zIndex};`;
+                1.001
+                ); width: ${cardDimensions.width}px; height: ${cardDimensions.height}px; z-index: ${zIndex};`;
             
             zIndex += 1;
         });
@@ -787,6 +830,9 @@ function calcCardPositions(player, stacked=true){
     // let emptySpace = (fieldSize - handWidth) / 2;
     let emptySpaceX = ((cssViewPort.width * viewPortDimension.width) - widthHand) / 2;
     let emptySpaceY = ((cssViewPort.height * viewPortDimension.height) - widthHand) / 2 - offset.stacked;
+    
+    // Added width and height to cardElem, requires new calculations (Ireeregular behaviour)//
+    // let emptySpaceY = ((cssViewPort.height * viewPortDimension.height) - widthHand) / 2;
 
     if (player.location == 'south'){
         Object.keys(cardsInHand).forEach((cardId, index) => {
@@ -799,6 +845,8 @@ function calcCardPositions(player, stacked=true){
         Object.keys(cardsInHand).forEach((cardId, index) => {
             player['cards-in-hand'][cardId].x = zonesPos.west;
             player['cards-in-hand'][cardId].y = emptySpaceY + (index * cardOffSet);
+            // Added width and height to cardElem, requires new calculations (irregular behaviour)//
+            // player['cards-in-hand'][cardId].y = emptySpaceY + (index * cardOffSet) + cardDimensions.width;
         })
 
     }
@@ -1038,7 +1086,7 @@ function createDeckElements(){
         //     )`; 
 
         // Scaling to keep images crisp //
-        cardElem.style.transform = `matrix3d(
+        cardElem.style = `transform: matrix3d(
             ${matrix0Flipped[0]},
             ${matrix0Flipped[1]},
             ${matrix0Flipped[2]},
@@ -1054,8 +1102,8 @@ function createDeckElements(){
             ${deckPos.x},
             ${deckPos.y},
             0,
-            ${1/viewPortScale.scale}
-            )`; 
+            1.001
+            ); width: ${cardDimensions.width}px; heightpx: ${cardDimensions.height};`; 
         
         // add hover mouse event //
         mouseOverEvent(cardElem);
@@ -1218,9 +1266,11 @@ function cardHoverEffect(hoverElem, reverse=false){
     let targetStyle = hoverElem.getAttribute('style').split(/\s/);
     targetStyle = targetStyle.map(item => item.replace(',',''));
     const transform = targetStyle[0];
-    const matrix3D = targetStyle.slice(1, targetStyle.length-2);
-    const zIndex = targetStyle.slice(targetStyle.length -2);
-
+    // const matrix3D = targetStyle.slice(1, targetStyle.length-2);
+    const matrix3D = targetStyle.slice(1, targetStyle.length-6);
+    // const zIndex = targetStyle.slice(targetStyle.length -2);
+    const trailing = targetStyle.slice(targetStyle.length -6);
+    // console.log(targetStyle);
     // hoverOffset is a global variable //
     // let hoverX = hoverOffsetX;
     // let hoverY = hoverOffsetY;
@@ -1236,7 +1286,10 @@ function cardHoverEffect(hoverElem, reverse=false){
     matrix3D[12] = Number(matrix3D[12]) - hoverX;
     matrix3D[13] = Number(matrix3D[13]) - hoverY;
 
-    matrixStr = `${transform} ${matrix3D.toString()} ${zIndex.toString().replace(',', '')}}`;
+    // matrixStr = `${transform} ${matrix3D.toString()} ${zIndex.toString().replace(',', '')}}`;
+    matrixStr = `${transform} ${matrix3D.toString()} ${trailing.toString().replace(/,/g, ' ')}}`;
+    // console.log(trailing.toString().replace(/,/g, ' '));
+    // console.log(matrixStr);
     
     return matrixStr;
 }

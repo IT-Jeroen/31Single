@@ -91,8 +91,8 @@ body {
 
 .card{
     position: absolute;
-    width: var(--img-width);
-    height: var(--img-height);
+    /* width: var(--img-width); */
+    /* height: var(--img-height); */
     /* width: var(--card-width);
     height: var(--card-height); */
     /* background-color: white; */
@@ -101,6 +101,11 @@ body {
     transition: transform 0.3s ease-in-out;
     transform-style: preserve-3d;
     box-shadow: 1px 1px 10px 3px rgba(0,0,0,.2);
+}
+
+.card img{
+    width : 100%;
+    height: 100%;
 }
 
 .front{
