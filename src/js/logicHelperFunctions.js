@@ -21,26 +21,40 @@ export function cardAttrCount(cardsInHand, attr){
 // Does it need to return an array ??? //
 // Could return multiple values depending on the settings //
 // Not applicable in this setup, as long as paying attention to settings //
-export function returnAttrFromCount(attrCount, countValue, minMax){
-    const countKeys = [];
+// export function returnAttrFromCount(attrCount, countValue, minMax){
+//     const countKeys = [];
 
-    if (minMax == 'min'){
-        for (const [key, value] of Object.entries(attrCount)) {
-            if (value >= countValue){
-                countKeys.push(key)
-            }
-        }
-    }
+//     if (minMax == 'min'){
+//         for (const [key, value] of Object.entries(attrCount)) {
+//             if (value >= countValue){
+//                 countKeys.push(key)
+//             }
+//         }
+//     }
 
-    if (minMax == 'max'){
-        for (const [key, value] of Object.entries(attrCount)) {
-            if (value <= countValue){
-                countKeys.push(key)
-            }
-        }
-    }
+//     if (minMax == 'max'){
+//         for (const [key, value] of Object.entries(attrCount)) {
+//             if (value <= countValue){
+//                 countKeys.push(key)
+//             }
+//         }
+//     }
     
-    // return countKeys[0];
+//     // return countKeys[0];
+//     return countKeys.length > 0 ? countKeys[0] : 'None';
+// }
+
+
+export function returnAttrFromCount(attrCount, countValue, minMax){
+    const countKeys = []
+    Object.entries(attrCount).forEach(([k,v]) =>{
+            if (minMax == 'min' && v >= countValue){
+                countKeys.push(k);
+            }
+            if (minMax == 'max' && v <= countValue){
+                countKeys.push(k);
+            }
+        }) 
     return countKeys.length > 0 ? countKeys[0] : 'None';
 }
 

@@ -1,5 +1,5 @@
 import { it, expect, describe } from 'vitest';
-import { cardAttrCount, returnAttrFromCount, calculateHand, findCardIdByAttr, filterCardsDB, sortCardByValue } from './src/js/helperFunctions.js';
+import { cardAttrCount, returnAttrFromCount, calculateHand, findCardIdByAttr, filterCardsDB, sortCardByValue } from './src/js/logicHelperFunctions.js';
 
 it('cardAttrCount() Should return an Object with the icon or symbol as a key, and a count as value', ()=>{
     const countTwoIconSymbol = {
