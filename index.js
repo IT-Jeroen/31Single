@@ -145,7 +145,7 @@ function loadGame(){
 
     // Deal Cards //
     setTimeout(()=>{
-        // setCursor('passive');
+        
         dealDeckCards(300);
     }, 1000);
 
@@ -154,10 +154,28 @@ function loadGame(){
         players[0].active = true;
         enableDisablePlayHoldBtn(holdCardsBtn, 'visible');
         enableDisablePlayHoldBtn(swapBankBtn, 'visible');
-        // setCursor('active');
+        
     }, 6000);  
+
+    // setTimeout(()=>{
+    //     // Reset unintenional card offsets //
+    //     // Not fully efficient //
+    //     resetHoverEffect();
+    // }, 8000);
 }
 
+// function resetHoverEffect(){
+//     Object.keys(players).forEach(id =>{
+//         if (!players[id].auto){
+//             if (players[id].name == 'Bank'){
+//                 calcCardPositions(players[id]['cards-in-hand'], false);
+//             }
+//         }else{
+//             calcCardPositions(players[id]['cards-in-hand']);
+//         }
+        
+//     })
+// }
 
 function resetGame(){
     // Reset Winner //
@@ -576,16 +594,22 @@ function addDeckCardsToPlayers(){
         addCardToCardDB(cardId, cardElem);
         
         // add card to player hand //
-        players[`${playerID}`]['cards-in-hand'][cardId] = {'x':0, 'y':0};
+        // players[`${playerID}`]['cards-in-hand'][cardId] = {'x':0, 'y':0};
+        players[`${playersID[playerID]}`]['cards-in-hand'][cardId] = {'x':deckPos.x, 'y':deckPos.y};
         cardsDB[cardId].location = players[`${playerID}`].location;
         
-        if (players[`${playerID}`].name == 'Bank' || players[`${playerID}`].location == 'south'){
+        if (players[`${playersID[playerID]}`].name == 'Bank' || players[`${playersID[playerID]}`].location == 'south'){
             cardsDB[cardId].access = true;
         }
         
         playerID += 1;
+    
+        // if (playerID == Number(playersID[playersID.length-1])+1){
+        //     playerID = 0;
+        // }
+        // players[playersID[playerID]]
 
-        if (playerID == Number(playersID[playersID.length-1])+1){
+        if (playerID == playersID.length){
             playerID = 0;
         }
     })  
@@ -1372,7 +1396,7 @@ function createDeckElements(){
             ${deckPos.y},
             0,
             1.001
-            ); width: ${cardDimensions.width}px; heightpx: ${cardDimensions.height};`; 
+            ); width: ${cardDimensions.width}px; height: ${cardDimensions.height}px;`; 
         
         // add hover mouse event //
         mouseOverEvent(cardElem);
@@ -1442,7 +1466,7 @@ function mouseOverEvent(elem){
         (event) => {
             // Hover UP //
             const cardID = findCardID(elem);
-            if (cardsDB[cardID].access && !cardsDB[cardID].picked){
+            if (cardsDB[cardID].access && players[0].active && !cardsDB[cardID].picked){
                 event.target.style = cardHoverEffect(event.target);
             }
         },
@@ -1454,7 +1478,7 @@ function mouseOverEvent(elem){
         (event) => {
             // Hover DOWN //
             const cardID = findCardID(elem);
-            if (cardsDB[cardID].access && !cardsDB[cardID].picked){
+            if (cardsDB[cardID].access && players[0].active && !cardsDB[cardID].picked){
                 event.target.style = cardHoverEffect(event.target, reverse=true);
             }
         },
@@ -1556,7 +1580,6 @@ function cardHoverEffect(hoverElem, reverse=false){
     matrix3D[13] = Number(matrix3D[13]) - hoverY;
 
     matrixStr = `${transform} ${matrix3D.toString()} ${trailing.toString().replace(/,/g, ' ')}}`;
-    
     return matrixStr;
 }
 
