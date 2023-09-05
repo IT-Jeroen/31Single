@@ -46,6 +46,7 @@ const viewPortScale = {'scale': 1, 'x': 1, 'y': 1};
 const imageDimensions = {'width': 169, 'height': 244};
 const cssViewPort = {'width': 0.98, 'height': 0.98};
 
+const winnerBadge = {'width': 160 * viewPortScale.scale, 'height': 160 * viewPortScale.scale, 'line': 160 * viewPortScale.scale, 'border': 5};
 const cardDimensions = {'width': imageDimensions.width * viewPortScale.scale, 'height': imageDimensions.height * viewPortScale.scale};
 const offset = {'stacked':40 * viewPortScale.scale, 'hoverx':5, 'hovery':40 * viewPortScale.scale};
 const handWidth = {'stacked': (cardDimensions.width + ((numPlayersCards -1) * offset.stacked)), 'unstacked': (numPlayersCards * cardDimensions.width)};
@@ -124,7 +125,7 @@ function loadGame(){
     intro = true;
     const playerName = document.getElementById('player-name');
     const playerEntry = document.getElementById('player-entry');
-    const winnerDisplay = document.getElementById('winner-display');
+    // const winnerDisplay = document.getElementById('winner-display');
 
     // Display Elements //
     setTimeout(()=>{
@@ -132,16 +133,17 @@ function loadGame(){
             players[0].name = playerName.value;
             players[0].auto = false;
             playerEntry.remove();
+            playCardsBtn = createPlayCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
+            holdCardsBtn = createHoldCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
+            swapBankBtn = createSwapBankBtn(((cssViewPort.width * viewPortDimension.width) / 2 + handWidth.stacked), zonesPos.south + 0.5 * cardDimensions.height);
         }
-        if (winnerDisplay){
-            winnerDisplay.remove();
-        }
+        // if (winnerDisplay){
+        //     winnerDisplay.remove();
+        // }
         
     }, 500);
 
-    playCardsBtn = createPlayCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
-    holdCardsBtn = createHoldCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
-    swapBankBtn = createSwapBankBtn(((cssViewPort.width * viewPortDimension.width) / 2 + handWidth.stacked), zonesPos.south + 0.5 * cardDimensions.height);
+    
 
     // Deal Cards //
     setTimeout(()=>{
@@ -154,15 +156,24 @@ function loadGame(){
         players[0].active = true;
         enableDisablePlayHoldBtn(holdCardsBtn, 'visible');
         enableDisablePlayHoldBtn(swapBankBtn, 'visible');
-        
-    }, 6000);  
+        // displayWinnerBadge(players[0]); 
+    }, 8000);  
 
+    // Timing Issue //
     // setTimeout(()=>{
-    //     // Reset unintenional card offsets //
-    //     // Not fully efficient //
-    //     resetHoverEffect();
+    //     activateCards(players[0]);
+    //     activateCards(players[Object.keys(players).length -1]);
     // }, 8000);
 }
+
+
+function activateCards(player){
+    const cardsInHand = Object.keys(player['cards-in-hand'])
+    cardsInHand.forEach(cardID => {
+        cardsDB[cardID].access = true;
+    });
+}
+
 
 // function resetHoverEffect(){
 //     Object.keys(players).forEach(id =>{
@@ -185,8 +196,17 @@ function resetGame(){
     // Clear pickedCards Save fail//
     cardPickedBank.pop();
     cardPickedPlayer.pop();
+    // Remove Winner Display //
+    document.getElementById('winner-display').remove();
     // Remove All Cards From Play Field //
     document.querySelectorAll('.card').forEach(card => card.remove());
+    // Remove Winner Badge //
+    const removeBadge = document.getElementById('winner-badge');
+    if (removeBadge){
+        removeBadge.remove();
+    }
+
+
     // Reset PLayer Settings to default //
     // Object.entries(players).forEach(([k,v])=>{
         
@@ -230,29 +250,34 @@ function gameContinues(){
     return true;
 }
 
-function playerHold(){
-    // const activePlayer = filterPlayers('active', [true], false);
-    // Object.values(activePlayer)[0].pass = true;
-    const activePlayer = Object.values(filterPlayers('active', [true], false))[0];
-    activePlayer.pass = true;
-    nextPlayer();
-    enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
-    enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
+
+function holdVisual(cardsInHand){
+    Object.keys(cardsInHand).forEach((cardID)=>{
+        addClassToElement(cardsDB[cardID].elem, 'hold')
+    })
 }
 
 
 function activeVisual(cardsInHand, active){
     // console.log('cardsInHand', cardsInHand)
     Object.keys(cardsInHand).forEach((cardID)=>{
-        const cardElem = cardsDB[cardID].elem
+        // const cardElem = cardsDB[cardID].elem
         if (active){
             
-            addClassToElement(cardElem, 'active');
+            addClassToElement(cardsDB[cardID].elem, 'active');
         }
         if (!active){
-            removeClassFromElement(cardElem, 'active');
+            removeClassFromElement(cardsDB[cardID].elem, 'active');
         }
     });
+}
+
+
+
+function displayWinnerBadge(player){
+    const badgeElem = createWinnerBadgeElem();
+    const badgePos = calcWinnerBadgePos(player)
+    badgeElem.style = `width: ${winnerBadge.width}px; height: ${winnerBadge.height}px; line-height:${winnerBadge.line}px; transform: translate(${badgePos[0]}px,${badgePos[1]}px);`
 }
 
 
@@ -290,6 +315,7 @@ function nextPlayer(){
     if (score == 31){
         if (winner.name == 'None'){
             winner.name = previousPlayer.name;
+            displayWinnerBadge(previousPlayer);
         }
     }
 
@@ -507,17 +533,17 @@ function playCards(){
 
 
 function playerHold(){
-    const activePlayer = filterPlayers('active', [true], false);
-    Object.values(activePlayer)[0].pass = true;
+    const activePlayer = Object.values(filterPlayers('active', [true], false))[0];
+    activePlayer.pass = true;
+    holdVisual(activePlayer['cards-in-hand']);
     console.log('PLAYER PASS:', Object.values(activePlayer)[0].name);
 
-    if (!Object.values(activePlayer)[0].auto){
+    if (!activePlayer.auto){
         enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
         enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
     }
     
 }
-
 
 
 // Swap Hand with Bank //
@@ -1606,6 +1632,28 @@ function repositionCards(playersArr=[]){
 }
 
 
+function calcWinnerBadgePos(player){
+    let emptySpaceX = ((cssViewPort.width * viewPortDimension.width) - winnerBadge.width - winnerBadge.border) / 2;
+    let emptySpaceY = ((cssViewPort.height * viewPortDimension.height) - winnerBadge.height - winnerBadge.border) / 2 ;
+    let badgePos = []
+
+    if (player.location == 'south'){
+        badgePos = [emptySpaceX,zonesPos.south + (cardDimensions.height - winnerBadge.height - 2 * winnerBadge.border) / 2] 
+    }
+    if (player.location == 'west'){
+        badgePos = [zonesPos.west, emptySpaceY] 
+    }
+    if (player.location == 'north'){
+        badgePos = [emptySpaceX,zonesPos.north + (cardDimensions.height - winnerBadge.height - 2 * winnerBadge.border) / 2] 
+    }
+    if (player.location == 'east'){
+        badgePos = [zonesPos.east, emptySpaceY] 
+    }
+
+    return badgePos;
+}
+
+
 function calcCardPositions(player, stacked=true){
     let cardsInHand = player['cards-in-hand'];
     let widthHand = 0;
@@ -2015,6 +2063,17 @@ function createCard(){
 }
 
 
+function createWinnerBadgeElem(){
+    const badgeElem = document.createElement('div');
+    addClassToElement(badgeElem, 'badge');
+    addIdToElement(badgeElem, 'winner-badge');
+    const badgeText = document.createTextNode('31');
+    addChildElement(badgeElem, badgeText);
+    addChildElement(playFieldElem, badgeElem);
+    return badgeElem;
+}
+
+
 function createElement(elemType){
     return document.createElement(elemType);
 }
@@ -2154,9 +2213,21 @@ function cardHoverEffect(hoverElem, reverse=false){
     let hoverX = offset.hoverx;
     let hoverY = offset.hovery;
 
+    // if (reverse){
+    //     hoverX = -1 * hoverX;
+    //     hoverY = -1 * hoverY;
+    // }
+
     if (reverse){
-        hoverX = -1 * hoverX;
-        hoverY = -1 * hoverY;
+        // If card has not recieved a mouseenter event //
+        if (Number.parseInt(matrix3D[13]) == parseInt(deckPos.y) || Number.parseInt(matrix3D[13]) == parseInt(zonesPos.south)){
+            hoverX = 0;
+            hoverY = 0;
+        }else{
+            hoverX = -1 * hoverX;
+            hoverY = -1 * hoverY;
+        }
+        
     }
 
     matrix3D[12] = Number(matrix3D[12]) - hoverX;
