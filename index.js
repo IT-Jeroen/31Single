@@ -128,11 +128,12 @@ function loadGame(){
             players[0].name = playerName.value;
             players[0].auto = false;
             playerEntry.remove();
-            playCardsBtn = createPlayCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
-            holdCardsBtn = createHoldCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
-            swapBankBtn = createSwapBankBtn(((cssViewPort.width * viewPortDimension.width) / 2 + handWidth.stacked), zonesPos.south + 0.5 * cardDimensions.height);
         }   
     }, 500);
+
+    playCardsBtn = createPlayCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
+    holdCardsBtn = createHoldCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
+    swapBankBtn = createSwapBankBtn(((cssViewPort.width * viewPortDimension.width) / 2 + handWidth.stacked), zonesPos.south + 0.5 * cardDimensions.height);
 
     // Deal Cards //
     setTimeout(()=>{
@@ -180,6 +181,10 @@ function resetGame(){
     cardPickedPlayer.pop();
     // Remove Winner Display //
     document.getElementById('winner-display').remove();
+    // Remove Buttons //
+    // document.getElementById('hold-cards-btn').remove();
+    // document.getElementById('swap-bank-btn').remove();
+    // document.getElementById('play-cards-btn').remove();
     // Remove All Cards From Play Field //
     document.querySelectorAll('.card').forEach(card => card.remove());
     // Remove Winner Badge //
@@ -347,7 +352,12 @@ function infiniteLoopCheck(player, pickedCard){
 
     player['last-dropped-cards'].push(pickedCard);
 
-    if (player['last-dropped-cards'].length == 3){
+    // Still an infinite loop in a cycle of 3 cards//
+    // if (player['last-dropped-cards'].length == 3){
+    //     player['last-dropped-cards'].shift()
+    // }
+
+    if (player['last-dropped-cards'].length == 4){
         player['last-dropped-cards'].shift()
     }
 
