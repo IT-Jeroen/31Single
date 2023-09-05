@@ -18,11 +18,11 @@ const matrix270Flipped = [0,1,0,-1,0,0,-1]; // 270 degree z axis
 // Cards In Hand Object = "Clubs-8" :{ x: 425, y: 870 }} //
 // Keep elem cards-in-hand as well for quicker search ??? (cards-in-hand.length vs cards-in cardsDB.length) //
 const players = {
-    0: {"name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix0, 'pass': false, 'active':false, 'auto':false},
-    1: {"name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix90Flipped, 'pass': false, 'active':false, 'auto':true},
-    2: {"name":'Dad', "location": 'north', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix180Flipped, 'pass': false, 'active':false, 'auto':true},
-    3: {"name":'Mum', "location": 'east', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix270Flipped, 'pass': false, 'active':false, 'auto':true},
-    4: {"name":'Bank', "location": 'center', 'cards-in-hand':{}, 'wins': 0, 'loses': 0, 'orientation': matrix0, 'pass': true, 'active':false, 'auto':false},
+    0: {"name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'last-dropped-cards': [],'wins': 0, 'loses': 0, 'orientation': matrix0, 'pass': false, 'active':false, 'auto':false},
+    1: {"name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix90Flipped, 'pass': false, 'active':false, 'auto':true},
+    2: {"name":'Dad', "location": 'north', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix180Flipped, 'pass': false, 'active':false, 'auto':true},
+    3: {"name":'Mum', "location": 'east', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix270Flipped, 'pass': false, 'active':false, 'auto':true},
+    4: {"name":'Bank', "location": 'center', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix0, 'pass': true, 'active':false, 'auto':false},
 }
 
 // const charValues = {'A':11, 'K':10, 'Q':10, 'J': 10};
@@ -167,12 +167,12 @@ function loadGame(){
 }
 
 
-function activateCards(player){
-    const cardsInHand = Object.keys(player['cards-in-hand'])
-    cardsInHand.forEach(cardID => {
-        cardsDB[cardID].access = true;
-    });
-}
+// function activateCards(player){
+//     const cardsInHand = Object.keys(player['cards-in-hand'])
+//     cardsInHand.forEach(cardID => {
+//         cardsDB[cardID].access = true;
+//     });
+// }
 
 
 // function resetHoverEffect(){
@@ -350,8 +350,19 @@ function nextPlayer(){
             const autoPlayerCardsInHand = activePlayer['cards-in-hand'];
             const cardsInBank = bank['cards-in-hand'];
             const autoPickedCards = autoPickACard(autoPlayerCardsInHand, cardsInBank);
-            const autoPickedBankCard = autoPickedCards[0];
+            // const autoPickedBankCard = autoPickedCards[0];
+            const autoPickedBankCard = infiniteLoopCheck(activePlayer, autoPickedCards[0]);
             const autoPickedPlayerCard = autoPickedCards[1];
+
+            // if (activePlayer['last-dropped-card'] == autoPickedBankCard){
+            //     autoPickedBankCard = 'Player Pass';
+            //     console.log("INFINITE LOOP STOP");
+            // }else{
+            //     activePlayer['last-dropped-card'] = autoPickedPlayerCard;
+            // }
+
+            // Cannot set value to constent
+            // autoPickedBankCard = infiniteLoopCheck(activePlayer, autoPickedBankCard);
 
             // If al other player pass , the last player will pass after the last turn //
             // Game Rule || Prevent Infinite Loop//
@@ -420,6 +431,23 @@ function stopLoop(){
     })
 }
 
+function infiniteLoopCheck(player, pickedCard){
+    // const droppedCards = player['last-dropped-cards'];
+
+    if(player['last-dropped-cards'].some(cardID => cardID == pickedCard)){
+        console.log("INFINITE LOOP STOP", player.name);
+        return 'Player Pass';
+    }
+
+    player['last-dropped-cards'].push(pickedCard);
+
+    if (player['last-dropped-cards'].length == 3){
+        player['last-dropped-cards'].shift()
+    }
+
+    return pickedCard;
+
+}
 
 // function winnersAndLosers(){
 //     let topScore = 0;
@@ -536,7 +564,7 @@ function playerHold(){
     const activePlayer = Object.values(filterPlayers('active', [true], false))[0];
     activePlayer.pass = true;
     holdVisual(activePlayer['cards-in-hand']);
-    console.log('PLAYER PASS:', Object.values(activePlayer)[0].name);
+    console.log('PLAYER PASS:', activePlayer.name);
 
     if (!activePlayer.auto){
         enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
