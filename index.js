@@ -236,6 +236,10 @@ function resetGame(){
 
     // Reset cardsDB //
 
+    Object.keys(cardsDB).forEach(cardID =>{
+        delete cardsDB[cardID];
+    })
+
     loadGame();
 
 }
@@ -432,7 +436,6 @@ function stopLoop(){
 }
 
 function infiniteLoopCheck(player, pickedCard){
-    // const droppedCards = player['last-dropped-cards'];
 
     if(player['last-dropped-cards'].some(cardID => cardID == pickedCard)){
         console.log("INFINITE LOOP STOP", player.name);
@@ -569,8 +572,7 @@ function playerHold(){
     if (!activePlayer.auto){
         enableDisablePlayHoldBtn(holdCardsBtn, 'hidden');
         enableDisablePlayHoldBtn(swapBankBtn, 'hidden');
-    }
-    
+    }  
 }
 
 
@@ -1561,13 +1563,15 @@ function createRandomDeckValues(numCards, minValue='2', maxValue='ace'){
     const max = cardValues.indexOf(maxValue)+1;
     const cardRange = cardValues.slice(min, max);
 
+    let randomIndex = 0;
+
     // Can be miss-aligned //
     if (cardRange.length > numCards){
         console.log('Card Value Range not inline with Number of Playing Cards per Player')
     }
 
-    let cardsInGame = [];
-    const cardsInDeck = [];
+    const cardsInGame = [];
+    // const cardsInDeck = [];
 
     cardRange.forEach(value => {
         cardSymbols.forEach(symbol => {
@@ -1576,15 +1580,53 @@ function createRandomDeckValues(numCards, minValue='2', maxValue='ace'){
     })
 
     // Randomize cards //
-    for (let i= 0; i < numCards; i++){
-        let pickIndex = Math.floor(Math.random() * (cardsInGame.length));
-        cardsInDeck.push(cardsInGame[pickIndex]);
-        // Adjust length cardsInGame //
-        cardsInGame.splice(pickIndex, 1);
-    }
+    for (let index = cardsInGame.length - 1; index > 0; index--){
+        
+        randomIndex = Math.floor(Math.random() * (index + 1));
+        [cardsInGame[index], cardsInGame[randomIndex]] = [cardsInGame[randomIndex], cardsInGame[index]]
+        
+      }
+    console.log(cardsInGame);
+    const pickIndex = Math.floor(Math.random() * (cardsInGame.length - numCards));
+    const cardsInDeck = cardsInGame.slice(pickIndex, pickIndex + numCards);
+    
+    console.log(cardsInDeck);
 
     return cardsInDeck;
 }
+
+// function createRandomDeckValues(numCards, minValue='2', maxValue='ace'){
+//     const cardValues = ['2','3','4','5','6','7','8','9','10','jack', 'queen', 'king', 'ace'];
+//     const cardSymbols = ['club', 'diamond', 'heart', 'spade'];
+
+//     const min = cardValues.indexOf(minValue);
+//     const max = cardValues.indexOf(maxValue)+1;
+//     const cardRange = cardValues.slice(min, max);
+
+//     // Can be miss-aligned //
+//     if (cardRange.length > numCards){
+//         console.log('Card Value Range not inline with Number of Playing Cards per Player')
+//     }
+
+//     let cardsInGame = [];
+//     const cardsInDeck = [];
+
+//     cardRange.forEach(value => {
+//         cardSymbols.forEach(symbol => {
+//             cardsInGame.push(`${symbol}_${value}`);
+//         })
+//     })
+
+//     // Randomize cards //
+//     for (let i= 0; i < numCards; i++){
+//         let pickIndex = Math.floor(Math.random() * (cardsInGame.length));
+//         cardsInDeck.push(cardsInGame[pickIndex]);
+//         // Adjust length cardsInGame //
+//         cardsInGame.splice(pickIndex, 1);
+//     }
+
+//     return cardsInDeck;
+// }
 
 
 // function repositionCards(playersID){
