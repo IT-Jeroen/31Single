@@ -18,9 +18,9 @@ const matrix270Flipped = [0,1,0,-1,0,0,-1]; // 270 degree z axis
 // Cards In Hand Object = "Clubs-8" :{ x: 425, y: 870 }} //
 const players = {
     0: {"name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'last-dropped-cards': [],'wins': 0, 'loses': 0, 'orientation': matrix0, 'pass': false, 'active':false, 'auto':false},
-    1: {"name":'Ziva', "location": 'west', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix90Flipped, 'pass': false, 'active':false, 'auto':true},
-    2: {"name":'Dad', "location": 'north', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix180Flipped, 'pass': false, 'active':false, 'auto':true},
-    3: {"name":'Mum', "location": 'east', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix270Flipped, 'pass': false, 'active':false, 'auto':true},
+    1: {"name":'Player East', "location": 'west', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix90Flipped, 'pass': false, 'active':false, 'auto':true},
+    2: {"name":'Player North', "location": 'north', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix180Flipped, 'pass': false, 'active':false, 'auto':true},
+    3: {"name":'East', "location": 'east', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix270Flipped, 'pass': false, 'active':false, 'auto':true},
     4: {"name":'Bank', "location": 'center', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix0, 'pass': true, 'active':false, 'auto':false},
 }
 
