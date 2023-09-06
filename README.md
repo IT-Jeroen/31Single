@@ -29,4 +29,3 @@
 ## Running The Game:  
 * The game runs as a github page: [31Single](https://it-jeroen.github.io/31Single/)  
 * Run the game localy: Download index.html, index.js and styles.css into the same folder. Open index.html with a web browser 
-* Run the game localy: Download index.html, index.js and styles.css into the same folder. Open index.html with a web browser 
