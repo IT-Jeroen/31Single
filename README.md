@@ -1,13 +1,13 @@
 # 31 Single  
 
 ## Game Rules:  
-* The purpose of this card game is to score 31 points, and or to not score the lowest number of points.  
+* The purpose of this card game is to score 31 points, and or not to score the lowest number of points.  
 * All number cards are worth their number value, All picture cards are worth 10 points, except Aces, which are worth 11 points.  
 * You need to collect three cards from the same suite (heart, club, spade, diamond) to be able to collect 31.  
 * You can collect three different suite cards with the same rank which will give you a score of 30.5 (Also with 3 aces).  
 * If one player scores 31, all other players will get one last turn. (A badge displaying 31 will appear)  
 * If all other players fold/hold then the the last player will get one last turn. (A player who folds/hold will display a red stroke around the cards)  
-* An orange stroke will appear around the cards of the auto-player who turn it is.  
+* An orange stroke will appear around the cards of the auto-player who's turn it is.  
 
 ## Purpose:  
 * The purpose of this project is to build up a portfolio as my resume, to display my skills for an entry-level full-stack web develloper job.  
@@ -20,7 +20,7 @@
 	
 ## Future Desires:  
 * I would like to look into async functions to get rid of the timeOut delays as the outcome of that is probably system dependent.  
-* I would like to add some quesing for the autoplayer, or for it to alter it train of thoughts to make the conditions for breaking the infinite loop.  
+* I would like to add some quesing for the autoplayer, or for it to alter it train of thoughts to make changes to the conditions for breaking the infinite loop.  
 * I would like to turn this single player version into a multi player version.  
 * Intergrate css variables and js variables more tightly from a single source  
 	
