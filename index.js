@@ -49,7 +49,7 @@ const displayPos = {'x': (viewPortDimension.width * 0.5) - (infoDisplay.width * 
 const cardDimensions = {'width': imageDimensions.width * viewPortScale.scale, 'height': imageDimensions.height * viewPortScale.scale};
 const offset = {'stacked':40 * viewPortScale.scale, 'hoverx':5, 'hovery':40 * viewPortScale.scale};
 const handWidth = {'stacked': (cardDimensions.width + ((numPlayersCards -1) * offset.stacked)), 'unstacked': (numPlayersCards * cardDimensions.width)};
-const btnDimensions = {'width': handWidth.stacked, 'height': null};
+const btnDimensions = {'width': handWidth.stacked, 'height': null, 'font': 1.5 * viewPortScale.scale};
 const centerPos = {'x': (cssViewPort.width * viewPortDimension.width) / 2,'y': (cssViewPort.height * viewPortDimension.height) / 2};
 const deckPos = {'x': centerPos.x - (cardDimensions.width / 2), 'y': centerPos.y - (cardDimensions.height /2)};
 const minViewPortDimensions = {'width': ((numPlayersCards -1) * cardDimensions.height) + (numPlayersCards * cardDimensions.width) + 80, 'height': (3 * cardDimensions.height) + 80};
@@ -1357,7 +1357,7 @@ function displayGameResults(names, score){
 
 function createHoldCardsBtn(x,y){
     const btnElem = createElem('div', ['hidden', 'play-hold-swap-btn'], 'hold-cards-btn');
-    btnElem.style = `width: ${btnDimensions.width}px; transform: translate(${x}px,${y}px);`;
+    btnElem.style = `width: ${btnDimensions.width}px; font-size: ${btnDimensions.font}em; transform: translate(${x}px,${y}px);`;
     const btnText = document.createTextNode('Hold');
     addChildElement(btnElem, btnText);
     addChildElement(playFieldElem, btnElem);
@@ -1369,7 +1369,7 @@ function createHoldCardsBtn(x,y){
 
 function createPlayCardsBtn(x,y){
     const btnElem = createElem('div', ['hidden', 'play-hold-swap-btn'], 'play-cards-btn');
-    btnElem.style = `width: ${btnDimensions.width}px; transform: translate(${x}px,${y}px);`;
+    btnElem.style = `width: ${btnDimensions.width}px; font-size: ${btnDimensions.font}em; transform: translate(${x}px,${y}px);`;
     const btnText = document.createTextNode('Play Cards');
     addChildElement(btnElem, btnText);
     addChildElement(playFieldElem, btnElem);
@@ -1381,7 +1381,7 @@ function createPlayCardsBtn(x,y){
 
 function createSwapBankBtn(x,y){
     const btnElem = createElem('div', ['hidden', 'play-hold-swap-btn'], 'swap-bank-btn');
-    btnElem.style = `width: ${btnDimensions.width}px; transform: translate(${x}px,${y}px);`;
+    btnElem.style = `width: ${btnDimensions.width}px; font-size: ${btnDimensions.font}em; transform: translate(${x}px,${y}px);`;
     const btnText = document.createTextNode('Swap Bank');
     addChildElement(btnElem, btnText);
     addChildElement(playFieldElem, btnElem);
