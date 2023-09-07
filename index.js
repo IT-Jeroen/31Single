@@ -49,7 +49,7 @@ const displayPos = {'x': (viewPortDimension.width * 0.5) - (infoDisplay.width * 
 const cardDimensions = {'width': imageDimensions.width * viewPortScale.scale, 'height': imageDimensions.height * viewPortScale.scale};
 const offset = {'stacked':40 * viewPortScale.scale, 'hoverx':5, 'hovery':40 * viewPortScale.scale};
 const handWidth = {'stacked': (cardDimensions.width + ((numPlayersCards -1) * offset.stacked)), 'unstacked': (numPlayersCards * cardDimensions.width)};
-const btnDimensions = {'width': handWidth.stacked, 'height': null, 'font': 1.5 * viewPortScale.scale};
+const btnDimensions = {'width': 250, 'height': null, 'font': 1.5 * viewPortScale.scale, 'padding': 1 * viewPortScale};
 const centerPos = {'x': (cssViewPort.width * viewPortDimension.width) / 2,'y': (cssViewPort.height * viewPortDimension.height) / 2};
 const deckPos = {'x': centerPos.x - (cardDimensions.width / 2), 'y': centerPos.y - (cardDimensions.height /2)};
 const minViewPortDimensions = {'width': ((numPlayersCards -1) * cardDimensions.height) + (numPlayersCards * cardDimensions.width) + 80, 'height': (3 * cardDimensions.height) + 80};
@@ -98,7 +98,15 @@ function calculateVariables(){
 
     handWidth.stacked = (cardDimensions.width + ((numPlayersCards -1) * offset.stacked));
     handWidth.unstacked = (numPlayersCards * cardDimensions.width)
-    btnDimensions.width = handWidth.stacked;
+
+    btnDimensions.width = btnDimensions.width * viewPortScale.scale;
+    btnDimensions.font = btnDimensions.font * viewPortScale.scale;
+    btnDimensions.padding = btnDimensions.padding * viewPortScale.scale;
+
+    infoDisplay.width = (viewPortDimension.width * 0.4) * viewPortScale.scale;
+    infoDisplay.height = (viewPortDimension.height / 6.5) * viewPortScale.scale;
+    infoDisplay.padding = infoDisplay.padding * viewPortScale.scale;
+    infoDisplay.font = infoDisplay.font * viewPortScale.scale;
 
     zonesPos.south = (cssViewPort.height * viewPortDimension.height) - cardDimensions.height;
     zonesPos.west = (cardDimensions.height - cardDimensions.width) /2;
@@ -1008,11 +1016,11 @@ function createRandomDeckValues(numCards, minValue='2', maxValue='ace'){
         [cardsInGame[index], cardsInGame[randomIndex]] = [cardsInGame[randomIndex], cardsInGame[index]]
         
       }
-    console.log(cardsInGame);
+    // console.log(cardsInGame);
     const pickIndex = Math.floor(Math.random() * (cardsInGame.length - numCards));
     const cardsInDeck = cardsInGame.slice(pickIndex, pickIndex + numCards);
     
-    console.log(cardsInDeck);
+    // console.log(cardsInDeck);
 
     return cardsInDeck;
 }
@@ -1355,9 +1363,10 @@ function displayGameResults(names, score){
 }
 
 
+
 function createHoldCardsBtn(x,y){
     const btnElem = createElem('div', ['hidden', 'play-hold-swap-btn'], 'hold-cards-btn');
-    btnElem.style = `width: ${btnDimensions.width}px; font-size: ${btnDimensions.font}em; transform: translate(${x}px,${y}px);`;
+    btnElem.style = `width: ${btnDimensions.width}px; font-size: ${btnDimensions.font}em; border-radius: ${btnDimensions.padding}em; padding-top: ${btnDimensions.padding}em; padding-bottom: ${btnDimensions.padding}em; transform: translate(${x}px,${y}px);`;
     const btnText = document.createTextNode('Hold');
     addChildElement(btnElem, btnText);
     addChildElement(playFieldElem, btnElem);
@@ -1636,4 +1645,5 @@ function mouseLeaveEffect(elem){
 
 
 ///////////////////////// CREATE START POINT ////////////////////////////////
+calculateVariables();
 displayPlayerEntry();
