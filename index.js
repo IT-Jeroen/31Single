@@ -105,15 +105,19 @@ function calculateVariables(){
     if (viewPortScale.scale <= 0.45){
         let fontScale = 0.7;
         btnDimensions.width = 100;
-        btnDimensions.font = btnDimensions.font *  fontScale;
-        btnDimensions.padding = btnDimensions.padding * fontScale;
+        btnDimensions.font = buttonSpecs.font *  fontScale;
+        btnDimensions.padding = buttonSpecs.padding * fontScale;
     }else{
         let fontScale = (viewPortScale.scale * 0.55) + (0.45);
-        btnDimensions.width = btnDimensions.width * viewPortScale.scale;
-        btnDimensions.font = btnDimensions.font *  fontScale;
-        btnDimensions.padding = btnDimensions.padding * fontScale;
+        btnDimensions.width = buttonSpecs.width * viewPortScale.scale;
+        btnDimensions.font = buttonSpecs.font *  fontScale;
+        btnDimensions.padding = buttonSpecs.padding * fontScale;
     }
 
+    winnerBadge.width = 160 * viewPortScale.scale;
+    winnerBadge.height = 160 * viewPortScale.scale;
+    winnerBadge.line = 160 * viewPortScale.scale;
+    winnerBadge.font = 500 * viewPortScale.scale;
 
     infoDisplay.width = (viewPortDimension.width * 0.6);
     infoDisplay.height = (viewPortDimension.height / 5);
