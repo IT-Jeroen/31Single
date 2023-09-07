@@ -93,8 +93,9 @@ function calculateVariables(){
 
 
     cardDimensions.width = imageDimensions.width * viewPortScale.scale;
-    cardDimensions.height = imageDimensions.height * viewPortScale.scale
-    offset.stacked = 40 * viewPortScale.scale;
+    cardDimensions.height = imageDimensions.height * viewPortScale.scale;
+    // For better access to cards on small screens //
+    // offset.stacked = 40 * viewPortScale.scale;
     offset.hovery = 40 * viewPortScale.scale
 
     handWidth.stacked = (cardDimensions.width + ((numPlayersCards -1) * offset.stacked));
@@ -243,10 +244,10 @@ function resetGame(){
         delete cardsDB[cardID];
     })
 
-    btnDimensions.width = buttonSpecs.width * viewPortScale.scale;
-    btnDimensions.height = null;
-    btnDimensions.font = buttonSpecs.font * viewPortScale.scale;
-    btnDimensions.padding = buttonSpecs.padding * viewPortScale.scale;
+    // btnDimensions.width = buttonSpecs.width * viewPortScale.scale;
+    // btnDimensions.height = null;
+    // btnDimensions.font = buttonSpecs.font * viewPortScale.scale;
+    // btnDimensions.padding = buttonSpecs.padding * viewPortScale.scale;
 
     loadGame();
 
@@ -1127,7 +1128,7 @@ function calcCardPositions(player, stacked=true){
     }
     
     let emptySpaceX = ((cssViewPort.width * viewPortDimension.width) - widthHand) / 2;
-    let emptySpaceY = ((cssViewPort.height * viewPortDimension.height) - widthHand) / 2 - offset.stacked;
+    let emptySpaceY = ((cssViewPort.height * viewPortDimension.height) - widthHand) / 2 - (offset.stacked / 2);
 
     if (player.location == 'south'){
         Object.keys(cardsInHand).forEach((cardId, index) => {
