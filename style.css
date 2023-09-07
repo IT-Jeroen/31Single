@@ -26,15 +26,16 @@ body {
 
 .player-display{
     position: absolute;
-    width: var(--player-display-width);
-    height: var(--player-display-height);
+    /* width: var(--player-display-width); */
+    /* height: var(--player-display-height); */
     background-color: gray;
     border: 5px solid white;
-    transform: translate(calc(50vw - calc(var(--player-display-width) / 2) - var(--border-radius)), calc(50vh - var(--field-size) - calc(var(--player-display-height) / 2)));
-    border-radius: var(--border-radius);;
-    font: 1.5em sans-serif;
-    padding: var(--border-radius);
-    z-index: 100;
+    /* transform: translate(calc(50vw - calc(var(--player-display-width) / 2) - var(--border-radius)), calc(50vh - var(--field-size) - calc(var(--player-display-height) / 2))); */
+    /* border-radius: var(--border-radius);; */
+    font-family: sans-serif;
+    /* font: 1.5em sans-serif; */
+    /* padding: var(--border-radius); */
+    z-index: 200;
 }
 
 .full-width{
@@ -91,17 +92,17 @@ body {
     /* shape-outside: circle(50%) margin-box; */
     border-radius: 50%;
     background-color: rgb(223, 89, 0);
-    width: 160px;
-    height: 160px;
+    /* width: 160px;
+    height: 160px; */
     border: 5px solid white;
-    z-index: 200;
+    z-index: 100;
     box-shadow: 2px 2px 10px 3px rgba(0,0,0,.2);
     position: absolute;
     color: white;
-    font-size: 500%;
+    /* font-size: 500%; */
     font-weight:bold;
     text-align: center;
-    line-height: 160px;
+    /* line-height: 160px; */
     /* transform: translate(100px, 100px); */
 }
 
@@ -114,6 +115,7 @@ body {
 } */
 
 .playfield{
+    position: absolute;
     width: var(--field-width);
     height: var(--field-height);
     background-image: url("./src/img/wood-texture.jpg");

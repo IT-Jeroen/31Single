@@ -18,9 +18,15 @@ const matrix270Flipped = [0,1,0,-1,0,0,-1]; // 270 degree z axis
 // Cards In Hand Object = "Clubs-8" :{ x: 425, y: 870 }} //
 const players = {
     0: {"name":'Local Player', "location": 'south', 'cards-in-hand':{}, 'last-dropped-cards': [],'wins': 0, 'loses': 0, 'orientation': matrix0, 'pass': false, 'active':false, 'auto':false},
+<<<<<<< HEAD
     1: {"name":'Player East', "location": 'west', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix90Flipped, 'pass': false, 'active':false, 'auto':true},
     2: {"name":'Player North', "location": 'north', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix180Flipped, 'pass': false, 'active':false, 'auto':true},
     3: {"name":'East', "location": 'east', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix270Flipped, 'pass': false, 'active':false, 'auto':true},
+=======
+    1: {"name":'Player West', "location": 'west', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix90Flipped, 'pass': false, 'active':false, 'auto':true},
+    2: {"name":'Player North', "location": 'north', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix180Flipped, 'pass': false, 'active':false, 'auto':true},
+    3: {"name":'Player East', "location": 'east', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix270Flipped, 'pass': false, 'active':false, 'auto':true},
+>>>>>>> af8d174 (Moved translate and dimensions of infoDisplay from css to js)
     4: {"name":'Bank', "location": 'center', 'cards-in-hand':{}, 'last-dropped-cards': [], 'wins': 0, 'loses': 0, 'orientation': matrix0, 'pass': true, 'active':false, 'auto':false},
 }
 
@@ -43,7 +49,9 @@ const viewPortScale = {'scale': 1, 'x': 1, 'y': 1};
 const imageDimensions = {'width': 169, 'height': 244};
 const cssViewPort = {'width': 0.98, 'height': 0.98};
 
-const winnerBadge = {'width': 160 * viewPortScale.scale, 'height': 160 * viewPortScale.scale, 'line': 160 * viewPortScale.scale, 'border': 5};
+const winnerBadge = {'width': 160 * viewPortScale.scale, 'height': 160 * viewPortScale.scale, 'line': 160 * viewPortScale.scale, 'font': 500 * viewPortScale.scale,'border': 5};
+const infoDisplay = {'width': (viewPortDimension.width * 0.4) * viewPortScale.scale, 'height': (viewPortDimension.height / 6.5) * viewPortScale.scale, 'padding': 20 * viewPortScale.scale, 'font': 1.5 * viewPortScale.scale,'border': 5};
+const displayPos = {'x': (viewPortDimension.width * 0.5) - (infoDisplay.width * 0.5) - infoDisplay.border, 'y': (viewPortDimension.height * 0.5) - (infoDisplay.height * 0.5)};
 const cardDimensions = {'width': imageDimensions.width * viewPortScale.scale, 'height': imageDimensions.height * viewPortScale.scale};
 const offset = {'stacked':40 * viewPortScale.scale, 'hoverx':5, 'hovery':40 * viewPortScale.scale};
 const handWidth = {'stacked': (cardDimensions.width + ((numPlayersCards -1) * offset.stacked)), 'unstacked': (numPlayersCards * cardDimensions.width)};
@@ -250,7 +258,7 @@ function activeVisual(cardsInHand, active){
 function displayWinnerBadge(player){
     const badgeElem = createWinnerBadgeElem();
     const badgePos = calcWinnerBadgePos(player)
-    badgeElem.style = `width: ${winnerBadge.width}px; height: ${winnerBadge.height}px; line-height:${winnerBadge.line}px; transform: translate(${badgePos[0]}px,${badgePos[1]}px);`
+    badgeElem.style = `width: ${winnerBadge.width}px; height: ${winnerBadge.height}px; line-height:${winnerBadge.line}px; font-size: ${winnerBadge.font}%; transform: translate(${badgePos[0]}px,${badgePos[1]}px);` 
 }
 
 
@@ -1311,6 +1319,8 @@ function displayPlayerEntry(){
     addChildElement(playerDisplay, startGameBtn);
 
     addChildElement(backgroundElem, playerDisplay);
+
+    playerDisplay.style = `width: ${infoDisplay.width}px; font-size: ${infoDisplay.font}em; padding: ${infoDisplay.padding}px; border-radius: ${infoDisplay.padding}px; transform: translate(${displayPos.x}px, ${displayPos.y}px);`
 }
 
 
@@ -1346,6 +1356,8 @@ function displayGameResults(names, score){
     
     addChildElement(winnerDisplay, restartGameBtn);
     addChildElement(backgroundElem, winnerDisplay);
+
+    winnerDisplay.style = `width: ${infoDisplay.width}px; font-size: ${infoDisplay.font}em; padding: ${infoDisplay.padding}px; border-radius: ${infoDisplay.padding}px; transform: translate(${displayPos.x}px, ${displayPos.y}px);`
 }
 
 
