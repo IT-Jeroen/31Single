@@ -42,14 +42,15 @@ const viewPortScale = {'scale': 1, 'x': 1, 'y': 1};
 
 const imageDimensions = {'width': 169, 'height': 244};
 const cssViewPort = {'width': 0.98, 'height': 0.98};
+const buttonSpecs = {'width': 250, 'height': null, 'font': 1.5, 'padding': 1};
 
 const winnerBadge = {'width': 160 * viewPortScale.scale, 'height': 160 * viewPortScale.scale, 'line': 160 * viewPortScale.scale, 'font': 500 * viewPortScale.scale,'border': 5};
-const infoDisplay = {'width': (viewPortDimension.width * 0.4) * viewPortScale.scale, 'height': (viewPortDimension.height / 6.5) * viewPortScale.scale, 'padding': 20 * viewPortScale.scale, 'font': 1.5 * viewPortScale.scale,'border': 5};
+const infoDisplay = {'width': (viewPortDimension.width * 0.6) * viewPortScale.scale, 'height': (viewPortDimension.height / 5) * viewPortScale.scale, 'padding': 20 * viewPortScale.scale, 'font': 1.5 * viewPortScale.scale,'border': 5};
 const displayPos = {'x': (viewPortDimension.width * 0.5) - (infoDisplay.width * 0.5) - infoDisplay.border, 'y': (viewPortDimension.height * 0.5) - (infoDisplay.height * 0.5)};
 const cardDimensions = {'width': imageDimensions.width * viewPortScale.scale, 'height': imageDimensions.height * viewPortScale.scale};
 const offset = {'stacked':40 * viewPortScale.scale, 'hoverx':5, 'hovery':40 * viewPortScale.scale};
 const handWidth = {'stacked': (cardDimensions.width + ((numPlayersCards -1) * offset.stacked)), 'unstacked': (numPlayersCards * cardDimensions.width)};
-const btnDimensions = {'width': 250, 'height': null, 'font': 1.5 * viewPortScale.scale, 'padding': 1 * viewPortScale};
+const btnDimensions = {'width': buttonSpecs.width * viewPortScale.scale, 'height': null, 'font': buttonSpecs.font * viewPortScale.scale, 'padding': buttonSpecs.padding * viewPortScale.scale};
 const centerPos = {'x': (cssViewPort.width * viewPortDimension.width) / 2,'y': (cssViewPort.height * viewPortDimension.height) / 2};
 const deckPos = {'x': centerPos.x - (cardDimensions.width / 2), 'y': centerPos.y - (cardDimensions.height /2)};
 const minViewPortDimensions = {'width': ((numPlayersCards -1) * cardDimensions.height) + (numPlayersCards * cardDimensions.width) + 80, 'height': (3 * cardDimensions.height) + 80};
@@ -99,14 +100,27 @@ function calculateVariables(){
     handWidth.stacked = (cardDimensions.width + ((numPlayersCards -1) * offset.stacked));
     handWidth.unstacked = (numPlayersCards * cardDimensions.width)
 
-    btnDimensions.width = btnDimensions.width * viewPortScale.scale;
-    btnDimensions.font = btnDimensions.font * viewPortScale.scale;
-    btnDimensions.padding = btnDimensions.padding * viewPortScale.scale;
 
-    infoDisplay.width = (viewPortDimension.width * 0.4) * viewPortScale.scale;
-    infoDisplay.height = (viewPortDimension.height / 6.5) * viewPortScale.scale;
-    infoDisplay.padding = infoDisplay.padding * viewPortScale.scale;
-    infoDisplay.font = infoDisplay.font * viewPortScale.scale;
+
+    if (viewPortScale.scale <= 0.45){
+        let fontScale = 0.7;
+        btnDimensions.width = 100;
+        btnDimensions.font = btnDimensions.font *  fontScale;
+        btnDimensions.padding = btnDimensions.padding * fontScale;
+    }else{
+        let fontScale = (viewPortScale.scale * 0.55) + (0.45);
+        btnDimensions.width = btnDimensions.width * viewPortScale.scale;
+        btnDimensions.font = btnDimensions.font *  fontScale;
+        btnDimensions.padding = btnDimensions.padding * fontScale;
+    }
+
+
+    infoDisplay.width = (viewPortDimension.width * 0.6);
+    infoDisplay.height = (viewPortDimension.height / 5);
+
+
+    displayPos.x = (viewPortDimension.width * 0.5) - (infoDisplay.width * 0.5) - infoDisplay.padding - infoDisplay.border;
+    displayPos.y = (viewPortDimension.height * 0.5) - (infoDisplay.height * 0.5) - infoDisplay.padding - infoDisplay.border;
 
     zonesPos.south = (cssViewPort.height * viewPortDimension.height) - cardDimensions.height;
     zonesPos.west = (cardDimensions.height - cardDimensions.width) /2;
@@ -141,9 +155,13 @@ function loadGame(){
         }   
     }, 500);
 
-    playCardsBtn = createPlayCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
-    holdCardsBtn = createHoldCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
-    swapBankBtn = createSwapBankBtn(((cssViewPort.width * viewPortDimension.width) / 2 + handWidth.stacked), zonesPos.south + 0.5 * cardDimensions.height);
+    // playCardsBtn = createPlayCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
+    // holdCardsBtn = createHoldCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked * 2)), zonesPos.south + 0.5 * cardDimensions.height);
+    // swapBankBtn = createSwapBankBtn(((cssViewPort.width * viewPortDimension.width) / 2 + handWidth.stacked), zonesPos.south + 0.5 * cardDimensions.height);
+
+    playCardsBtn = createPlayCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked / 2) - btnDimensions.width - 20), zonesPos.south + 0.5 * cardDimensions.height);
+    holdCardsBtn = createHoldCardsBtn(((cssViewPort.width * viewPortDimension.width) / 2 - (handWidth.stacked / 2) - btnDimensions.width - 20), zonesPos.south + 0.5 * cardDimensions.height);
+    swapBankBtn = createSwapBankBtn(((cssViewPort.width * viewPortDimension.width) / 2 + (handWidth.stacked / 2) + 20), zonesPos.south + 0.5 * cardDimensions.height);
 
     // Deal Cards //
     setTimeout(()=>{
@@ -220,6 +238,11 @@ function resetGame(){
     Object.keys(cardsDB).forEach(cardID =>{
         delete cardsDB[cardID];
     })
+
+    btnDimensions.width = buttonSpecs.width * viewPortScale.scale;
+    btnDimensions.height = null;
+    btnDimensions.font = buttonSpecs.font * viewPortScale.scale;
+    btnDimensions.padding = buttonSpecs.padding * viewPortScale.scale;
 
     loadGame();
 
@@ -1378,7 +1401,7 @@ function createHoldCardsBtn(x,y){
 
 function createPlayCardsBtn(x,y){
     const btnElem = createElem('div', ['hidden', 'play-hold-swap-btn'], 'play-cards-btn');
-    btnElem.style = `width: ${btnDimensions.width}px; font-size: ${btnDimensions.font}em; transform: translate(${x}px,${y}px);`;
+    btnElem.style = `width: ${btnDimensions.width}px; font-size: ${btnDimensions.font}em; border-radius: ${btnDimensions.padding}em; padding-top: ${btnDimensions.padding}em; padding-bottom: ${btnDimensions.padding}em; transform: translate(${x}px,${y}px);`;
     const btnText = document.createTextNode('Play Cards');
     addChildElement(btnElem, btnText);
     addChildElement(playFieldElem, btnElem);
@@ -1390,7 +1413,7 @@ function createPlayCardsBtn(x,y){
 
 function createSwapBankBtn(x,y){
     const btnElem = createElem('div', ['hidden', 'play-hold-swap-btn'], 'swap-bank-btn');
-    btnElem.style = `width: ${btnDimensions.width}px; font-size: ${btnDimensions.font}em; transform: translate(${x}px,${y}px);`;
+    btnElem.style = `width: ${btnDimensions.width}px; font-size: ${btnDimensions.font}em; border-radius: ${btnDimensions.padding}em; padding-top: ${btnDimensions.padding}em; padding-bottom: ${btnDimensions.padding}em; transform: translate(${x}px,${y}px);`;
     const btnText = document.createTextNode('Swap Bank');
     addChildElement(btnElem, btnText);
     addChildElement(playFieldElem, btnElem);
