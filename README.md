@@ -1,31 +1,25 @@
 # 31 Single  
 
+[![button_play](https://github.com/IT-Jeroen/31Single/assets/55962983/302318c4-8570-4a8b-8f07-74cda87b6c4f)](https://it-jeroen.github.io/31Single/) 
+
+![31_ScreenShot](https://github.com/IT-Jeroen/31Single/assets/55962983/e73630f5-9e81-41ad-b279-c08c6cd8780b)
+
 ## Game Rules:  
 * The purpose of this card game is to score 31 points, and or not to score the lowest number of points.  
 * All number cards are worth their number value, All picture cards are worth 10 points, except Aces, which are worth 11 points.  
-* You need to collect three cards from the same suite (heart, club, spade, diamond) to be able to collect 31.  
-* You can collect three different suite cards with the same rank which will give you a score of 30.5 (Also with 3 aces). 
-* The first player (local player) has the option to swap all cards with the bank without having to fold, at its first turn.
-* Swapping all cards with the bank by default will end your turn, and will force you to fold/hold
+* You need to collect three cards from the same suite (heart, club, spade, diamond) to be able to collect 31, consisting of 1 ace and two 10 point cards.  
+* You can collect three different suite cards with the same rank which will give you a score of 30.5 (3 aces counts as 30.5 and not 33).  
+* If the bank (3 open cards the middle) has a good hand, you can swap your hand with the bank. This will action will by default end your turn and force you too fold/hold in the game. Use wisely!  
+* The first player (local player) has the option to swap all cards with the bank without having to fold/hold, only at its first turn. Swapping cards with the bank after the first turn will default back to the origional rule.  
 * If one player scores 31, all other players will get one last turn. (A badge displaying 31 will appear)  
 * If all other players fold/hold then the the last player will get one last turn. (A player who folds/hold will display a red stroke around the cards)  
-* An orange stroke will appear around the cards of the auto-player who's turn it is.  
+* An orange stroke will appear around the cards of the auto-player who's turn it is.
+* Each turn you can change ONE card in your hand with ONE card in the bank.
+* You can select and deselect cards as many times as you like by clicking. But only with ONE bank card and ONE hand card selected, will the Hold button change into a Play Cards button and finalize the action of changing cards and end your turn.
 
-## Purpose:  
-* The purpose of this project is to build up a portfolio as my resume, to display my skills for an entry-level full-stack web develloper job.  
+## Acknowledgements  
+The card images are generated and produced by this repo [SVG-cards](https://github.com/htdebeer/SVG-cards)
+Which in turn is build upon by these designs created by [David Bellot](https://svg-cards.sourceforge.net/)
+
 	
-## Challenges:  
-* Not knowing where to start or what works it took some time to work out the best way for placing cards in their designated zones.  
-* css tranform has some unexpected outcomes on translate when applying scale or rotate, and a mix of inline transform and css file transform doesn't work.  
-* There is a time difference between what gets rendered in the DOM and what gets processed as javaScript. Right now that is handled by adding timeOut delays.  
-* The number of possible moves the auto player can make is chalenging to predict. And it can easily lock into an infinte loop.  
-	
-## Future Desires:  
-* I would like to look into async functions to get rid of the timeOut delays as the outcome of that is probably system dependent.  
-* I would like to add some quesing for the autoplayer, or for it to alter it train of thoughts to make changes to the conditions for breaking the infinite loop.  
-* I would like to turn this single player version into a multi player version.  
-* Intergrate css variables and js variables more tightly from a single source  
-	
-## Running The Game:  
-* The game runs as a github page: [31Single](https://it-jeroen.github.io/31Single/)  
-* Run the game localy: Download index.html, index.js and styles.css into the same folder. Open index.html with a web browser 
+
